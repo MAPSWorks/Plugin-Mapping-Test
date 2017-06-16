@@ -1,0 +1,27 @@
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/gen/com/uavos/qgc/R.java \
+ : /home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-ro/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/drawable-hdpi/icon.png \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-fa/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-el/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/drawable-ldpi/icon.png \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-ru/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-et/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-zh-rCN/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-rs/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-it/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/drawable-mdpi/icon.png \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values/libs.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-pl/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-zh-rTW/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-ms/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/layout/splash.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-nl/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-es/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-id/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-de/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-ja/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-pt-rBR/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-nb/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/res/values-fr/strings.xml \
+/home/uavinda/Projects/uav/Software/gcu/src/gcu-map/android-build/bin/AndroidManifest.xml \
