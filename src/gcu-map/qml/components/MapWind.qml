@@ -1,7 +1,7 @@
-import QtQuick 2.2
+﻿import QtQuick 2.2
 import QtGraphicalEffects 1.0
 import "."
-import "../pfd"
+//import "../pfd"
 import "../components"
 
 

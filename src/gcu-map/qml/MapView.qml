@@ -1,4 +1,4 @@
-import QtQuick 2.2
+﻿import QtQuick 2.2
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.2
@@ -151,13 +151,13 @@ QmlMap {
 
 
     //Overlay items
-    MapWind {
+    /*MapWind {
         id: wind
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.topMargin: 4
         anchors.rightMargin: 4
-    }
+    }*/
 
     //top mission title bar
     Rectangle {
