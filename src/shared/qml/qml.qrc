@@ -20,21 +20,9 @@
         <file>hdg/hdg.svg</file>
         <file>hdg/HdgImage.qml</file>
         <file>hdg/NumberHdg.qml</file>
-        <file>pfd/Airspeed.qml</file>
-        <file>pfd/Altitude.qml</file>
-        <file>pfd/Flags.qml</file>
-        <file>pfd/Horizon.qml</file>
-        <file>pfd/Pfd.qml</file>
-        <file>pfd/pfd.svg</file>
-        <file>pfd/PfdImage.qml</file>
-        <file>pfd/Vspeed.qml</file>
         <file>components/Btn.qml</file>
         <file>components/ActionsMenu.qml</file>
         <file>videoCV.qml</file>
-        <file>pfd/Heading.qml</file>
-        <file>nav/Nav.qml</file>
-        <file>pfd/Wind.qml</file>
-        <file>pfd/ILS.qml</file>
         <file>components/TextLine.qml</file>
         <file>controls.qml</file>
         <file>components/Pages.qml</file>
@@ -44,6 +32,5 @@
         <file>components/PopupMenu.qml</file>
         <file>components/PopupMenuItem.qml</file>
         <file>AppWindow.qml</file>
-        <file>pfd/PfdMenu.qml</file>
     </qresource>
 </RCC>

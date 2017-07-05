@@ -1,7 +1,7 @@
 import QtQuick 2.2
 import QtGraphicalEffects 1.0
 import "."
-import "../pfd"
+//import "../pfd"
 import "../components"
 
 
@@ -31,14 +31,14 @@ Item {
         source: ColorOverlay {
             width: height
             height: arrow.height
-            source: PfdImage {
-                width: height
-                height: arrow.height
-                elementName: "wind-arrow"
-                smooth: true
-                border: 5
-                fillMode: Image.PreserveAspectFit
-            }
+//            source: PfdImage {
+//                width: height
+//                height: arrow.height
+//                elementName: "wind-arrow"
+//                smooth: true
+//                border: 5
+//                fillMode: Image.PreserveAspectFit
+//            }
             color: "yellow"
         }
         rotation: windHdg.value
