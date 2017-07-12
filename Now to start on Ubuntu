@@ -1,2 +1,11 @@
-https://wiki.qt.io/Install_Qt_5_on_Ubuntu
+How to install Qt5
+	https://wiki.qt.io/Install_Qt_5_on_Ubuntu
+
+How to link with Proj.4
+	Terminal:
+		- sudo apt-get install libproj-dev
+	QtCreator:
+		- Project / Add Library / Add System Package
+		- Package Name: proj
+		
 
