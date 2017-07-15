@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += map
+SUBDIRS += map \
+    photoplan
 SUBDIRS += gcu-map
 

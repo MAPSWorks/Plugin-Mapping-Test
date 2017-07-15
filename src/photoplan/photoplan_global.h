@@ -1,0 +1,12 @@
+#ifndef PHOTOPLAN_GLOBAL_H
+#define PHOTOPLAN_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(PHOTOPLAN_LIBRARY)
+#  define PHOTOPLANSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define PHOTOPLANSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // PHOTOPLAN_GLOBAL_H

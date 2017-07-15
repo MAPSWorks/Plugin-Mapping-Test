@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 
   QmlView *view=new QmlView(QStringLiteral("qrc:///"));
 
+  view->engine()->addImportPath("plugins");
   view->engine()->rootContext()->setContextProperty("datalink",datalink);
 
   QSurfaceFormat format = view->format();
