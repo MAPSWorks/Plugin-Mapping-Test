@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/PhotoPlan.qml</file>
+    </qresource>
+</RCC>
