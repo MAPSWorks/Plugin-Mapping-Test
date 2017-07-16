@@ -112,6 +112,17 @@ QmlMap {
         anchors.leftMargin: 4
     }*/
 
+    PhotoPlanPanel
+    {
+        id: photoPlanPanel
+        leftBarOffset: buttonsLeft.width
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.bottom: statusBar.top
+        visible: true
+        //anchors.fill: map
+    }
 
 
     //scaleFactor: Screen.pixelDensity>0?Screen.pixelDensity/6:1
