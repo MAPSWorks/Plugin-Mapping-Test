@@ -1,0 +1,4 @@
+module PhotoPlan
+    PhotoPlanPanel 1.0 qrc:///qml/PhotoPlan.qml
+plugin PhotoPlan
+
