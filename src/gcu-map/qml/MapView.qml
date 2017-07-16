@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.2
 import com.uavos.map 1.0
+import PhotoPlan 1.0
 import "."
 import "./components"
 import "./vehicle"
