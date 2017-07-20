@@ -1,5 +1,7 @@
 #include "photoplanmodel.h"
 
+#include "PhotoPlanner/PhotoPrintsGenerator.h"
+
 PhotoPlanModel::PhotoPlanModel(QObject *parent) : QAbstractListModel(parent)
 {
 
@@ -70,9 +72,20 @@ QVariantMap PhotoPlanModel::get(int row) {
 
 void PhotoPlanModel::recalc()
 {
-    if(m_GeoCoordinates.last() != m_GeoCoordinates.first())
-    {
-        m_GeoCoordinates.append(m_GeoCoordinates.first());
+    aero_photo::LinearPhotoRegion region(m_GeoCoordinates);
+    aero_photo::LinearPhotoPrintsGenerator generator(region);
+    auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 100, 4);
+    auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 200, 100);
+
+    m_GeoCoordinates.clear();
+    for (auto photoPrint : photoPrints) {
+//        m_GeoCoordinates.append(photoPrint.GetBorder());
+        m_GeoCoordinates.append(photoPrint.GetCenter());
     }
+
+//    if(m_GeoCoordinates.last() != m_GeoCoordinates.first())
+//    {
+//        m_GeoCoordinates.append(m_GeoCoordinates.first());
+//    }
 }
 

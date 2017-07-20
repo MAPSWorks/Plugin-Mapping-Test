@@ -123,82 +123,82 @@ private:
 };
 
 
-class AreaPhotoPrintsGenerator {
-public:
-    AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) {
-        if (area.GetBorder().size()<3)
-            throw std::logic_error("Invalid AreaPhotoRegion size()");
+//class AreaPhotoPrintsGenerator {
+//public:
+//    AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) {
+//        if (area.GetBorder().size()<3)
+//            throw std::logic_error("Invalid AreaPhotoRegion size()");
 
-        // azimuthOfPhotography_ = area.border_[0].azimuthTo(area.border_[1]);
-        areaRegion_.reserve(area.GetBorder().size());
-        for(auto geoPoint : area.GetBorder()) {
-          areaRegion_ << QPointF(geoPoint.latitude(), geoPoint.longitude());
-        }
-        boundingRect_ = areaRegion_.boundingRect();
-        boundingRadius_ = QLineF(boundingRect_.topLeft(), boundingRect_.bottomRight()).length()/2;
-        geoCenter_.setLatitude(boundingRect_.center().x());
-        geoCenter_.setLongitude(boundingRect_.center().y());
-    }
-
-    PhotoPrints GeneratePhotoPrints(qreal azimuth, qreal Lxp, qreal Lyp, qreal Lx, qreal Ly) {
-        PhotoPrints photoPrints;
-        size_t totalRuns = (boundingRadius_ / Lyp) + 1;
-        RunStartPointsCalc startPointsCalc(geoCenter_, azimuth, Lyp, totalRuns);
-        for (size_t i = 0; i < totalRuns; ++i) {
-            auto startPoint = startPointsCalc.Calculate(i);
-            auto endPointL = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth + 180);
-            auto endPointR = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth);
-            LinePhotoPrintsGenerator thisRunLineGenerator(endPointL, endPointR);
-            auto allPhotoPrintsCenters = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
-            GeoPoints thisRunPhotoPrinCenters;
-            for(auto printCenter : allPhotoPrintsCenters) {
-                CartesianPoint cartPrintCenter(printCenter.latitude(), printCenter.longitude());
-                if (areaRegion_.containsPoint(cartPrintCenter, Qt::FillRule::OddEvenFill))
-                    thisRunPhotoPrinCenters.push_back(printCenter);
-            }
-            auto thisRunPhotoPrints = thisRunLineGenerator.GeneratePhotoPrints(thisRunPhotoPrinCenters, Lx, Ly);
-            photoPrints.append(thisRunPhotoPrints);
-        }
-        return photoPrints;
-    }
-
-//    void GenerateLines(qreal azimuth, qreal Lx, qreal Ly) {
-//        qreal azimuthUp = azimuth
-//        for (qreal prodY = 0; true; ++prodY) {
-//            qreal offset = Ly * prodY;
+//        // azimuthOfPhotography_ = area.border_[0].azimuthTo(area.border_[1]);
+//        areaRegion_.reserve(area.GetBorder().size());
+//        for(auto geoPoint : area.GetBorder()) {
+//          areaRegion_ << QPointF(geoPoint.latitude(), geoPoint.longitude());
 //        }
+//        boundingRect_ = areaRegion_.boundingRect();
+//        boundingRadius_ = QLineF(boundingRect_.topLeft(), boundingRect_.bottomRight()).length()/2;
+//        geoCenter_.setLatitude(boundingRect_.center().x());
+//        geoCenter_.setLongitude(boundingRect_.center().y());
 //    }
 
-private:
-//    CalculateLine(const GeoPoint &geoPoint, qreal lineAzimuth) {
-//        QLinkedList<GeoPoint> lineOfPhotoPrints;
-
-//        auto processDistance = [this, &geoPoint, &lineOfPhotoPrints, ](qreal prod){
-//            qreal distance = prod * Lx_;
-//            auto distanceGeoPoint = geoPoint.atDistanceAndAzimuth(distance, azimuthOfPhotography_);
-//            QPointF distancePoint(distancePoint.latitude(), distancePoint.longitude());
-//            if (!boundingRect_.contains(distancePoint))
-//                return false;
-//            if (areaRegion_.containsPoint(distancePoint, Qt::FillRule::OddEvenFill))
-//                lineOfPhotoPrints.push_back(distanceGeoPoint);
-//            return true;
-//        };
-
-//        for(qreal prod = 0; processDistance(prod); ++prod) {
+//    PhotoPrints GeneratePhotoPrints(qreal azimuth, qreal Lxp, qreal Lyp, qreal Lx, qreal Ly) {
+//        PhotoPrints photoPrints;
+//        size_t totalRuns = (boundingRadius_ / Lyp) + 1;
+//        RunStartPointsCalc startPointsCalc(geoCenter_, azimuth, Lyp, totalRuns);
+//        for (size_t i = 0; i < totalRuns; ++i) {
+//            auto startPoint = startPointsCalc.Calculate(i);
+//            auto endPointL = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth + 180);
+//            auto endPointR = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth);
+//            LinePhotoPrintsGenerator thisRunLineGenerator(endPointL, endPointR);
+//            auto allPhotoPrintsCenters = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
+//            GeoPoints thisRunPhotoPrinCenters;
+//            for(auto printCenter : allPhotoPrintsCenters) {
+//                CartesianPoint cartPrintCenter(printCenter.latitude(), printCenter.longitude());
+//                if (areaRegion_.containsPoint(cartPrintCenter, Qt::FillRule::OddEvenFill))
+//                    thisRunPhotoPrinCenters.push_back(printCenter);
+//            }
+//            auto thisRunPhotoPrints = thisRunLineGenerator.GeneratePhotoPrints(thisRunPhotoPrinCenters, Lx, Ly);
+//            photoPrints.append(thisRunPhotoPrints);
 //        }
-
-//        for(qreal prod = 0; processDistance(prod); ++prod) {
-//        }
+//        return photoPrints;
 //    }
 
-    QPolygonF areaRegion_;
-    QRectF boundingRect_;
-    qreal boundingRadius_;
-    GeoPoint geoCenter_;
+////    void GenerateLines(qreal azimuth, qreal Lx, qreal Ly) {
+////        qreal azimuthUp = azimuth
+////        for (qreal prodY = 0; true; ++prodY) {
+////            qreal offset = Ly * prodY;
+////        }
+////    }
 
-    //qreal azimuthOfPhotography_;
-    //qreal Lx_, Ly_;
-};
+//private:
+////    CalculateLine(const GeoPoint &geoPoint, qreal lineAzimuth) {
+////        QLinkedList<GeoPoint> lineOfPhotoPrints;
+
+////        auto processDistance = [this, &geoPoint, &lineOfPhotoPrints, ](qreal prod){
+////            qreal distance = prod * Lx_;
+////            auto distanceGeoPoint = geoPoint.atDistanceAndAzimuth(distance, azimuthOfPhotography_);
+////            QPointF distancePoint(distancePoint.latitude(), distancePoint.longitude());
+////            if (!boundingRect_.contains(distancePoint))
+////                return false;
+////            if (areaRegion_.containsPoint(distancePoint, Qt::FillRule::OddEvenFill))
+////                lineOfPhotoPrints.push_back(distanceGeoPoint);
+////            return true;
+////        };
+
+////        for(qreal prod = 0; processDistance(prod); ++prod) {
+////        }
+
+////        for(qreal prod = 0; processDistance(prod); ++prod) {
+////        }
+////    }
+
+//    QPolygonF areaRegion_;
+//    QRectF boundingRect_;
+//    qreal boundingRadius_;
+//    GeoPoint geoCenter_;
+
+//    //qreal azimuthOfPhotography_;
+//    //qreal Lx_, Ly_;
+//};
 
 
 }

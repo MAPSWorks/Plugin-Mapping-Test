@@ -29,7 +29,7 @@ protected:
     QHash<int, QByteArray> roleNames() const;
 
 private:
-    QList<QGeoCoordinate> m_GeoCoordinates;
+    QVector<QGeoCoordinate> m_GeoCoordinates;
 };
 
 #endif // PHOTOPLANMODEL_H
