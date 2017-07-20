@@ -16,7 +16,6 @@ public:
     PhotoPrint() {}
     PhotoPrint(const GeoPoint &center, const GeoPoints &border)
         : center_(center), border_(border) {
-
     }
 
     const GeoPoint &GetCenter() const {
@@ -33,21 +32,29 @@ private:
 
 using PhotoPrints = QVector<PhotoPrint>;
 
-
-class TargetArea {
+class LinearPhotoRegion {
 public:
-    TargetArea(const GeoPoints &border) : border_(border) { }
+    LinearPhotoRegion(const GeoPoints &track) : track_(track) { }
+
+    const GeoPoints &GetTrack() const {
+        return track_;
+    }
+
+private:
+    const GeoPoints track_;
+};
+
+class AreaPhotoRegion {
+public:
+    AreaPhotoRegion(const GeoPoints &border) : border_(border) { }
 
     const GeoPoints &GetBorder() const {
         return border_;
     }
 
 private:
-    GeoPoints border_;
+    const GeoPoints border_;
 };
-
-
-
 
 }
 

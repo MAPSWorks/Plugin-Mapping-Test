@@ -26,8 +26,9 @@ SOURCES += \
 
 HEADERS += \
         photoplanner.h \
-    photoplannercore.h \
-    photoprintsgenerator.h
+    photogeocalcs.h \
+    PhotoPrintsGenerator.h \
+    PhotoPlannerCore.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
