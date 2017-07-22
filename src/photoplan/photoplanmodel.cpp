@@ -72,20 +72,43 @@ QVariantMap PhotoPlanModel::get(int row) {
 
 void PhotoPlanModel::recalc()
 {
-    aero_photo::LinearPhotoRegion region(m_GeoCoordinates);
-    aero_photo::LinearPhotoPrintsGenerator generator(region);
-    auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 100, 4);
-    auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 200, 100);
+    using namespace aero_photo;
+    auto getDefaultTrack = []() {
+        GeoPoint startPoint(47.2589912414551, 11.3327512741089);
+        GeoPoints defaultTrack;
+        defaultTrack << startPoint;
+        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(1100, 90);
+        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(220, 180);
+        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(1100, -90);
+//        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(220, 0);
+        return defaultTrack;
+    };
 
-    m_GeoCoordinates.clear();
-    for (auto photoPrint : photoPrints) {
-//        m_GeoCoordinates.append(photoPrint.GetBorder());
-        m_GeoCoordinates.append(photoPrint.GetCenter());
+//    auto areaTestFun = [](auto &&track) {
+//        AreaPhotoRegion testArea(track);
+//        AreaPhotoPrintsGenerator generator(testArea);
+//        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(45, 100, 50, 125, 75);
+//        //auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, )
+//    };
+
+
+    auto linearTestFun = [](auto &&track) {
+        LinearPhotoRegion region(track);
+        LinearPhotoPrintsGenerator generator(region);
+        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 4);
+        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 200, 90);
+        return photoPrints;
+    };
+
+    static int counter = 0;
+    m_GeoCoordinates = getDefaultTrack();
+
+    if (counter++ % 2 == 0) {
+        auto photoPrints = linearTestFun(m_GeoCoordinates);
+        for (auto photoPrint : photoPrints) {
+            //        m_GeoCoordinates.append(photoPrint.GetBorder());
+            m_GeoCoordinates.append(photoPrint.GetCenter());
+        }
     }
-
-//    if(m_GeoCoordinates.last() != m_GeoCoordinates.first())
-//    {
-//        m_GeoCoordinates.append(m_GeoCoordinates.first());
-//    }
 }
 
