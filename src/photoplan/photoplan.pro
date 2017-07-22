@@ -6,7 +6,7 @@
 
 QT      -= gui
 QT      += qml quick quickwidgets  positioning
-CONFIG  += qt exception c++11
+CONFIG  += qt exception c++14
 
 TARGET = PhotoPlan/$$qtLibraryTarget(photoplan)
 include( ../../gcu_plugin.pri )
