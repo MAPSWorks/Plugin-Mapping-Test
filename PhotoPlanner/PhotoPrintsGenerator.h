@@ -107,6 +107,7 @@ public:
             auto thisRunLinePhotoPrints = thisRunLineGenerator.GeneratePhotoPrints(linePoints, Lx, Ly);
             photoPrints.append(thisRunLinePhotoPrints);
         }
+        photoPrints.squeeze();
         return photoPrints;
     }
 
@@ -125,82 +126,162 @@ private:
 };
 
 
-//class AreaPhotoPrintsGenerator {
-//public:
-//    AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) {
-//        if (area.GetBorder().size()<3)
-//            throw std::logic_error("Invalid AreaPhotoRegion size()");
+class AreaPhotoPrintsGenerator {
 
-//        // azimuthOfPhotography_ = area.border_[0].azimuthTo(area.border_[1]);
-//        areaRegion_.reserve(area.GetBorder().size());
-//        for(auto geoPoint : area.GetBorder()) {
-//          areaRegion_ << QPointF(geoPoint.latitude(), geoPoint.longitude());
-//        }
-//        boundingRect_ = areaRegion_.boundingRect();
-//        boundingRadius_ = QLineF(boundingRect_.topLeft(), boundingRect_.bottomRight()).length()/2;
-//        geoCenter_.setLatitude(boundingRect_.center().x());
-//        geoCenter_.setLongitude(boundingRect_.center().y());
-//    }
+    class RegionInternals {
+    private:
+        auto InitializeFilteredMarks(const LinedGeoPoints &pointsGrid) {
+            const auto filteredRowSize = pointsGrid.front().size() + 2;
+            for (auto &rowGrid : pointsGrid)
+                if (filteredRowSize != rowGrid.size() + 2)
+                    throw std::logic_error("GeoPoints grid has rows with different size");
 
-//    PhotoPrints GeneratePhotoPrints(qreal azimuth, qreal Lxp, qreal Lyp, qreal Lx, qreal Ly) {
-//        PhotoPrints photoPrints;
-//        size_t totalRuns = (boundingRadius_ / Lyp) + 1;
-//        RunStartPointsCalc startPointsCalc(geoCenter_, azimuth, Lyp, totalRuns);
-//        for (size_t i = 0; i < totalRuns; ++i) {
-//            auto startPoint = startPointsCalc.Calculate(i);
-//            auto endPointL = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth + 180);
-//            auto endPointR = startPoint.atDistanceAndAzimuth(boundingRadius_, azimuth);
-//            LinePhotoPrintsGenerator thisRunLineGenerator(endPointL, endPointR);
-//            auto allPhotoPrintsCenters = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
-//            GeoPoints thisRunPhotoPrinCenters;
-//            for(auto printCenter : allPhotoPrintsCenters) {
-//                CartesianPoint cartPrintCenter(printCenter.latitude(), printCenter.longitude());
-//                if (areaRegion_.containsPoint(cartPrintCenter, Qt::FillRule::OddEvenFill))
-//                    thisRunPhotoPrinCenters.push_back(printCenter);
-//            }
-//            auto thisRunPhotoPrints = thisRunLineGenerator.GeneratePhotoPrints(thisRunPhotoPrinCenters, Lx, Ly);
-//            photoPrints.append(thisRunPhotoPrints);
-//        }
-//        return photoPrints;
-//    }
+            using FilteredMarks = QVector<QVector<bool>>;
+            FilteredMarks filteredMarks(pointsGrid.size() + 2);
+            for (auto &rowMarks : filteredMarks)
+                rowMarks.resize(filteredRowSize);
 
-////    void GenerateLines(qreal azimuth, qreal Lx, qreal Ly) {
-////        qreal azimuthUp = azimuth
-////        for (qreal prodY = 0; true; ++prodY) {
-////            qreal offset = Ly * prodY;
-////        }
-////    }
+            for (int iRow = 1; iRow < filteredMarks.size() - 1; ++iRow)
+                for (int iColumn = 1; iColumn < filteredMarks[iRow].size() - 1; ++iColumn) {
+                    filteredMarks[iRow][iColumn] = Contains(pointsGrid[iRow-1][iColumn-1]);
+                }
+            return filteredMarks;
+        }
+        LinedGeoPoints CreateFilteredGeoPoints(auto &&filteredMarks, const LinedGeoPoints &pointsGrid) {
+            LinedGeoPoints filteredGeoPoints(pointsGrid.size());
+            for (int iRow = 1; iRow < filteredMarks.size() - 1; ++iRow)
+                for (int iColumn = 1; iColumn < filteredMarks[iRow].size() - 1; ++iColumn) {
+                    if (   // self
+                            filteredMarks[iRow][iColumn] ||
+                            // horizontal & vertical
+//                           filteredMarks[iRow - 1][iColumn] ||
+//                           filteredMarks[iRow][iColumn - 1] ||
+//                           filteredMarks[iRow][iColumn + 1] ||
+//                           filteredMarks[iRow + 1][iColumn] ||
+                           // diagonal
+//                           filteredMarks[iRow - 1][iColumn - 1] ||
+//                           filteredMarks[iRow - 1][iColumn + 1] ||
+//                           filteredMarks[iRow + 1][iColumn - 1] ||
+//                           filteredMarks[iRow + 1][iColumn + 1] ||
+                           //
+                           false
+                           )
+                        filteredGeoPoints[iRow-1].push_back(pointsGrid[iRow-1][iColumn-1]);
+                }
+            return filteredGeoPoints;
+        }
 
-//private:
-////    CalculateLine(const GeoPoint &geoPoint, qreal lineAzimuth) {
-////        QLinkedList<GeoPoint> lineOfPhotoPrints;
+    public:
+        RegionInternals(const AreaPhotoRegion &area) {
+            if (area.GetBorder().size()<3)
+                throw std::logic_error("Invalid AreaPhotoRegion size()");
 
-////        auto processDistance = [this, &geoPoint, &lineOfPhotoPrints, ](qreal prod){
-////            qreal distance = prod * Lx_;
-////            auto distanceGeoPoint = geoPoint.atDistanceAndAzimuth(distance, azimuthOfPhotography_);
-////            QPointF distancePoint(distancePoint.latitude(), distancePoint.longitude());
-////            if (!boundingRect_.contains(distancePoint))
-////                return false;
-////            if (areaRegion_.containsPoint(distancePoint, Qt::FillRule::OddEvenFill))
-////                lineOfPhotoPrints.push_back(distanceGeoPoint);
-////            return true;
-////        };
+            InitializeAreaPolygonAndBounds(area.GetBorder());
+            InitializeGeoItems(area.GetBorder());
+        }
 
-////        for(qreal prod = 0; processDistance(prod); ++prod) {
-////        }
+        auto GetCenter() const { return geoCenter_; }
+        auto GetRadius() const { return geoRadius_; }
+        auto GetPreferredAzimuth() const { return preferredAzimuth_; }
 
-////        for(qreal prod = 0; processDistance(prod); ++prod) {
-////        }
-////    }
+        auto FilterPointsGrid(const LinedGeoPoints &pointsGrid) {
+            LinedGeoPoints outPoints;
+            if (!pointsGrid.empty() && !pointsGrid.front().empty()) {
+                auto filteredMarks = InitializeFilteredMarks(pointsGrid);
+                outPoints = CreateFilteredGeoPoints(filteredMarks, pointsGrid);
+            }
+            return outPoints;
+        }
 
-//    QPolygonF areaRegion_;
-//    QRectF boundingRect_;
-//    qreal boundingRadius_;
-//    GeoPoint geoCenter_;
+    private:
+        void InitializeAreaPolygonAndBounds(const GeoPoints &border) {
+            areaPolygon_.reserve(border.size());
+            for(auto geoPoint : border) {
+              areaPolygon_ << QPointF(geoPoint.latitude(), geoPoint.longitude());
+            }
+            if (!areaPolygon_.isClosed())
+                areaPolygon_ << areaPolygon_.front();
+            areaBounds_ = areaPolygon_.boundingRect();
+        }
+        void InitializeGeoItems(const GeoPoints &border) {
+            geoCenter_.setLatitude(areaBounds_.center().x());
+            geoCenter_.setLongitude(areaBounds_.center().y());
 
-//    //qreal azimuthOfPhotography_;
-//    //qreal Lx_, Ly_;
-//};
+            for(auto borderPoint : border) {
+                auto distanceToBorder = geoCenter_.distanceTo(borderPoint);
+                if (geoRadius_ < distanceToBorder) {
+                    geoRadius_ = distanceToBorder;
+                    preferredAzimuth_ = geoCenter_.azimuthTo(borderPoint);
+                }
+            }
+        }
+
+
+        bool Contains(const GeoPoint &geoPoint) const {
+            CartesianPoint cartPoint(geoPoint.latitude(), geoPoint.longitude());
+            return
+                    //areaBounds_.contains(cartPoint) &&
+                    areaPolygon_.containsPoint(cartPoint, Qt::FillRule::WindingFill) &&
+                    true;
+        }
+
+        QPolygonF areaPolygon_;
+        QRectF areaBounds_;
+
+        GeoPoint geoCenter_;
+        qreal geoRadius_ = 0;
+
+        qreal preferredAzimuth_ = 0;
+    };
+
+public:
+    AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) : regionInternals_(area) {
+    }
+
+    LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth) {
+        auto geoPointsGrid = GeneratePhotoPrintsGrid(Lxp, Lyp, azimuth);
+        auto linedGeoPoints = regionInternals_.FilterPointsGrid(geoPointsGrid);
+        return linedGeoPoints;
+    }
+
+    PhotoPrints GeneratePhotoPrints(const LinedGeoPoints &linedGeoPoints, qreal Lx, qreal Ly) {
+        PhotoPrints photoPrints;
+        for (auto &&linePoints : linedGeoPoints) {
+            if (!linePoints.empty()) {
+                LinePhotoPrintsGenerator thisRunLineGenerator(linePoints.front(), linePoints.back());
+                auto thisRunLinePhotoPrints = thisRunLineGenerator.GeneratePhotoPrints(linePoints, Lx, Ly);
+                photoPrints.append(thisRunLinePhotoPrints);
+            }
+        }
+        photoPrints.squeeze();
+        return photoPrints;
+    }
+
+    auto GetPreferredAzimuth() const { return regionInternals_.GetPreferredAzimuth(); }
+
+private:
+
+    LinedGeoPoints GeneratePhotoPrintsGrid(qreal Lxp, qreal Lyp, qreal azimuth) {
+        LinedGeoPoints geoPointsGrid;
+        size_t totalRuns = ceil(regionInternals_.GetRadius() * 2 / Lyp);
+        geoPointsGrid.resize(totalRuns);
+        RunStartPointsCalc middlePointsCalc(regionInternals_.GetCenter(), azimuth, Lyp, totalRuns);
+        for (size_t i = 0; i < totalRuns; ++i) {
+            auto middlePoint = middlePointsCalc.Calculate(i);
+            const auto runAzimuth = azimuth + 180 * ( i % 2 );
+            auto endPntA = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius(), runAzimuth + 180);
+            auto endPntB = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius(), runAzimuth);
+            GeoCalc geoCalc;
+            const auto runDistance = geoCalc.RoundUpPoints(endPntA, endPntB, Lxp);
+            LinePhotoPrintsGenerator thisRunLineGenerator(endPntA, endPntA.azimuthTo(endPntB), runDistance);
+            geoPointsGrid[i] = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
+        }
+        return geoPointsGrid;
+    }
+
+
+    RegionInternals regionInternals_;
+};
 
 
 }

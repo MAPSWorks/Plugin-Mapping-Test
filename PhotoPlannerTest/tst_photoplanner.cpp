@@ -155,21 +155,51 @@ private slots:
         track << track.back().atDistanceAndAzimuth(1100, -90);
     }
 
-//    void test_AreaPhotoPrintsGenerator() {
-//        using namespace aero_photo;
-//        GeoPoint startPoint(47.2589912414551, 11.3327512741089);
-//        GeoPoints testAreaBorder;
-//        testAreaBorder << startPoint;
-//        testAreaBorder << testAreaBorder.back().atDistanceAndAzimuth(1100, 90);
-//        testAreaBorder << testAreaBorder.back().atDistanceAndAzimuth(220, 180);
-//        testAreaBorder << testAreaBorder.back().atDistanceAndAzimuth(1100, -90);
-//        testAreaBorder << testAreaBorder.back().atDistanceAndAzimuth(220, 0);
-//        QVERIFY (testAreaBorder.front().distanceTo(testAreaBorder.back()) < 1);
-//        AreaPhotoRegion testArea(testAreaBorder);
-//        AreaPhotoPrintsGenerator generator(testArea);
-//        auto photoPrints = generator.GeneratePhotoPrints(45, 100, 50, 125, 75);
-//        //QCOMPARE(photoPrints.size(), 16);
-//    }
+    void test_AreaPhotoPrintsGenerator() {
+        using namespace aero_photo;
+
+        GeoPoint startPoint(47.2589912414551, 11.3327512741089);
+        GeoPoints border;
+
+        {
+            AreaPhotoRegion photoRegion(border);
+            QVERIFY_EXCEPTION_THROWN(AreaPhotoPrintsGenerator generator(photoRegion), std::logic_error);
+        }
+        border << startPoint;
+        {
+            AreaPhotoRegion photoRegion(border);
+            QVERIFY_EXCEPTION_THROWN(AreaPhotoPrintsGenerator generator(photoRegion), std::logic_error);
+        }
+        border << border.back().atDistanceAndAzimuth(1100, 90);
+        {
+            AreaPhotoRegion photoRegion(border);
+            QVERIFY_EXCEPTION_THROWN(AreaPhotoPrintsGenerator generator(photoRegion), std::logic_error);
+        }
+        border << border.back().atDistanceAndAzimuth(220, 180);
+        {
+            AreaPhotoRegion photoRegion(border);
+            AreaPhotoPrintsGenerator generator(photoRegion);
+            {
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 200, 90, 90);
+                QCOMPARE(photoPrintsCenters.size(), 13);
+                QCOMPARE(photoPrintsCenters[0].size(), 0);
+                QCOMPARE(photoPrintsCenters[1].size(), 0);
+                QCOMPARE(photoPrintsCenters[2].size(), 0);
+                QCOMPARE(photoPrintsCenters[3].size(), 0);
+                QCOMPARE(photoPrintsCenters[4].size(), 0);
+                QCOMPARE(photoPrintsCenters[5].size(), 5);
+                QCOMPARE(photoPrintsCenters[6].size(), 2);
+                QCOMPARE(photoPrintsCenters[7].size(), 0);
+                QCOMPARE(photoPrintsCenters[8].size(), 0);
+                QCOMPARE(photoPrintsCenters[9].size(), 0);
+                QCOMPARE(photoPrintsCenters[10].size(), 0);
+                QCOMPARE(photoPrintsCenters[11].size(), 0);
+                QCOMPARE(photoPrintsCenters[12].size(), 0);
+            }
+        }
+//        border << border.back().atDistanceAndAzimuth(1100, -90);
+//        border << border.back().atDistanceAndAzimuth(220, 0);
+    }
 
 
 };
