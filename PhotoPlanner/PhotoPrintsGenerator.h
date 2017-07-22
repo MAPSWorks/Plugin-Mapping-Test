@@ -5,6 +5,7 @@
 #include "photogeocalcs.h"
 
 #include <QPolygonF>
+#include <QLineF>
 
 namespace aero_photo {
 
@@ -71,6 +72,7 @@ public:
     LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, size_t totalRuns) {
         LinedGeoPoints linedGeoPoints;
         linedGeoPoints.resize(totalRuns * (trackTail_.size()));
+        // !!! Both pntA & pntB must be copy of members
         auto pntA = trackHead_;
         for (int trackIndex = 0; trackIndex < trackTail_.size(); trackIndex++) {
             auto pntB = trackTail_[trackIndex];
@@ -92,7 +94,7 @@ public:
                 // We must calculate index
                 linedGeoPoints[CalculateRunSequnce(trackIndex, runIndex)] = pointRunPrintsCenters;
             }
-            pntA = pntB;
+            pntA = trackTail_[trackIndex];
         }
         return linedGeoPoints;
     }
