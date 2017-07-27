@@ -5,21 +5,7 @@ PhotoPlanModel::PhotoPlanModel(QObject *parent) : QAbstractListModel(parent)
 
 }
 
-void PhotoPlanModel::addGeoCoordinate(const QGeoCoordinate &geoCoordinate)
-{
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_GeoCoordinates << geoCoordinate;
-    endInsertRows();
-}
-
-void PhotoPlanModel::append(const QGeoCoordinate &geoCoordinate)
-{
-    beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_GeoCoordinates << geoCoordinate;
-    endInsertRows();
-}
-
-void PhotoPlanModel::append1(const double latitude, const double longitude)
+void PhotoPlanModel::addGeoCoordinate(const double latitude, const double longitude)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_GeoCoordinates << QGeoCoordinate(latitude, longitude);

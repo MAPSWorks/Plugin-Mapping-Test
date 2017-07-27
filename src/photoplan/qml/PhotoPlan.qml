@@ -163,7 +163,7 @@ Item {
 */
             //'number': pointView.model.count+1,
             var data = {'latitude': mapProvider.mouseLL.x, 'longitude': mapProvider.mouseLL.y}; //coordList.count()
-            pointView.model.append1(mapProvider.mouseLL.x, mapProvider.mouseLL.y);
+            pointView.model.addGeoCoordinate(mapProvider.mouseLL.x, mapProvider.mouseLL.y);
             canvas.requestPaint();
    //       pointView.model.sync();
         }
