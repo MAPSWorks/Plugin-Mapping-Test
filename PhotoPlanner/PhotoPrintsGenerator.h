@@ -125,49 +125,111 @@ private:
     GeoPoints trackTail_;
 };
 
+template <class T>
+    class Array2D {
+public:
+    Array2D(size_t rows, size_t columns) : rows_(rows), cols_(columns), data_(rows * columns) { }
+    ~Array2D() { }
+
+    auto Rows() const { return rows_; }
+    auto Cols() const { return cols_; }
+
+    auto &&Item (size_t row, size_t column) { return data_[CalculateIndex(row, column)]; }
+    auto &&Item (size_t row, size_t column) const { return data_[CalculateIndex(row, column)]; }
+
+    auto Data() { return data_.data(); }
+    auto Data() const { return data_.data(); }
+
+    void SetItems(auto &&setter) {
+        for(size_t iRow = 0; iRow < rows_; iRow++)
+            for(size_t iCol = 0; iCol < cols_; iCol++)
+                Item(iRow, iCol) = setter(iRow, iCol);
+    }
+    void IterateItems (auto &&itemFun) const {
+        for(size_t iRow = 0; iRow < rows_; iRow++)
+            for(size_t iCol = 0; iCol < cols_; iCol++)
+                itemFun(iRow, iCol, Item(iRow, iCol));
+    }
+
+private:
+    inline size_t CalculateIndex(size_t row, size_t column) const { return row * cols_ + column; }
+
+    const size_t rows_;
+    const size_t cols_;
+    std::vector<T> data_;
+};
+
+template <typename T>
+class NearFilter {
+public:
+    NearFilter(size_t filterSize) : filterSize_(filterSize) { }
+
+    Array2D<T> operator() (const Array2D<T> &inArray) {
+
+        Array2D<T> workArray(inArray.Rows() + 2*filterSize_, inArray.Cols() + 2*filterSize_);
+        auto initWorkItem = [this, &workArray](auto iRow, auto iCol, T item) {
+            workArray.Item(iRow + filterSize_, iCol + filterSize_) = item;
+        };
+        inArray.IterateItems(initWorkItem);
+
+        Array2D<T> outArray(inArray.Rows(), inArray.Cols());
+        auto fillOutItem = [this, &workArray] (auto iRow, auto iCol) {
+            for (size_t iFilterRow = iRow; iFilterRow < iRow + 2*filterSize_ + 1; iFilterRow++)
+                for (size_t iFilterCol = iCol; iFilterCol < iCol + 2*filterSize_ + 1; iFilterCol++) {
+                    if (workArray.Item(iFilterRow, iFilterCol))
+                        return 1;
+                }
+            return 0;
+        };
+        outArray.SetItems(fillOutItem);
+
+        return outArray;
+    }
+
+private:
+    const size_t filterSize_;
+};
+
+//struct GeoPointGridItem {
+//    GeoPoint geoPoint_;
+//    bool isActive_ = false;
+//};
+
+//using GeoPointsGrid = Array2D<GeoPointGridItem>;
+
+//class LinedGeoPoints {
+//public:
+
+//private:
+
+//};
 
 class AreaPhotoPrintsGenerator {
 
     class RegionInternals {
     private:
-        auto InitializeFilteredMarks(const LinedGeoPoints &pointsGrid) {
-            const auto filteredRowSize = pointsGrid.front().size() + 2;
+        auto FilterPointsGridInternal(const LinedGeoPoints &pointsGrid, size_t extentBorderValue) {
+
+            const auto rowSize = pointsGrid.front().size();
             for (auto &rowGrid : pointsGrid)
-                if (filteredRowSize != rowGrid.size() + 2)
+                if (rowSize != rowGrid.size())
                     throw std::logic_error("GeoPoints grid has rows with different size");
 
-            using FilteredMarks = QVector<QVector<bool>>;
-            FilteredMarks filteredMarks(pointsGrid.size() + 2);
-            for (auto &rowMarks : filteredMarks)
-                rowMarks.resize(filteredRowSize);
+            Array2D<uint8_t> containsArray(pointsGrid.size(), pointsGrid.front().size());
+            auto initContainsItem = [this, &pointsGrid](auto iRow, auto iCol){
+                return this->Contains(pointsGrid[iRow][iCol]);
+            };
+            containsArray.SetItems(initContainsItem);
 
-            for (int iRow = 1; iRow < filteredMarks.size() - 1; ++iRow)
-                for (int iColumn = 1; iColumn < filteredMarks[iRow].size() - 1; ++iColumn) {
-                    filteredMarks[iRow][iColumn] = Contains(pointsGrid[iRow-1][iColumn-1]);
-                }
-            return filteredMarks;
-        }
-        LinedGeoPoints CreateFilteredGeoPoints(auto &&filteredMarks, const LinedGeoPoints &pointsGrid) {
+            NearFilter<uint8_t> filter(extentBorderValue);
+            auto filteredArray = filter(containsArray);
+
             LinedGeoPoints filteredGeoPoints(pointsGrid.size());
-            for (int iRow = 1; iRow < filteredMarks.size() - 1; ++iRow)
-                for (int iColumn = 1; iColumn < filteredMarks[iRow].size() - 1; ++iColumn) {
-                    if (   // self
-                            filteredMarks[iRow][iColumn] ||
-                            // horizontal & vertical
-//                           filteredMarks[iRow - 1][iColumn] ||
-//                           filteredMarks[iRow][iColumn - 1] ||
-//                           filteredMarks[iRow][iColumn + 1] ||
-//                           filteredMarks[iRow + 1][iColumn] ||
-                           // diagonal
-//                           filteredMarks[iRow - 1][iColumn - 1] ||
-//                           filteredMarks[iRow - 1][iColumn + 1] ||
-//                           filteredMarks[iRow + 1][iColumn - 1] ||
-//                           filteredMarks[iRow + 1][iColumn + 1] ||
-                           //
-                           false
-                           )
-                        filteredGeoPoints[iRow-1].push_back(pointsGrid[iRow-1][iColumn-1]);
-                }
+            auto fillFilteredGeoPoints = [&filteredGeoPoints, &pointsGrid](auto iRow, auto iCol, uint8_t itemValue) {
+                if (itemValue)
+                    filteredGeoPoints[iRow].push_back(pointsGrid[iRow][iCol]);
+            };
+            filteredArray.IterateItems(fillFilteredGeoPoints);
             return filteredGeoPoints;
         }
 
@@ -184,11 +246,10 @@ class AreaPhotoPrintsGenerator {
         auto GetRadius() const { return geoRadius_; }
         auto GetPreferredAzimuth() const { return preferredAzimuth_; }
 
-        auto FilterPointsGrid(const LinedGeoPoints &pointsGrid) {
+        auto FilterPointsGrid(const LinedGeoPoints &pointsGrid, size_t extentBorderValue) {
             LinedGeoPoints outPoints;
             if (!pointsGrid.empty() && !pointsGrid.front().empty()) {
-                auto filteredMarks = InitializeFilteredMarks(pointsGrid);
-                outPoints = CreateFilteredGeoPoints(filteredMarks, pointsGrid);
+                outPoints = FilterPointsGridInternal(pointsGrid, extentBorderValue);
             }
             return outPoints;
         }
@@ -216,11 +277,10 @@ class AreaPhotoPrintsGenerator {
             }
         }
 
-
         bool Contains(const GeoPoint &geoPoint) const {
             CartesianPoint cartPoint(geoPoint.latitude(), geoPoint.longitude());
             return
-                    //areaBounds_.contains(cartPoint) &&
+                    areaBounds_.contains(cartPoint) &&
                     areaPolygon_.containsPoint(cartPoint, Qt::FillRule::WindingFill) &&
                     true;
         }
@@ -239,8 +299,9 @@ public:
     }
 
     LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth) {
-        auto geoPointsGrid = GeneratePhotoPrintsGrid(Lxp, Lyp, azimuth);
-        auto linedGeoPoints = regionInternals_.FilterPointsGrid(geoPointsGrid);
+        const auto extentBorderValue = 2;
+        auto geoPointsGrid = GeneratePhotoPrintsGrid(Lxp, Lyp, azimuth, extentBorderValue);
+        auto linedGeoPoints = regionInternals_.FilterPointsGrid(geoPointsGrid, extentBorderValue);
         return linedGeoPoints;
     }
 
@@ -261,16 +322,16 @@ public:
 
 private:
 
-    LinedGeoPoints GeneratePhotoPrintsGrid(qreal Lxp, qreal Lyp, qreal azimuth) {
+    LinedGeoPoints GeneratePhotoPrintsGrid(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
         LinedGeoPoints geoPointsGrid;
-        size_t totalRuns = ceil(regionInternals_.GetRadius() * 2 / Lyp);
+        size_t totalRuns = ceil(regionInternals_.GetRadius() * 2 / Lyp) + extentBorderValue;
         geoPointsGrid.resize(totalRuns);
         RunStartPointsCalc middlePointsCalc(regionInternals_.GetCenter(), azimuth, Lyp, totalRuns);
         for (size_t i = 0; i < totalRuns; ++i) {
             auto middlePoint = middlePointsCalc.Calculate(i);
-            const auto runAzimuth = azimuth + 180 * ( i % 2 );
-            auto endPntA = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius(), runAzimuth + 180);
-            auto endPntB = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius(), runAzimuth);
+            const auto runAzimuth = azimuth ; // + 180 * ( i % 2 );
+            auto endPntA = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius() + Lxp * extentBorderValue, runAzimuth + 180);
+            auto endPntB = middlePoint.atDistanceAndAzimuth(regionInternals_.GetRadius() + Lxp * extentBorderValue, runAzimuth);
             GeoCalc geoCalc;
             const auto runDistance = geoCalc.RoundUpPoints(endPntA, endPntB, Lxp);
             LinePhotoPrintsGenerator thisRunLineGenerator(endPntA, endPntA.azimuthTo(endPntB), runDistance);
