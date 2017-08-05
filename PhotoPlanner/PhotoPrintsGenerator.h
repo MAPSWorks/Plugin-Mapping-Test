@@ -7,6 +7,9 @@
 #include <QPolygonF>
 #include <QLineF>
 
+#include "array2d.h"
+#include "nearfilter.h"
+
 namespace aero_photo {
 
 using LinedGeoPoints = QVector<GeoPoints>;
@@ -25,7 +28,7 @@ public:
 
     GeoPoints GeneratePhotoPrintsCenters(qreal Lxp) {
         GeoPoints photoPrintsCenters;
-        const int totalPrints = distance_/Lxp + 1;
+        const int totalPrints = ceil(distance_/Lxp)+1;
         for (int i = 0; i<totalPrints; ++i) {
             auto nextCenter = pntA_.atDistanceAndAzimuth(Lxp*i, azimuth_);
             photoPrintsCenters.push_back(nextCenter);
@@ -123,71 +126,6 @@ public:
 private:
     GeoPoint trackHead_;
     GeoPoints trackTail_;
-};
-
-template <class T>
-    class Array2D {
-public:
-    Array2D(size_t rows, size_t columns) : rows_(rows), cols_(columns), data_(rows * columns) { }
-    ~Array2D() { }
-
-    auto Rows() const { return rows_; }
-    auto Cols() const { return cols_; }
-
-    auto &&Item (size_t row, size_t column) { return data_[CalculateIndex(row, column)]; }
-    auto &&Item (size_t row, size_t column) const { return data_[CalculateIndex(row, column)]; }
-
-    auto Data() { return data_.data(); }
-    auto Data() const { return data_.data(); }
-
-    void SetItems(auto &&setter) {
-        for(size_t iRow = 0; iRow < rows_; iRow++)
-            for(size_t iCol = 0; iCol < cols_; iCol++)
-                Item(iRow, iCol) = setter(iRow, iCol);
-    }
-    void IterateItems (auto &&itemFun) const {
-        for(size_t iRow = 0; iRow < rows_; iRow++)
-            for(size_t iCol = 0; iCol < cols_; iCol++)
-                itemFun(iRow, iCol, Item(iRow, iCol));
-    }
-
-private:
-    inline size_t CalculateIndex(size_t row, size_t column) const { return row * cols_ + column; }
-
-    const size_t rows_;
-    const size_t cols_;
-    std::vector<T> data_;
-};
-
-template <typename T>
-class NearFilter {
-public:
-    NearFilter(size_t filterSize) : filterSize_(filterSize) { }
-
-    Array2D<T> operator() (const Array2D<T> &inArray) {
-
-        Array2D<T> workArray(inArray.Rows() + 2*filterSize_, inArray.Cols() + 2*filterSize_);
-        auto initWorkItem = [this, &workArray](auto iRow, auto iCol, T item) {
-            workArray.Item(iRow + filterSize_, iCol + filterSize_) = item;
-        };
-        inArray.IterateItems(initWorkItem);
-
-        Array2D<T> outArray(inArray.Rows(), inArray.Cols());
-        auto fillOutItem = [this, &workArray] (auto iRow, auto iCol) {
-            for (size_t iFilterRow = iRow; iFilterRow < iRow + 2*filterSize_ + 1; iFilterRow++)
-                for (size_t iFilterCol = iCol; iFilterCol < iCol + 2*filterSize_ + 1; iFilterCol++) {
-                    if (workArray.Item(iFilterRow, iFilterCol))
-                        return 1;
-                }
-            return 0;
-        };
-        outArray.SetItems(fillOutItem);
-
-        return outArray;
-    }
-
-private:
-    const size_t filterSize_;
 };
 
 //struct GeoPointGridItem {
@@ -299,7 +237,7 @@ public:
     }
 
     LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth) {
-        const auto extentBorderValue = 2;
+        const auto extentBorderValue = 0;
         auto geoPointsGrid = GeneratePhotoPrintsGrid(Lxp, Lyp, azimuth, extentBorderValue);
         auto linedGeoPoints = regionInternals_.FilterPointsGrid(geoPointsGrid, extentBorderValue);
         return linedGeoPoints;
