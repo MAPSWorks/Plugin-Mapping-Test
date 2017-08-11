@@ -73,7 +73,7 @@ void PhotoPlanModel::recalc()
     auto areaTestFun = [](auto &&track) {
         AreaPhotoRegion testArea(track);
         AreaPhotoPrintsGenerator generator(testArea);
-        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 90);
+        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 90, 2);
 //        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, generator.GetPreferredAzimuth());
         auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
         return photoPrints;
@@ -89,7 +89,7 @@ void PhotoPlanModel::recalc()
     };
 
     static int counter = 0;
-//    m_GeoCoordinates = getDefaultTrack();
+    m_GeoCoordinates = getDefaultTrack();
 
     if (counter++ % 2 == 0) {
         auto photoPrints = areaTestFun(m_GeoCoordinates);

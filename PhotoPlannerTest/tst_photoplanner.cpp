@@ -24,6 +24,24 @@ private slots:
         QCOMPARE(sqrt(25), double(5));
     }
 
+    void test_Array2D() {
+        using namespace aero_photo;
+
+        Array2D<uint8_t> array2D(5, 4);
+        for(size_t iRow = 0; iRow < array2D.Rows(); iRow++)
+            for(size_t iCol = 0; iCol < array2D.Cols(); iCol++)
+                QCOMPARE (array2D.Item(iRow, iCol), (uint8_t)0);
+
+        array2D.Item(0,0)=1;
+        array2D.Item(0,2)=2;
+        array2D.Item(1,1)=3;
+        array2D.Item(4,3)=0;
+        QCOMPARE (array2D.Item(0,0), (uint8_t)1);
+        QCOMPARE (array2D.Item(0,2), (uint8_t)2);
+        QCOMPARE (array2D.Item(1,1), (uint8_t)3);
+        QCOMPARE (array2D.Item(4,3), (uint8_t)0);
+    }
+
     void test_proj4() {
         projPJ pj_merc = pj_init_plus("+proj=merc +ellps=clrk66 +lat_ts=33");
         QVERIFY(pj_merc!=nullptr);
