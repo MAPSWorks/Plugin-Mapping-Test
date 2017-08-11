@@ -1,9 +1,10 @@
 #include "photoplan_plugin.h"
-#include "photoplanmodel.h"
-
+#include "geocoordinatesmodel.h"
+#include "photoplan.h"
 #include <qqml.h>
 
 void PhotoPlanPlugin::registerTypes(const char *uri)
 {
-    qmlRegisterType<PhotoPlanModel>("PhotoPlan", 1, 0, "PhotoPlanModel");
+    qmlRegisterType<GeoCoordinatesModel>("PhotoPlan", 1, 0, "PhotoPlanModel");
+    qmlRegisterType<PhotoPlan>("PhotoPlan", 1, 0, "QMLPhotoPlan");
 }

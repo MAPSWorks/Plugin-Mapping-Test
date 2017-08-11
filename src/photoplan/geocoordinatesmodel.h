@@ -1,10 +1,10 @@
-#ifndef PHOTOPLANMODEL_H
-#define PHOTOPLANMODEL_H
+#ifndef GEOCOORDINATESMODEL_H
+#define GEOCOORDINATESMODEL_H
 
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
 
-class PhotoPlanModel : public QAbstractListModel
+class GeoCoordinatesModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
@@ -14,14 +14,14 @@ public:
         AltitudeRole
     };
 
-    PhotoPlanModel(QObject *parent=0);
+    GeoCoordinatesModel(QObject *parent=0);
 
     Q_INVOKABLE void addGeoCoordinate(const double latitude, const double longitude);
+    Q_INVOKABLE void addGeoCoordinate(const QGeoCoordinate& coord);
     Q_INVOKABLE QVariantMap get(int row);
     Q_INVOKABLE int rowCount(const QModelIndex & parent = QModelIndex()) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
-
-    Q_INVOKABLE void recalc();
+    QVector<QGeoCoordinate> getGeoCoordinates() const;
 
 protected:
     QHash<int, QByteArray> roleNames() const;
@@ -30,4 +30,4 @@ private:
     QVector<QGeoCoordinate> m_GeoCoordinates;
 };
 
-#endif // PHOTOPLANMODEL_H
+#endif // GEOCOORDINATESMODEL_H

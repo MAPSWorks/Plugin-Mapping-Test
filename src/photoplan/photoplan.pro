@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         photoplan_plugin.cpp \
-    photoplanmodel.cpp
+    photoplan.cpp \
+    geocoordinatesmodel.cpp
 
 HEADERS += \
         photoplan_plugin.h \
-    photoplanmodel.h
+    photoplan.h \
+    geocoordinatesmodel.h
 
 unix {
     target.path = /usr/lib

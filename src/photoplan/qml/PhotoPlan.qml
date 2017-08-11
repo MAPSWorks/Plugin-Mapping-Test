@@ -17,7 +17,7 @@ Item {
         width: 50
         text: "Calc"
         onClicked:  {
-            pointView.model.recalc();
+            photoPlan.recalc();
             canvas.requestPaint();
         }
     }
@@ -60,6 +60,9 @@ Item {
                 //pointView.model.sync();
             }
 */
+            QMLPhotoPlan{
+                id: photoPlan
+        }
             ListView {
                 id: pointView
                 Layout.fillHeight: true
@@ -67,9 +70,9 @@ Item {
 
                // model:     ListModel {
 //                 model:     PhotoPlanModel {
-                model:     PhotoPlanModel {
-                     id: coordList
-                }
+                 model:     photoPlan.AOIModel//{
+                     //id: coordList
+                //}
 
                 delegate: Text {
                    // font: zoomLevel.font
@@ -107,10 +110,8 @@ Item {
             ctx.strokeStyle = "red";
             ctx.fillStyle = Qt.rgba(1.0, 0.3, 0.3, 0.1);
             ctx.beginPath();
-
             var mapPointX;
             var mapPointY;
-
             for (var i =0; i<pointView.model.rowCount(); i++)
             {
                 mapPointX = map.sceneToWindowX(map.mapToSceneX(mapProvider.lonToX(pointView.model.get(i)['longitude'])))*map.ws;
@@ -131,6 +132,40 @@ Item {
                 mapPointX = map.sceneToWindowX(map.mapToSceneX(mapProvider.lonToX(pointView.model.get(i)['longitude'])))*map.ws;
                 mapPointY = map.sceneToWindowY(map.mapToSceneY(mapProvider.latToY(pointView.model.get(i)['latitude'])))*map.hs;
                 ctx.fillStyle = "red";
+                ctx.arc(mapPointX, mapPointY, 7, 0, Math.PI * 2, false);
+                ctx.fill();
+                ctx.closePath();
+                ctx.fillStyle = "white";
+                ctx.font = "10px sans-serif"
+                ctx.textAlign = "center"
+                ctx.textBaseline = "middle"
+                ctx.fillText(i, mapPointX, mapPointY);
+            }
+
+            ctx.strokeStyle = "blue";
+            ctx.fillStyle = Qt.rgba(1.0, 0.3, 0.3, 0.1);
+            ctx.beginPath();
+            for (var i =0; i<photoPlan.FlightModel.rowCount(); i++)
+            {
+                mapPointX = map.sceneToWindowX(map.mapToSceneX(mapProvider.lonToX(photoPlan.FlightModel.get(i)['longitude'])))*map.ws;
+                mapPointY = map.sceneToWindowY(map.mapToSceneY(mapProvider.latToY(photoPlan.FlightModel.get(i)['latitude'])))*map.hs;
+
+                if(i>0)
+                    ctx.lineTo(mapPointX, mapPointY);
+                else
+                    ctx.moveTo(mapPointX, mapPointY);
+                ctx.stroke();
+            }
+            ctx.fill();
+            ctx.closePath();
+
+
+            for (var i =0; i<photoPlan.FlightModel.rowCount(); i++)
+            {
+                ctx.beginPath();
+                mapPointX = map.sceneToWindowX(map.mapToSceneX(mapProvider.lonToX(photoPlan.FlightModel.get(i)['longitude'])))*map.ws;
+                mapPointY = map.sceneToWindowY(map.mapToSceneY(mapProvider.latToY(photoPlan.FlightModel.get(i)['latitude'])))*map.hs;
+                ctx.fillStyle = "blue";
                 ctx.arc(mapPointX, mapPointY, 7, 0, Math.PI * 2, false);
                 ctx.fill();
                 ctx.closePath();
