@@ -27,20 +27,28 @@ GeoCoordinatesModel* PhotoPlan::PhotoPointsModel()
 #include <vector>
 using namespace std;
 
-void PhotoPlan::recalc()
+void PhotoPlan::calcLinearPhotoPrints()
 {
     using namespace aero_photo;
 
-    auto getDefaultTrack = []() {
-        GeoPoint startPoint(47.2589912414551, 11.3247512741089);
-        GeoPoints defaultTrack;
-        defaultTrack << startPoint;
-        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(1500, 90);
-        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(750, 180);
-//        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(1100, -90);
-//        defaultTrack << defaultTrack.back().atDistanceAndAzimuth(220, 0);
-        return defaultTrack;
+    auto linearTestFun = [](auto &&track) {
+        LinearPhotoRegion region(track);
+        LinearPhotoPrintsGenerator generator(region);
+        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 4);
+        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
+        return photoPrints;
     };
+    auto photoPrints = linearTestFun(m_AOIModel.getGeoCoordinates());
+    m_FlightModel.clear();
+    for (auto photoPrint : photoPrints) {
+        //        m_GeoCoordinates.append(photoPrint.GetBorder());
+        m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
+    }
+}
+
+void PhotoPlan::calcAreaPhotoPrints()
+{
+    using namespace aero_photo;
 
     auto areaTestFun = [](auto &&track) {
         AreaPhotoRegion testArea(track);
@@ -50,27 +58,11 @@ void PhotoPlan::recalc()
         auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
         return photoPrints;
     };
-
-
-    auto linearTestFun = [](auto &&track) {
-        LinearPhotoRegion region(track);
-        LinearPhotoPrintsGenerator generator(region);
-        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 4);
-        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
-        return photoPrints;
-    };
-
-    static int counter = 0;
-//    m_GeoCoordinates = getDefaultTrack();
-
-   // QVector<QGeoCoordinate> m_GeoCoordinates1;
-
-
-    if (counter++ % 2 == 0) {
-        auto photoPrints = areaTestFun(m_AOIModel.getGeoCoordinates());
-        for (auto photoPrint : photoPrints) {
-            //        m_GeoCoordinates.append(photoPrint.GetBorder());
-            m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
-        }
+    auto photoPrints = areaTestFun(m_AOIModel.getGeoCoordinates());
+    m_FlightModel.clear();
+    for (auto photoPrint : photoPrints) {
+        //        m_GeoCoordinates.append(photoPrint.GetBorder());
+        m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
     }
 }
+
