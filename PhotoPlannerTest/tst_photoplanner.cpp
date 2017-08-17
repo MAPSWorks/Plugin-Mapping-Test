@@ -4,6 +4,7 @@
 
 #include "photogeocalcs.h"
 #include "PhotoPrintsGenerator.h"
+#include "photocamera.h"
 
 #include <proj_api.h>
 #include <geodesic.h>
@@ -90,6 +91,24 @@ private slots:
 //        }
     }
 
+    void test_PhotoCameraModel() {
+        aero_photo::PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
+        double Lx = 0, Ly = 0;
+        sonyA6000.CalcLxLy(100, Lx, Ly);
+        QCOMPARE(Lx, 75.0);
+        QCOMPARE(Ly, 112.5);
+        sonyA6000.CalcLxLy(500, Lx, Ly);
+        QCOMPARE(Lx, 375.0);
+        QCOMPARE(Ly, 562.5);
+
+        double Bx = 0, By = 0;
+        sonyA6000.CalcBxBy(100, 80, 60, Bx, By);
+        QCOMPARE(Bx, 15.0);
+        QCOMPARE(By, 45.0);
+        sonyA6000.CalcBxBy(500, 80, 60, Bx, By);
+        QCOMPARE(Bx, 75.0);
+        QCOMPARE(By, 225.0);
+    }
 
     void test_GeoCalcs() {
         using namespace aero_photo;
