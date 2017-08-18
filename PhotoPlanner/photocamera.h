@@ -25,8 +25,8 @@ private:
         return h/f_;
     }
 
-    const double lx_, ly_;
     const double f_;
+    const double lx_, ly_;
 };
 
 }
