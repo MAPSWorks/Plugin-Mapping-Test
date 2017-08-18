@@ -34,7 +34,7 @@ using PhotoPrints = QVector<PhotoPrint>;
 
 class LinearPhotoRegion {
 public:
-    LinearPhotoRegion(const GeoPoints &track) : track_(track) { }
+    explicit LinearPhotoRegion(const GeoPoints &track) : track_(track) { }
 
     const GeoPoints &GetTrack() const {
         return track_;
@@ -46,7 +46,7 @@ private:
 
 class AreaPhotoRegion {
 public:
-    AreaPhotoRegion(const GeoPoints &border) : border_(border) { }
+    explicit AreaPhotoRegion(const GeoPoints &border) : border_(border) { }
 
     const GeoPoints &GetBorder() const {
         return border_;

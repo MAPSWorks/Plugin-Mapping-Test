@@ -14,6 +14,11 @@ namespace aero_photo {
 
 using LinedGeoPoints = QVector<GeoPoints>;
 
+class PhotoPrintsGenerator {
+public:
+    virtual GeoPoints GeneratePhotoPrintsCenters() = 0;
+};
+
 class LinePhotoPrintsGenerator {
 public:
     LinePhotoPrintsGenerator(const GeoPoint &pntA, qreal azimuth, GeoDistance distance)
@@ -64,7 +69,7 @@ private:
 
 class LinearPhotoPrintsGenerator {
 public:
-    LinearPhotoPrintsGenerator(const LinearPhotoRegion &linearRegion) {
+    explicit LinearPhotoPrintsGenerator(const LinearPhotoRegion &linearRegion) {
         if (linearRegion.GetTrack().size()<2)
             throw std::logic_error("Invalid LinearPhotoRegion size()");
         trackHead_ = linearRegion.GetTrack().front();
@@ -132,7 +137,7 @@ class AreaPhotoPrintsGenerator {
 
     class RegionInternals {
     public:
-        RegionInternals(const AreaPhotoRegion &area) {
+        explicit RegionInternals(const AreaPhotoRegion &area) {
             if (area.GetBorder().size()<3)
                 throw std::logic_error("Invalid AreaPhotoRegion size()");
 
@@ -191,7 +196,7 @@ class AreaPhotoPrintsGenerator {
     private:
         class GeoPointsGrid {
         public:
-            GeoPointsGrid(size_t totalRuns) : linedGeoPoints_(totalRuns), isRevertedGeoPoint_(totalRuns, false) { }
+            explicit GeoPointsGrid(size_t totalRuns) : linedGeoPoints_(totalRuns), isRevertedGeoPoint_(totalRuns, false) { }
 
             bool Empty() const { return linedGeoPoints_.empty() || linedGeoPoints_.front().empty(); }
             bool HasDifferentSizes() const {
@@ -272,7 +277,7 @@ class AreaPhotoPrintsGenerator {
     };
 
 public:
-    AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) : regionInternals_(area) {
+    explicit AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) : regionInternals_(area) {
     }
 
     LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue = 0) {

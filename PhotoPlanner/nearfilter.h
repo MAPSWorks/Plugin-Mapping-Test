@@ -8,7 +8,7 @@ namespace aero_photo {
 template <typename T>
 class NearFilter {
 public:
-    NearFilter(size_t filterSize) : filterSize_(filterSize) { }
+    explicit NearFilter(size_t filterSize) : filterSize_(filterSize) { }
 
     Array2D<T> operator() (const Array2D<T> &inArray) {
 
