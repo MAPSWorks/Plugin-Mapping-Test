@@ -5,17 +5,18 @@
 #include "photogeocalcs.h"
 #include "PhotoPrintsGenerator.h"
 #include "photocamera.h"
+#include "photoplanner.h"
 
 #include <proj_api.h>
 #include <geodesic.h>
 
-class PhotoPlanner : public QObject
+class Tst_PhotoPlanner : public QObject
 {
     Q_OBJECT
 
 public:
-    PhotoPlanner();
-    ~PhotoPlanner();
+    Tst_PhotoPlanner();
+    ~Tst_PhotoPlanner();
 
 private slots:
     void initTestCase();
@@ -238,28 +239,47 @@ private slots:
 //        border << border.back().atDistanceAndAzimuth(220, 0);
     }
 
+    void test_PhotoPlannerCreate() {
+        using namespace aero_photo;
+
+        PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
+        GeoPoints track;
+        GeoPoint startPoint(47.2589912414551, 11.3327512741089);
+        track << startPoint;
+        track << track.back().atDistanceAndAzimuth(1000, 90);
+        {
+            LinearPhotoRegion photoRegion(track);
+            LinearPhotoPlanner planner(sonyA6000, photoRegion);
+        }
+        track << track.back().atDistanceAndAzimuth(1000, 180);
+        {
+            AreaPhotoRegion photoRegion(track);
+            AreaPhotoPlanner planner(sonyA6000, photoRegion);
+        }
+    }
+
 
 };
 
-PhotoPlanner::PhotoPlanner()
+Tst_PhotoPlanner::Tst_PhotoPlanner()
 {
 }
 
-PhotoPlanner::~PhotoPlanner()
-{
-
-}
-
-void PhotoPlanner::initTestCase()
+Tst_PhotoPlanner::~Tst_PhotoPlanner()
 {
 
 }
 
-void PhotoPlanner::cleanupTestCase()
+void Tst_PhotoPlanner::initTestCase()
 {
 
 }
 
-QTEST_APPLESS_MAIN(PhotoPlanner)
+void Tst_PhotoPlanner::cleanupTestCase()
+{
+
+}
+
+QTEST_APPLESS_MAIN(Tst_PhotoPlanner)
 
 #include "tst_photoplanner.moc"
