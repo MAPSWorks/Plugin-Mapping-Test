@@ -2,6 +2,7 @@
 #define PHOTOGEOUCALC_H
 
 #include "PhotoPlannerCore.h"
+#include <math.h>
 
 namespace aero_photo {
 
