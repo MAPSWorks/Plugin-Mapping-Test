@@ -31,7 +31,8 @@ HEADERS += \
     PhotoPrintsGenerator.h \
     PhotoPlannerCore.h \
     array2d.h \
-    nearfilter.h
+    nearfilter.h \
+    photocamera.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

@@ -23,6 +23,8 @@ public:
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QVector<QGeoCoordinate> getGeoCoordinates() const;
 
+    void clear();
+
 protected:
     QHash<int, QByteArray> roleNames() const;
 

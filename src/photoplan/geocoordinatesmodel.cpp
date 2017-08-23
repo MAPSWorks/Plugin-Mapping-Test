@@ -52,6 +52,11 @@ QVector<QGeoCoordinate> GeoCoordinatesModel::getGeoCoordinates() const
     return m_GeoCoordinates;
 }
 
+void GeoCoordinatesModel::clear()
+{
+    m_GeoCoordinates.clear();
+}
+
 QVariantMap GeoCoordinatesModel::get(int row) {
     QHash<int,QByteArray> names = roleNames();
     QHashIterator<int, QByteArray> i(names);

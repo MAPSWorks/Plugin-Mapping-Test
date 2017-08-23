@@ -13,11 +13,22 @@ Item {
     Button
     {
         y: 50
-        height: 50
-        width: 50
-        text: "Calc"
+        height: 45
+        width: 75
+        text: "Linear"
         onClicked:  {
-            photoPlan.recalc();
+            photoPlan.calcLinearPhotoPrints();
+            canvas.requestPaint();
+        }
+    }
+    Button
+    {
+        y: 100
+        height: 45
+        width: 75
+        text: "Area"
+        onClicked:  {
+            photoPlan.calcAreaPhotoPrints();
             canvas.requestPaint();
         }
     }

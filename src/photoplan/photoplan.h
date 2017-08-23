@@ -18,7 +18,8 @@ public:
     GeoCoordinatesModel* PhotoPointsModel();
 
 
-    Q_INVOKABLE void recalc();
+    Q_INVOKABLE void calcLinearPhotoPrints();
+    Q_INVOKABLE void calcAreaPhotoPrints();
 
 private:
     GeoCoordinatesModel m_AOIModel;
