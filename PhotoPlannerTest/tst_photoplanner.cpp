@@ -112,7 +112,12 @@ private slots:
     }
 
     void test_GeoCalcs() {
-        using namespace aero_photo;
+        QCOMPARE( aero_photo::D2R(0), 0.0);
+        QCOMPARE( aero_photo::D2R(180), M_PI);
+        QCOMPARE( aero_photo::R2D(0), 0.0);
+        QCOMPARE( aero_photo::R2D(M_PI), 180.0);
+
+//        using namespace aero_photo;
 
 
 //        const double distance = 5000;
@@ -256,6 +261,25 @@ private slots:
             AreaPhotoRegion photoRegion(track);
             AreaPhotoPlanner planner(sonyA6000, photoRegion);
         }
+    }
+
+    void test_PhotoUavModelCalcs() {
+        using namespace aero_photo;
+        PhotoUavModel uavModel(10, D2R(45));
+        QCOMPARE(uavModel.GetManeuverR(), 100.0 / 9.81);
+    }
+
+    void test_ManeuverTrackAlignment() {
+        using namespace aero_photo;
+
+        PhotoUavModel uavModel(100, D2R(45));
+        auto R = uavModel.GetManeuverR();
+
+        GeoPoint pnt1(47.2589912414551, 11.3327512741089);
+        GeoPoint pnt2 = pnt1.atDistanceAndAzimuth(3 * R, 45);
+        ManeuverTrackAlignment mnvAligment(pnt1, 0, pnt2, 90);
+        auto turnPoints = mnvAligment.Calculate(uavModel);
+        QCOMPARE(turnPoints.size(), 2);
     }
 
 

@@ -3,8 +3,13 @@
 
 #include "PhotoPlannerCore.h"
 #include <math.h>
+#include <cmath>
+#include <QPointF>
 
 namespace aero_photo {
+
+constexpr qreal D2R(qreal degree) { return degree * M_PI / qreal(180); }
+constexpr qreal R2D(qreal radian) { return radian / M_PI * qreal(180); }
 
 using GeoDistance = qreal;
 
@@ -70,6 +75,98 @@ private:
     const qreal startPointsAzimuth_;
     const qreal Lyp_;
     const size_t totalRuns_;
+};
+
+class CartesianCalcs {
+public:
+    CartesianCalcs(GeoPoint basePoint, qreal baseAzimuth)
+        : basePoint_(basePoint)
+        , baseAzimuth_(baseAzimuth)
+    {
+    }
+
+    QPointF ConvertToCartesian(const GeoPoint &point) {
+        auto azimuthToPoint = D2R(basePoint_.azimuthTo(point));
+        auto distanceToPoint = basePoint_.distanceTo(point);
+        return QPointF(distanceToPoint * cos(azimuthToPoint), distanceToPoint * sin(azimuthToPoint));
+    }
+
+private:
+    const GeoPoint basePoint_;
+    const qreal baseAzimuth_;
+};
+
+class PhotoUavModel {
+public:
+    PhotoUavModel(qreal photoVelocity, qreal photoRoll) : velocity_(photoVelocity), roll_(photoRoll) { }
+
+    qreal GetManeuverR() const { return velocity_ * velocity_ / 9.81 / tan(roll_); }
+
+private:
+    qreal velocity_;
+    qreal roll_;
+};
+
+class ManeuverTrackAlignment {
+
+    struct TurnPointData {
+        GeoPoint center;
+        bool isTurnRight = true;
+    };
+
+public:
+    ManeuverTrackAlignment(const GeoPoint &pnt1, qreal az1, const GeoPoint &pnt2, qreal az2)
+        : pnt1_(pnt1)
+        , az1_(az1)
+        , pnt2_(pnt2)
+        , az2_(az2)
+        , distance12_(pnt1.distanceTo(pnt2))
+        , az12_(pnt1.azimuthTo(pnt2))
+    {
+    }
+
+    GeoPoints Calculate(const PhotoUavModel &uavModel) {
+        auto R = uavModel.GetManeuverR();
+
+        auto getTurnPoint = [R](const GeoPoint &pnt, qreal az1, qreal az2) {
+            auto deltaAz = az2 - az1; // Normalize????
+            bool isTurnRight = deltaAz >= 0;
+            auto turnPoint = pnt.atDistanceAndAzimuth(R, az1 + isTurnRight ? 90 : 270);
+            return TurnPointData{turnPoint, isTurnRight};
+        };
+
+        auto turn1 = getTurnPoint(pnt1_, az1_, az12_);
+        auto turn2 = getTurnPoint(pnt2_, az12_, az2_);
+
+        if ( (turn1.isTurnRight && !turn2.isTurnRight) || (!turn1.isTurnRight && turn2.isTurnRight) )
+            return CalculateTwoSideLine(turn1, turn2, R);
+        else
+            return CalculateOneSideLine(turn1, turn2, R);
+    }
+
+private:
+    GeoPoints CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R) {
+        auto az = turn1.center.azimuthTo(turn2.center) + turn1.isTurnRight ? 270 : 90;
+        auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
+        auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
+        return GeoPoints{t1mnv, t2mnv};
+    }
+    GeoPoints CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R) {
+        auto halfDistance = turn1.center.distanceTo(turn2.center) / 2.0;
+        auto deltaAz = asin(R/halfDistance);
+        auto az = turn1.center.azimuthTo(turn2.center) + turn1.isTurnRight ? -deltaAz : deltaAz;
+        auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
+        auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az + 180);
+        return GeoPoints{t1mnv, t2mnv};
+    }
+
+    const GeoPoint pnt1_;
+    const qreal az1_;
+    const GeoPoint pnt2_;
+    const qreal az2_;
+
+    const qreal distance12_;
+    const qreal az12_;
 };
 
 }
