@@ -8,6 +8,7 @@ class PHOTOPLANNERSHARED_EXPORT PhotoPlanner
 
 public:
     PhotoPlanner();
+
 };
 
 #endif // PHOTOPLANNER_H

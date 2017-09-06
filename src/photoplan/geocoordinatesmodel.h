@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QGeoCoordinate>
+#include "PhotoPlanner/PhotoPlannerCore.h"
 
 class GeoCoordinatesModel : public QAbstractListModel
 {
@@ -31,5 +32,21 @@ protected:
 private:
     QVector<QGeoCoordinate> m_GeoCoordinates;
 };
+/*
+class PhotoPrintsModel : public QAbstractListModel
+{
+    Q_OBJECT
+public:
+    enum PhotoPrintsRoles{
+        CenterRole = Qt::UserRole + 1,
+        CenterRole
+    };
 
+    PhotoPrintsModel(QObject *parent=0);
+
+
+private:
+    QVector<aero_photo::PhotoPrint> m_photoPrints;
+};
+*/
 #endif // GEOCOORDINATESMODEL_H

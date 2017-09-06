@@ -2,6 +2,7 @@
 #define PHOTOPLAN_H
 
 #include <QObject>
+#include "PhotoPlanner/photoplanner.h"
 #include "geocoordinatesmodel.h"
 
 class PhotoPlan : public QObject
@@ -17,7 +18,6 @@ public:
     GeoCoordinatesModel* FlightModel();
     GeoCoordinatesModel* PhotoPointsModel();
 
-
     Q_INVOKABLE void calcLinearPhotoPrints();
     Q_INVOKABLE void calcAreaPhotoPrints();
 
@@ -25,6 +25,7 @@ private:
     GeoCoordinatesModel m_AOIModel;
     GeoCoordinatesModel m_FlightModel;
     GeoCoordinatesModel m_PhotoPointsModel;
+
 };
 
 #endif // PHOTOPLAN_H

@@ -27,13 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         photoplanner.cpp \
     photoplannerplugin.cpp \
-    photoplannerwindow.cpp
+    photoplannerwindow.cpp \
+    photoplan.cpp
 
 HEADERS += \
         photoplanner.h \
         photoplanner_global.h \ 
     photoplannerplugin.h \
-    photoplannerwindow.h
+    photoplannerwindow.h \
+    photoplan.h
 
 unix {
     target.path = /usr/lib

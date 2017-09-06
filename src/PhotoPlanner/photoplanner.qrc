@@ -1,5 +1,12 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/PhotoPlanner.qml</file>
+        <file>qml/icons/map.svg</file>
+        <file>qml/icons/unarchive.svg</file>
+        <file>qml/icons/settings.svg</file>
+        <file>qml/qtquickcontrols2.conf</file>
+        <file>qml/CalculationsPanel.qml</file>
+        <file>qml/icons/area.svg</file>
+        <file>qml/icons/linear.svg</file>
     </qresource>
 </RCC>

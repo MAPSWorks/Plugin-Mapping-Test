@@ -115,7 +115,17 @@ Item {
         renderStrategy: Canvas.Immediate//Threaded//Immediate //Threaded //.Cooperative
         renderTarget: Canvas.Image//Image //.FramebufferObject
         contextType: "2d"
+     /*   Path {
+            id: pathAOI;
+            objectName: "pathAOI"
+
+             PathCurve { x: 75; y: 75 }
+             PathCurve { x: 20; y: 75 }
+        }
+*/
         onPaint: {
+
+  //          pathAOI.pathElements.append(PathCurve.new(77,88));
             var ctx = getContext("2d");
             ctx.reset();
             ctx.strokeStyle = "red";
@@ -123,6 +133,7 @@ Item {
             ctx.beginPath();
             var mapPointX;
             var mapPointY;
+
             for (var i =0; i<pointView.model.rowCount(); i++)
             {
                 mapPointX = map.sceneToWindowX(map.mapToSceneX(mapProvider.lonToX(pointView.model.get(i)['longitude'])))*map.ws;
