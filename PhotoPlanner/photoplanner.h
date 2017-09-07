@@ -26,8 +26,9 @@ using CartesianPoint = QPointF;
 
 class PhotoPlanner {
 protected:
-    PhotoPlanner(const PhotoCameraModel &photoCamera)
-        : photoCamera_(photoCamera) {
+    PhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera)
+        : photoUav_(photoUav)
+        , photoCamera_(photoCamera) {
     }
 
 public:
@@ -38,17 +39,31 @@ public:
 protected:
     void CalculateTrack() {
         trackPoints_.clear();
-        for(auto &line: linedGeoPoints_) {
-            if (line.empty())
+
+        int prevLine = -1;
+        for(int i = 0; i<linedGeoPoints_.size(); ++i) {
+            auto &line = linedGeoPoints_[i];
+            if(line.empty())
                 continue;
+
+            if(prevLine>=0) {
+                ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_.GetAzimuth(prevLine), linedGeoPoints_[i].front(), linedGeoPoints_.GetAzimuth(i));
+                auto aligmentPoints = aligment.Calculate(photoUav_);
+                for(auto point : aligmentPoints)
+                    trackPoints_.push_back(point);
+            }
+
             trackPoints_.push_back(line.front());
             if(line.size()>1)
                 trackPoints_.push_back(line.back());
+            prevLine = i;
         }
+
         isCalculated = true;
     }
 
     bool isCalculated = false;
+    PhotoUavModel photoUav_;
     PhotoCameraModel photoCamera_;
     LinedGeoPoints linedGeoPoints_;
     GeoPoints trackPoints_;
@@ -57,8 +72,8 @@ protected:
 
 class LinearPhotoPlanner : public PhotoPlanner {
 public:
-    LinearPhotoPlanner(const PhotoCameraModel &photoCamera, const LinearPhotoRegion &photoRegion)
-        : PhotoPlanner(photoCamera)
+    LinearPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const LinearPhotoRegion &photoRegion)
+        : PhotoPlanner(photoUav, photoCamera)
         , photoPrintsGenerator_(photoRegion) {
     }
 
@@ -82,8 +97,8 @@ private:
 
 class AreaPhotoPlanner : public PhotoPlanner {
 public:
-    AreaPhotoPlanner(const PhotoCameraModel &photoCamera, const AreaPhotoRegion &photoRegion)
-        : PhotoPlanner(photoCamera)
+    AreaPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const AreaPhotoRegion &photoRegion)
+        : PhotoPlanner(photoUav, photoCamera)
         , photoPrintsGenerator_(photoRegion) {
     }
 

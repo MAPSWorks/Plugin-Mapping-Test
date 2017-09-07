@@ -11,6 +11,8 @@ TARGET = $$qtLibraryTarget(PhotoPlanner)
 include( ../../gcu_plugin.pri )
 TEMPLATE = lib
 
+CONFIG  += exception c++14
+
 DEFINES += PHOTOPLANNER_LIBRARY
 
 # The following define makes your compiler emit warnings if you use

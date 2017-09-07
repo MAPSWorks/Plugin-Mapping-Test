@@ -128,15 +128,16 @@ public:
     GeoPoints Calculate(const PhotoUavModel &uavModel) {
         auto R = uavModel.GetManeuverR();
 
-        auto getTurnPoint = [R](const GeoPoint &pnt, qreal az1, qreal az2) {
-            auto deltaAz = az2 - az1; // Normalize????
+        auto getTurnPoint = [R](const GeoPoint &pnt, qreal az, qreal deltaAz) {
+            if (deltaAz < -180)
+                deltaAz += 360;
             bool isTurnRight = deltaAz >= 0;
-            auto turnPoint = pnt.atDistanceAndAzimuth(R, az1 + isTurnRight ? 90 : 270);
+            auto turnPoint = pnt.atDistanceAndAzimuth(R, az + (isTurnRight ? 90 : 270));
             return TurnPointData{turnPoint, isTurnRight};
         };
 
-        auto turn1 = getTurnPoint(pnt1_, az1_, az12_);
-        auto turn2 = getTurnPoint(pnt2_, az12_, az2_);
+        auto turn1 = getTurnPoint(pnt1_, az1_, az12_ - az1_);
+        auto turn2 = getTurnPoint(pnt2_, az2_, az2_ - az12_);
 
         if ( (turn1.isTurnRight && !turn2.isTurnRight) || (!turn1.isTurnRight && turn2.isTurnRight) )
             return CalculateTwoSideLine(turn1, turn2, R);
@@ -146,18 +147,48 @@ public:
 
 private:
     GeoPoints CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R) {
-        auto az = turn1.center.azimuthTo(turn2.center) + turn1.isTurnRight ? 270 : 90;
+        auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? 270 : 90);
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
-        return GeoPoints{t1mnv, t2mnv};
+        //return GeoPoints{t1mnv, t2mnv};
+        auto t12mnv = t1mnv.atDistanceAndAzimuth(t1mnv.distanceTo(t2mnv) / 2, t1mnv.azimuthTo(t2mnv));
+//        return GeoPoints{t1mnv,
+//                    //turn1.center,
+//                    t12mnv,
+//                    //turn2.center,
+//                    t2mnv};
+        GeoPoints points;
+        AddCircle(points, turn1.center, R);
+        points << t1mnv;
+        points << t12mnv;
+        points << t2mnv;
+        AddCircle(points, turn2.center, R);
+        return points;
     }
     GeoPoints CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R) {
         auto halfDistance = turn1.center.distanceTo(turn2.center) / 2.0;
         auto deltaAz = asin(R/halfDistance);
-        auto az = turn1.center.azimuthTo(turn2.center) + turn1.isTurnRight ? -deltaAz : deltaAz;
+        auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? -deltaAz : deltaAz);
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az + 180);
-        return GeoPoints{t1mnv, t2mnv};
+//        //return GeoPoints{t1mnv, t2mnv};
+        auto t12mnv = t1mnv.atDistanceAndAzimuth(t1mnv.distanceTo(t2mnv) / 2, t1mnv.azimuthTo(t2mnv));
+//        return GeoPoints{t1mnv,
+//                    //turn1.center, t12mnv, turn2.center,
+//                    t2mnv};
+        GeoPoints points;
+        AddCircle(points, turn1.center, R);
+        points << t1mnv;
+        points << t12mnv;
+        points << t2mnv;
+        AddCircle(points, turn2.center, R);
+        return points;
+    }
+
+    void AddCircle(GeoPoints &points, const GeoPoint &center, qreal R) {
+        for (qreal az = 0; az < 360; az += 30)
+            points.push_back(center.atDistanceAndAzimuth(R, az));
+        points.push_back(points.front());
     }
 
     const GeoPoint pnt1_;

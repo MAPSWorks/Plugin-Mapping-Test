@@ -12,7 +12,23 @@
 
 namespace aero_photo {
 
-using LinedGeoPoints = QVector<GeoPoints>;
+//using LinedGeoPoints = QVector<std::tuple<qreal, GeoPoints>>;
+
+class LinedGeoPoints : public QVector<GeoPoints> {
+public:
+    explicit LinedGeoPoints() { }
+    explicit LinedGeoPoints(size_t size)
+        : QVector<GeoPoints>(size)
+        , azimuths_(size)
+    {
+    }
+
+    void SetAzimuth(size_t index, qreal azimuth) { azimuths_[index] = azimuth; }
+    qreal GetAzimuth(size_t index) const { return azimuths_[index]; }
+private:
+    void resize(int asize) = delete;
+    QVector<qreal> azimuths_;
+};
 
 class PhotoPrintsGenerator {
 public:
@@ -78,8 +94,7 @@ public:
     }
 
     LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, size_t totalRuns) {
-        LinedGeoPoints linedGeoPoints;
-        linedGeoPoints.resize(totalRuns * (trackTail_.size()));
+        LinedGeoPoints linedGeoPoints(totalRuns * (trackTail_.size()));
         // !!! Both pntA & pntB must be copy of members
         auto pntA = trackHead_;
         for (int trackIndex = 0; trackIndex < trackTail_.size(); trackIndex++) {
@@ -95,12 +110,15 @@ public:
                 LinePhotoPrintsGenerator thisRunLineGenerator(startPointAB, runAzimuth, distance);
                 auto pointRunPrintsCenters = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
                 if (runIndex % 2 != 0) {
+                    runAzimuth += 180;
                     if (!pointRunPrintsCenters.empty())
                         for (int i = 0, j = pointRunPrintsCenters.size() - 1; i < j; ++i, --j)
                             std::swap(pointRunPrintsCenters[i], pointRunPrintsCenters[j]);
                 }
                 // We must calculate index
-                linedGeoPoints[CalculateRunSequnce(trackIndex, runIndex)] = pointRunPrintsCenters;
+                const auto linedIndex = CalculateRunSequnce(trackIndex, runIndex);
+                linedGeoPoints[linedIndex] = pointRunPrintsCenters;
+                linedGeoPoints.SetAzimuth(linedIndex, runAzimuth);
             }
             pntA = trackTail_[trackIndex];
         }

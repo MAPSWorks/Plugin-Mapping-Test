@@ -1,6 +1,6 @@
 #include "photoplan.h"
 #include "PhotoPlanner/PhotoPrintsGenerator.h"
-
+#include "PhotoPlanner/photoplanner.h"
 
 PhotoPlan::PhotoPlan()
 {
@@ -32,17 +32,18 @@ void PhotoPlan::calcLinearPhotoPrints()
     using namespace aero_photo;
 
     auto linearTestFun = [](auto &&track) {
+        PhotoUavModel fakeUav(60, D2R(45));
+        PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
         LinearPhotoRegion region(track);
-        LinearPhotoPrintsGenerator generator(region);
-        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 4);
-        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
-        return photoPrints;
+        LinearPhotoPlanner planner(fakeUav, sonyA6000, region);
+
+        planner.Calculate(500, 50, 50, 3);
+        return planner.GetTrackPoints();
     };
-    auto photoPrints = linearTestFun(m_AOIModel.getGeoCoordinates());
+    auto trackPoints = linearTestFun(m_AOIModel.getGeoCoordinates());
     m_FlightModel.clear();
-    for (auto photoPrint : photoPrints) {
-        //        m_GeoCoordinates.append(photoPrint.GetBorder());
-        m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
+    for (auto trackPoint : trackPoints) {
+        m_FlightModel.addGeoCoordinate(trackPoint);
     }
 }
 

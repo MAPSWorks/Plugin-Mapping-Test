@@ -247,6 +247,7 @@ private slots:
     void test_PhotoPlannerCreate() {
         using namespace aero_photo;
 
+        PhotoUavModel fakeUav(10, D2R(45));
         PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
         GeoPoints track;
         GeoPoint startPoint(47.2589912414551, 11.3327512741089);
@@ -254,12 +255,12 @@ private slots:
         track << track.back().atDistanceAndAzimuth(1000, 90);
         {
             LinearPhotoRegion photoRegion(track);
-            LinearPhotoPlanner planner(sonyA6000, photoRegion);
+            LinearPhotoPlanner planner(fakeUav, sonyA6000, photoRegion);
         }
         track << track.back().atDistanceAndAzimuth(1000, 180);
         {
             AreaPhotoRegion photoRegion(track);
-            AreaPhotoPlanner planner(sonyA6000, photoRegion);
+            AreaPhotoPlanner planner(fakeUav, sonyA6000, photoRegion);
         }
     }
 
