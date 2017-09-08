@@ -4,13 +4,10 @@
 
 PhotoPlannerWindow::PhotoPlannerWindow()
 {
-
-
-
     setWindowTitle(tr("Photo Planner"));
     setSource(QUrl("qrc:/qml/PhotoPlanner.qml"));
 
-    qmlRegisterType<PhotoPlan>("PhotoPlan", 1, 0, "PhotoPlan");
+    qmlRegisterType<PhotoPlan>("PhotoPlanner", 1, 0, "PhotoPlanner");
 
     rootContext()->setContextProperty("photoPlanner", &photoPlan);
 
@@ -21,27 +18,4 @@ PhotoPlannerWindow::PhotoPlannerWindow()
 bool PhotoPlannerWindow::aboutToQuit()
 {
     return true;
-}
-
-QVariantList PhotoPlannerWindow::aoi() const
-{
-//   return QList<QGeoCoordinate> m_aoi.toList();
-}
-
-void PhotoPlannerWindow::setAoi(const QVariantList &aoi)
-{
-    //m_aoi = aoi;
-}
-
-void PhotoPlannerWindow::calculateAoI(QVariantList aoi)
-{
-    QVector<QGeoCoordinate> pathAoI;
-
-    foreach(QVariant crd, aoi)
-    {
-        pathAoI.append(crd.value<QGeoCoordinate>());
-    }
-
-    double k= pathAoI[0].latitude();
-    k=0;
 }

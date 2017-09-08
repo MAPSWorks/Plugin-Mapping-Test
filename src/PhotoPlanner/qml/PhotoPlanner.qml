@@ -39,17 +39,30 @@ Item {
             for(var i=0; i<count; i++)
             {
 //                var marker = Qt.createQmlObject ('Marker {}', map)
-                var marker = Qt.createQmlObject ('import QtLocation 5.6; MapCircle {}', map)
+                //import QtQuick 2.0;
+//                property string labelText
+
+                var marker = Qt.createQmlObject ('  import QtLocation 5.6;
+                                                  MapCircle {
+
+                                                  }', map)
+                /*   Text {
+                     anchors.fill: parent
+                     text: labelText
+                   } */
+
                 map.addMapItem(marker)
                 marker.z = map.z
                 //marker.coordinate = photoPlanner.photoCenters[i]
                 marker.center = photoPlanner.photoCenters[i];
                 marker.radius= 20
-                marker.border.width= 1
-                marker.color =  'green'
-
+                marker.border.width = 1;
+                marker.border.color =  '#8021be2b' //'red'
+                marker.color =  '#2021be2b' // 'transparent'
+                //marker.color= 'green'
+                //marker. labelText = i;
                 //marker.circleText = i;
-                console.log("11");
+               // console.log("11");
             }
         }
 
@@ -66,12 +79,12 @@ Item {
                 //marker.coordinate = photoPlanner.photoCenters[i]
                 marker.addCoordinate(photoPlanner.photoPrints[i*4]);
                 marker.addCoordinate(photoPlanner.photoPrints[i*4+1]);
-                marker.addCoordinate(photoPlanner.photoPrints[i*4+2]);
                 marker.addCoordinate(photoPlanner.photoPrints[i*4+3]);
+                marker.addCoordinate(photoPlanner.photoPrints[i*4+2]);
 //                marker.radius= 20
                 marker.border.width= 1
-                marker.border.color =  'red'
-                marker.color =  'transparent'
+                marker.border.color =  '#8021be2b' //'red'
+                marker.color =  '#2021be2b' // 'transparent'
 
                 //marker.circleText = i;
             }
