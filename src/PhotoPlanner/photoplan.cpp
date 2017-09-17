@@ -246,29 +246,20 @@ void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
         return;
     }
 
-    auto areaTestFun = [](auto &&track) {
-        AreaPhotoRegion testArea(track);
-        AreaPhotoPrintsGenerator generator(testArea);
-        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 90);
-//        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, generator.GetPreferredAzimuth());
-        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
-        return photoPrints;
-    };
+//    PhotoUavModel uavModel(60, D2R(30));
+    auto uavModel = CreatePhotoUavModelFromGui();
+    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
+//    auto photoCameraModel = CreatePhotoCameraModelFromGui();
+    AreaPhotoRegion region(pathAoI);
+    AreaPhotoPlanner planner(uavModel, photoCameraModel, region);
+    planner.Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
 
-    auto photoPrints = areaTestFun(pathAoI);
-
-    m_sourceTrack.clear();
+    m_sourceTrack = planner.GetTrackPoints();
     m_photoCenters.clear();
     m_photoPrints.clear();
-
-    for (auto photoPrint : photoPrints) {
-                m_photoPrints.append(photoPrint.GetBorder());
-//        m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
-      m_photoCenters.append(photoPrint.GetCenter());
-
-      m_sourceTrack.append(photoPrint.GetCenter());
+    for (auto photoPrint : planner.GetPhotoPrints()) {
+        m_photoPrints.append(photoPrint.GetBorder());
+        m_photoCenters.append(photoPrint.GetCenter());
     }
- //   emit trackChanged();
-
 }
 

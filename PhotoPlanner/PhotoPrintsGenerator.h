@@ -214,7 +214,7 @@ class AreaPhotoPrintsGenerator {
     private:
         class GeoPointsGrid {
         public:
-            explicit GeoPointsGrid(size_t totalRuns) : linedGeoPoints_(totalRuns), isRevertedGeoPoint_(totalRuns, false) { }
+            explicit GeoPointsGrid(size_t totalRuns, qreal azimuth) : azimuth_(azimuth), linedGeoPoints_(totalRuns), isRevertedGeoPoint_(totalRuns, false) { }
 
             bool Empty() const { return linedGeoPoints_.empty() || linedGeoPoints_.front().empty(); }
             bool HasDifferentSizes() const {
@@ -227,6 +227,7 @@ class AreaPhotoPrintsGenerator {
 
             void SetLine(size_t runIndex, GeoPoints &&geoPoints, bool isDirectOrder) {
                 linedGeoPoints_[runIndex] = geoPoints;
+                linedGeoPoints_.SetAzimuth(runIndex, azimuth_);
                 isRevertedGeoPoint_[runIndex] = !isDirectOrder;
             }
 
@@ -239,18 +240,22 @@ class AreaPhotoPrintsGenerator {
                     if (isRevertedGeoPoint_[iRow]) {
                         std::vector<GeoPoint> revertedGeoPoints(geoPoints[iRow].crbegin(), geoPoints[iRow].crend());
                         geoPoints[iRow] = GeoPoints::fromStdVector(revertedGeoPoints);
+                        geoPoints.SetAzimuth(iRow, azimuth_ + 180);
+                    } else {
+                        geoPoints.SetAzimuth(iRow, azimuth_);
                     }
                 }
             }
 
         private:
+            qreal azimuth_;
             LinedGeoPoints linedGeoPoints_;
             std::vector<bool> isRevertedGeoPoint_;
         };
 
         GeoPointsGrid GeneratePhotoPrintsGrid(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
             size_t totalRuns = ceil(GetRadius() * 2 / Lyp) + extentBorderValue;
-            GeoPointsGrid geoPointsGrid(totalRuns);
+            GeoPointsGrid geoPointsGrid(totalRuns, azimuth);
             RunStartPointsCalc middlePointsCalc(GetCenter(), azimuth, Lyp, totalRuns);
             for (size_t i = 0; i < totalRuns; ++i) {
                 auto middlePoint = middlePointsCalc.Calculate(i);
