@@ -2,6 +2,7 @@
 #include "PhotoPlanner/PhotoPrintsGenerator.h"
 
 #include <QVariant>
+#include <QtDebug>
 
 
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
@@ -13,7 +14,7 @@ PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
     m_azimuth               = 0;
     m_altitude              = 100;
     m_gsd                   = 150;
-    m_speed                 = 30;
+    m_speed                 = 50;
     m_width                 = 100;
     m_maxRoll               = 30;
 
@@ -194,6 +195,8 @@ QVariantList PhotoPlan::photoPrints()
 #include <algorithm>
 #include <iostream>
 #include <vector>
+
+
 using namespace std;
 
 void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
@@ -202,39 +205,29 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
 
     QVector<QGeoCoordinate> pathAoI;
 
-    foreach(QVariant crd, aoi)
-    {
+    foreach(QVariant crd, aoi) {
         pathAoI.append(crd.value<QGeoCoordinate>());
     }
 
-    if(pathAoI.empty())
-    {
+    if(pathAoI.empty()) {
         return;
     }
 
-    auto linearTestFun = [](auto &&track) {
-        LinearPhotoRegion region(track);
-        LinearPhotoPrintsGenerator generator(region);
-        auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(200, 90, 4);
-        auto photoPrints = generator.GeneratePhotoPrints(photoPrintsCenters, 250, 120);
-        return photoPrints;
-    };
+//    PhotoUavModel uavModel(60, D2R(30));
+    auto uavModel = CreatePhotoUavModelFromGui();
+    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
+//    auto photoCameraModel = CreatePhotoCameraModelFromGui();
+    LinearPhotoRegion region(pathAoI);
+    LinearPhotoPlanner planner(uavModel, photoCameraModel, region);
+    planner.Calculate(altitude(), longitOverlap(), transverseOverlap(), 2);
 
-
-
-    auto photoPrints = linearTestFun(pathAoI);
-
-    m_sourceTrack.clear();
+    m_sourceTrack = planner.GetTrackPoints();
     m_photoCenters.clear();
     m_photoPrints.clear();
-
-    for (auto photoPrint : photoPrints) {
-                m_photoPrints.append(photoPrint.GetBorder());
-                m_photoCenters.append(photoPrint.GetCenter());
-                m_sourceTrack.append(photoPrint.GetCenter());
-
+    for (auto photoPrint : planner.GetPhotoPrints()) {
+        m_photoPrints.append(photoPrint.GetBorder());
+        m_photoCenters.append(photoPrint.GetCenter());
     }
-//        m_FlightModel.addGeoCoordinate(photoPrint.GetCenter());
 }
 
 void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)

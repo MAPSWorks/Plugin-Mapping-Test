@@ -6,6 +6,8 @@
 #include <QVariantList>
 #include <QVector>
 
+#include "PhotoPlanner/photoplanner.h"
+
 class PhotoPlan : public QObject
 {
     Q_OBJECT
@@ -86,6 +88,21 @@ signals:
 public slots:
 
 private:
+    aero_photo::PhotoUavModel CreatePhotoUavModelFromGui() const {
+        qreal speedKmPerHour = speed();
+        qreal speedMPerSecond = speedKmPerHour * 1000 / 3600;
+        auto rollRadian = aero_photo::D2R(maxRoll());
+        return aero_photo::PhotoUavModel(speedMPerSecond, rollRadian);
+    }
+
+    aero_photo::PhotoCameraModel CreatePhotoCameraModelFromGui() const  {
+        qreal focusM = qreal(focusRange()) / 100;
+        // Warning!!! This data items missed in GUI
+        qreal lxM = 0.015;
+        qreal lyM = 0.0225;
+        return aero_photo::PhotoCameraModel(focusM, lxM, lyM);
+    }
+
     QString m_cameraModel;
     quint32 m_focusRange;
     quint32 m_longitOverlap;

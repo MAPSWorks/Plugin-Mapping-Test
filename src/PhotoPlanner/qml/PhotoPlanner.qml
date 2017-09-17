@@ -103,7 +103,7 @@ Item {
             map.track.line.width = 2;
             map.track.line.color = 'blue';
             map.addMapItem(map.track);
-            map.track.path = photoPlanner.photoCenters //map.areaPoI.path //photoPlanner.track;
+            map.track.path = photoPlanner.track; //map.areaPoI.path //photoPlanner.track;
         }
 
         function startLinearPoI() {
@@ -258,10 +258,9 @@ Item {
                     {
                         photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
 
-                        map.startTrack();
-                        map.addMarkers();
                         map.addPhotoPrints();
-
+                        map.addMarkers();
+                        map.startTrack();
                     }
 
                     //newMissionPopup.x = mouseX
