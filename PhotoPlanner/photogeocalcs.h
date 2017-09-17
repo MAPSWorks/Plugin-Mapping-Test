@@ -13,6 +13,74 @@ constexpr qreal R2D(qreal radian) { return radian / M_PI * qreal(180); }
 
 using GeoDistance = qreal;
 
+
+template <typename TDegreeType>
+struct DegreeTraits {
+    static constexpr TDegreeType Zero = {};
+    static constexpr TDegreeType MaxUnique = {360};
+};
+
+// TAzimuth area of value [-180; 180]
+template <typename TAzimuthType = qreal>
+class TAzimuth {
+public:
+    using ValueType = TAzimuthType;
+    using AzimuthTraits = DegreeTraits<ValueType>;
+
+    TAzimuth() {}
+    TAzimuth(TAzimuthType degree) : degree_(NormalizeValue(degree)) {
+    }
+    TAzimuth(const TAzimuth &other) : degree_(other.degree_) {
+    }
+    TAzimuth(TAzimuth &&other) : degree_(other.degree_) {
+        other.degree_ = AzimuthTraits::Zero;
+    }
+
+    TAzimuth &operator= (const TAzimuth &other) {
+        degree_ = other.degree_;
+        return *this;
+    }
+    TAzimuth &operator= (TAzimuthType degree) {
+        degree_ = NormalizeValue(degree);
+        return *this;
+    }
+
+    TAzimuth &operator+= (const TAzimuth &other) {
+        degree_ = NormalizeValue(degree_ + other.degree_);
+        return *this;
+    }
+    TAzimuth &operator-= (const TAzimuth &other) {
+        degree_ = NormalizeValue(degree_ - other.degree_);
+        return *this;
+    }
+
+    operator ValueType() const { return degree_; }
+
+private:
+
+    inline static ValueType NormalizeValue(ValueType degree) {
+        degree = std::remainder(degree, AzimuthTraits::MaxUnique);
+        if (degree == 180)
+            return -180;
+        return degree;
+    }
+    ValueType degree_ = AzimuthTraits::Zero;
+};
+
+template <typename TAzimuthType>
+TAzimuth<TAzimuthType> &operator + (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
+    TAzimuth<TAzimuthType> ret(lft);
+    return ret+=rht;
+}
+
+template <typename TAzimuthType>
+TAzimuth<TAzimuthType> &operator - (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
+    TAzimuth<TAzimuthType> ret(lft);
+    return ret-=rht;
+}
+
+using Azimuth =  TAzimuth<qreal>;
+
 class GeoCalc {
 public:
     qreal Azimuth(const GeoPoint &pntA, const GeoPoint &pntB) {
@@ -98,7 +166,7 @@ private:
 
 class PhotoUavModel {
 public:
-    PhotoUavModel(qreal photoVelocity, qreal photoRoll) : velocity_(photoVelocity), roll_(photoRoll) { }
+    PhotoUavModel(qreal photoVelocityMPerSec, qreal photoRollRadian) : velocity_(photoVelocityMPerSec), roll_(photoRollRadian) { }
 
     qreal GetManeuverR() const { return velocity_ * velocity_ / 9.81 / tan(roll_); }
 
@@ -128,61 +196,136 @@ public:
     GeoPoints Calculate(const PhotoUavModel &uavModel) {
         auto R = uavModel.GetManeuverR();
 
-        auto getTurnPoint = [R](const GeoPoint &pnt, qreal az, qreal deltaAz) {
-            if (deltaAz < -180)
-                deltaAz += 360;
-            bool isTurnRight = deltaAz >= 0;
-            auto turnPoint = pnt.atDistanceAndAzimuth(R, az + (isTurnRight ? 90 : 270));
-            return TurnPointData{turnPoint, isTurnRight};
-        };
+        if (2*R < distance12_ )
+            return CalculateMoreThen2RAligment(R);
 
-        auto turn1 = getTurnPoint(pnt1_, az1_, az12_ - az1_);
-        auto turn2 = getTurnPoint(pnt2_, az2_, az2_ - az12_);
+        //if ( distance12_ < R)
+        {
+        }
 
-        if ( (turn1.isTurnRight && !turn2.isTurnRight) || (!turn1.isTurnRight && turn2.isTurnRight) )
-            return CalculateTwoSideLine(turn1, turn2, R);
-        else
-            return CalculateOneSideLine(turn1, turn2, R);
+        ManeuverTrackAlignment enlargedEntry(pnt1_, az1_, pnt2_.atDistanceAndAzimuth(R, az2_ + Azimuth(180)), az2_);
+        auto geoPoints = enlargedEntry.Calculate(uavModel);
+        geoPoints.push_back(pnt2_);
+        return geoPoints;
     }
 
 private:
-    GeoPoints CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R) {
-        auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? 270 : 90);
+    GeoPoints CalculateMoreThen2RAligment(qreal R) {
+        auto t1R = GetTurnPointData(R, pnt1_, az1_, true);
+        auto t1L = GetTurnPointData(R, pnt1_, az1_, false);
+        auto t2R = GetTurnPointData(R, pnt2_, az2_, true);
+        auto t2L = GetTurnPointData(R, pnt2_, az2_, false);
+
+        std::map<qreal, GeoPoints> maneuverLengths;
+        auto addTurnPairsChecked = [this, &maneuverLengths, R](auto &&t1, auto &&t2) {
+            auto distance = t1.center.distanceTo(t2.center);
+            if ((t1.isTurnRight && !t2.isTurnRight) || (!t1.isTurnRight && t2.isTurnRight))
+                if (distance < 2*R)
+                    return;
+
+            qreal length = 0;
+            GeoPoints geoPoints;
+            if ( (t1.isTurnRight && !t2.isTurnRight) || (!t1.isTurnRight && t2.isTurnRight) )
+                geoPoints = CalculateTwoSideLine(t1, t2, R, length);
+            else
+                geoPoints = CalculateOneSideLine(t1, t2, R, length);
+
+            maneuverLengths[length] = geoPoints;
+        };
+        addTurnPairsChecked(t1R, t2R);
+        addTurnPairsChecked(t1L, t2R);
+        addTurnPairsChecked(t1R, t2L);
+        addTurnPairsChecked(t1L, t2L);
+
+        if (maneuverLengths.empty())
+            return GeoPoints();
+
+        return maneuverLengths.begin()->second;
+    }
+
+
+    static TurnPointData GetTurnPointData(qreal R, const GeoPoint &pnt, Azimuth az, bool isTurnRight) {
+        auto turnPoint = pnt.atDistanceAndAzimuth(R, az + (isTurnRight ? 90 : 270));
+        return TurnPointData{turnPoint, isTurnRight};
+    }
+
+    GeoPoints CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
+        auto az = Azimuth(turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? 270 : 90));
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
-        //return GeoPoints{t1mnv, t2mnv};
-        auto t12mnv = t1mnv.atDistanceAndAzimuth(t1mnv.distanceTo(t2mnv) / 2, t1mnv.azimuthTo(t2mnv));
-//        return GeoPoints{t1mnv,
-//                    //turn1.center,
-//                    t12mnv,
-//                    //turn2.center,
-//                    t2mnv};
+
         GeoPoints points;
-        AddCircle(points, turn1.center, R);
-        points << t1mnv;
-        points << t12mnv;
-        points << t2mnv;
-        AddCircle(points, turn2.center, R);
+
+        auto azt1p1 = turn1.center.azimuthTo(pnt1_);
+        auto azt1t1mnv = az;
+        AddManeuverTurn(points, R, turn1, azt1p1, azt1t1mnv);
+        length += CalculateManeuverLength(R, turn1.isTurnRight, azt1p1, azt1t1mnv);
+
+        points.push_back(t1mnv);
+        points.push_back(t2mnv);
+        length += t1mnv.distanceTo(t2mnv);
+
+        auto azt2p1 = turn2.center.azimuthTo(pnt2_);
+        auto azt2t2mnv = az;
+        AddManeuverTurn(points, R, turn2, azt2t2mnv, azt2p1);
+        length += CalculateManeuverLength(R, turn2.isTurnRight, azt2t2mnv, azt2p1);
+
         return points;
     }
-    GeoPoints CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R) {
+    GeoPoints CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
         auto halfDistance = turn1.center.distanceTo(turn2.center) / 2.0;
-        auto deltaAz = asin(R/halfDistance);
+        auto deltaAz = R2D(acos(R/halfDistance));
         auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? -deltaAz : deltaAz);
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az + 180);
-//        //return GeoPoints{t1mnv, t2mnv};
-        auto t12mnv = t1mnv.atDistanceAndAzimuth(t1mnv.distanceTo(t2mnv) / 2, t1mnv.azimuthTo(t2mnv));
-//        return GeoPoints{t1mnv,
-//                    //turn1.center, t12mnv, turn2.center,
-//                    t2mnv};
+
         GeoPoints points;
-        AddCircle(points, turn1.center, R);
-        points << t1mnv;
-        points << t12mnv;
-        points << t2mnv;
-        AddCircle(points, turn2.center, R);
+
+        auto azt1p1 = turn1.center.azimuthTo(pnt1_);
+        auto azt1t1mnv = az;
+        AddManeuverTurn(points, R, turn1, azt1p1, azt1t1mnv);
+        length += CalculateManeuverLength(R, turn1.isTurnRight, azt1p1, azt1t1mnv);
+
+        points.push_back(t1mnv);
+        points.push_back(t2mnv);
+        length += t1mnv.distanceTo(t2mnv);
+
+        auto azt2p1 = turn2.center.azimuthTo(pnt2_);
+        auto azt2t2mnv = az + 180;
+        AddManeuverTurn(points, R, turn2, azt2t2mnv, azt2p1);
+        length += CalculateManeuverLength(R, turn2.isTurnRight, azt2t2mnv, azt2p1);
+
         return points;
+    }
+
+    void AddManeuverTurn(GeoPoints &points, qreal R, auto &&turn, Azimuth az1A, Azimuth az2A) {
+        if (az1A == az2A)
+            return;
+
+        auto addPointsInternal = [&points, R](const GeoPoint &center, auto az1, auto az2, auto delta, auto comparer) {
+            for (; comparer(az1, az2); az1 += delta) {// (turn.isTurnRight ? (az < az2) : (az > az2)); az += delta) {
+                points.push_back(center.atDistanceAndAzimuth(R, az1));
+            }
+       };
+
+        const auto delta = 10;
+        Azimuth::ValueType az1 = az1A;
+        if (az1 < 0)
+            az1 += 360;
+        Azimuth::ValueType az2 = az2A;
+        if (az2 < 0)
+            az2 += 360;
+
+        if (turn.isTurnRight) {
+            if (az2 < az1)
+                az2 += 360;
+            addPointsInternal(turn.center, az1, az2, delta, [](auto cur, auto end) { return cur < end; });
+        }
+        else {
+            if (az2 > az1)
+                az2 -= 360;
+            addPointsInternal(turn.center, az1, az2, -delta, [](auto cur, auto end) { return cur > end; });
+        }
     }
 
     void AddCircle(GeoPoints &points, const GeoPoint &center, qreal R) {
@@ -191,13 +334,35 @@ private:
         points.push_back(points.front());
     }
 
+    static qreal CalculateManeuverLength(qreal R, bool isClockwise, Azimuth az1A, Azimuth az2A) {
+        Azimuth::ValueType az1 = az1A;
+        if (az1 < 0)
+            az1 += 360;
+        Azimuth::ValueType az2 = az2A;
+        if (az2 < 0)
+            az2 += 360;
+
+        Azimuth::ValueType  delta = 0;
+        if (isClockwise) {
+            if (az2 < az1)
+                az2 += 360;
+            delta = az2 - az1;
+        }
+        else {
+            if (az2 > az1)
+                az2 -= 360;
+            delta = az1 - az2;
+        }
+        return M_PI*R*delta/180;
+    }
+
     const GeoPoint pnt1_;
-    const qreal az1_;
+    const Azimuth az1_;
     const GeoPoint pnt2_;
-    const qreal az2_;
+    const Azimuth az2_;
 
     const qreal distance12_;
-    const qreal az12_;
+    const Azimuth az12_;
 };
 
 }

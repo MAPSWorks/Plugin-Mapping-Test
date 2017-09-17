@@ -60,6 +60,47 @@ private slots:
         pj_free(pj_merc);
     }
 
+    void test_Azimuth() {
+        using namespace aero_photo;
+        {
+            Azimuth az;
+            QCOMPARE ((qreal)az, 0.0);
+            Azimuth azM(Azimuth(45));
+            QCOMPARE ((qreal)azM, 45.0);
+        }
+        {
+            Azimuth az(90);
+            Azimuth az2(az);
+            Azimuth az3 = az2;
+            Azimuth az4 = -90.0;
+            QCOMPARE ((qreal)az, 90.0);
+            QCOMPARE ((qreal)az2, 90.0);
+            QCOMPARE ((qreal)az3, 90.0);
+            QCOMPARE ((qreal)az4, -90.0);
+
+            az = -90;
+            QCOMPARE ((qreal)az, -90.0);
+        }
+        {
+            Azimuth az(225);
+            Azimuth az2(-225);
+            Azimuth az3(45);
+            Azimuth az4(-45);
+            QCOMPARE ((qreal)az, -135.0);
+            QCOMPARE ((qreal)az2, 135.0);
+            QCOMPARE ((qreal)az3, 45.0);
+            QCOMPARE ((qreal)az4, -45.0);
+        }
+        {
+            QCOMPARE (Azimuth(90) == Azimuth(-90), false);
+            Azimuth az(180);
+            Azimuth az2(-180);
+            QCOMPARE ((qreal)az, -180.0);
+            QCOMPARE ((qreal)az2, -180.0);
+            QCOMPARE (az == az2, true);
+        }
+    }
+
     void test_GeoCalcsRoundUpPoints() {
         using namespace aero_photo;
 

@@ -6,6 +6,7 @@
 #include "PhotoPrintsGenerator.h"
 
 #include <QPoint>
+#include <QtDebug>
 
 namespace aero_photo {
 
@@ -75,6 +76,7 @@ public:
     LinearPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const LinearPhotoRegion &photoRegion)
         : PhotoPlanner(photoUav, photoCamera)
         , photoPrintsGenerator_(photoRegion) {
+        qDebug() << "Created photo planner for linear region: " << photoRegion.GetTrack();
     }
 
     bool Calculate(double h, double Px, double Py, size_t totalRuns) {
@@ -85,9 +87,7 @@ public:
         double Lx, Ly;
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
-
         CalculateTrack();
-
         return IsCalculated();
     }
 
@@ -100,6 +100,7 @@ public:
     AreaPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const AreaPhotoRegion &photoRegion)
         : PhotoPlanner(photoUav, photoCamera)
         , photoPrintsGenerator_(photoRegion) {
+        qDebug() << "Created photo planner for area region: " << photoRegion.GetBorder();
     }
 
     bool Calculate(double h, double Px, double Py, qreal azimuth, size_t extentBorderValue) {
