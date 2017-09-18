@@ -59,11 +59,12 @@ public:
     PhotoPrints GeneratePhotoPrints(const GeoPoints &photoPrintsCenters, qreal Lx, qreal Ly) {
         PhotoPrints linePhotoPrints;
         auto photoPrintHalfDiag = sqrt(Lx*Lx+Ly*Ly)/2.0;
-        auto generatePhotoPrintBorder = [this,photoPrintHalfDiag](const GeoPoint &photoPrintCenter){
-            auto ppLT = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ - 45);
-            auto ppRT = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ + 45);
-            auto ppLB = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ - 135);
-            auto ppRB = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ + 135);
+        auto cornerAngle = R2D(atan(Ly/Lx));
+        auto generatePhotoPrintBorder = [this, photoPrintHalfDiag, cornerAngle](const GeoPoint &photoPrintCenter){
+            auto ppLT = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ - cornerAngle);
+            auto ppRT = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ + cornerAngle);
+            auto ppLB = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ + 180 + cornerAngle);
+            auto ppRB = photoPrintCenter.atDistanceAndAzimuth(photoPrintHalfDiag, azimuth_ + 180 - cornerAngle);
             GeoPoints photoPrintBorder = {ppLT, ppRT, ppLB, ppRB};
             return photoPrintBorder;
         };

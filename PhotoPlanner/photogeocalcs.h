@@ -100,10 +100,8 @@ public:
         if (deltaDistance != 0) {
             auto azimuthAB = Azimuth(pntA, pntB);
             auto azimuthBA = azimuthAB + 180;
-            auto movedA = AtDistanceAndAzimuth(pntA, deltaDistance / 2, azimuthBA);
-            auto movedB = AtDistanceAndAzimuth(movedA, distance + deltaDistance, azimuthAB);
-            pntA = movedA;
-            pntB = movedB;
+            pntA = AtDistanceAndAzimuth(pntA, deltaDistance / 2, azimuthBA);
+            pntB = AtDistanceAndAzimuth(pntA, distance + deltaDistance, azimuthAB);
         }
         return distance + deltaDistance;
     }

@@ -10,11 +10,11 @@ PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
     m_cameraModel           = "Sony S600";
     m_focusRange            = 35;
     m_longitOverlap         = 80;
-    m_transverseOverlap     = 80;
+    m_transverseOverlap     = 60;
     m_azimuth               = 0;
     m_altitude              = 100;
     m_gsd                   = 150;
-    m_speed                 = 50;
+    m_speed                 = 80;
     m_width                 = 100;
     m_maxRoll               = 30;
 
