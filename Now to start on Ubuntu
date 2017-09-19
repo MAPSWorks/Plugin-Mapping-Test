@@ -7,5 +7,8 @@ How to link with Proj.4
 	QtCreator:
 		- Project / Add Library / Add System Package
 		- Package Name: proj
+
+How to install GL.h
+	sudo apt-get install mesa-common-dev libglu1-mesa-dev
 		
 
