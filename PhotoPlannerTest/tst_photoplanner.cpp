@@ -7,9 +7,6 @@
 #include "photocamera.h"
 #include "photoplanner.h"
 
-#include <proj_api.h>
-#include <geodesic.h>
-
 class Tst_PhotoPlanner : public QObject
 {
     Q_OBJECT
@@ -42,22 +39,6 @@ private slots:
         QCOMPARE (array2D.Item(0,2), (uint8_t)2);
         QCOMPARE (array2D.Item(1,1), (uint8_t)3);
         QCOMPARE (array2D.Item(4,3), (uint8_t)0);
-    }
-
-    void test_proj4() {
-        projPJ pj_merc = pj_init_plus("+proj=merc +ellps=clrk66 +lat_ts=33");
-        QVERIFY(pj_merc!=nullptr);
-        projPJ pj_latlong = pj_init_plus("+proj=latlong +ellps=clrk66");
-        QVERIFY(pj_latlong!=nullptr);
-        double x = -16; x *= DEG_TO_RAD;
-        double y = 20.25; y*= DEG_TO_RAD;
-        auto errcode = pj_transform(pj_latlong, pj_merc, 1, 1, &x, &y, NULL );
-        QCOMPARE (errcode, 0);
-        // qDebug("x='%f' y='%f'", x, y);
-        QCOMPARE (x, -1495284.211473);
-        QCOMPARE (y, 1920596.789917);
-        pj_free(pj_latlong);
-        pj_free(pj_merc);
     }
 
     void test_Azimuth() {

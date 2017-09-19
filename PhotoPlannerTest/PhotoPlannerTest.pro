@@ -26,4 +26,3 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../PhotoPlanner/libPhotoPlanner.a
 
 
 unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += proj
