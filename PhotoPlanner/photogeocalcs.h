@@ -68,13 +68,13 @@ private:
 };
 
 template <typename TAzimuthType>
-TAzimuth<TAzimuthType> &operator + (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
+TAzimuth<TAzimuthType> operator + (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
     TAzimuth<TAzimuthType> ret(lft);
     return ret+=rht;
 }
 
 template <typename TAzimuthType>
-TAzimuth<TAzimuthType> &operator - (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
+TAzimuth<TAzimuthType> operator - (const TAzimuth<TAzimuthType> &lft, const TAzimuth<TAzimuthType> &rht) {
     TAzimuth<TAzimuthType> ret(lft);
     return ret-=rht;
 }
