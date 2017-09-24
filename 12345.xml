@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mission title="12345" href="http://www.uavos.com/" version="9.10.55">
+  <hash>356b56cdba65de817f8d1618bc3fba6d</hash>
+  <timestamp>сб вер 23 19:21:57 2017 GMT</timestamp>
+  <home>
+    <lat>47.25798416</lat>
+    <lon>11.34992313</lon>
+    <hmsl>581</hmsl>
+  </home>
+  <waypoints cnt="5">
+    <waypoint idx="0">
+      <altitude>100</altitude>
+      <type>0</type>
+      <latitude>47.26155331436259</latitude>
+      <longitude>11.33589506149292</longitude>
+      <actions>
+        <speed>0</speed>
+        <shot>0</shot>
+        <dshot>0</dshot>
+        <POI>0</POI>
+        <loiter>0</loiter>
+        <turnR>0</turnR>
+        <loops>0</loops>
+        <time>0</time>
+      </actions>
+    </waypoint>
+    <waypoint idx="1">
+      <altitude>100</altitude>
+      <type>0</type>
+      <latitude>47.26289302958821</latitude>
+      <longitude>11.347460746765137</longitude>
+      <actions>
+        <speed>0</speed>
+        <shot>0</shot>
+        <dshot>0</dshot>
+        <POI>0</POI>
+        <loiter>0</loiter>
+        <turnR>0</turnR>
+        <loops>0</loops>
+        <time>0</time>
+      </actions>
+    </waypoint>
+    <waypoint idx="2">
+      <altitude>100</altitude>
+      <type>0</type>
+      <latitude>47.26254354192829</latitude>
+      <longitude>11.357760429382324</longitude>
+      <actions>
+        <speed>0</speed>
+        <shot>0</shot>
+        <dshot>0</dshot>
+        <POI>0</POI>
+        <loiter>0</loiter>
+        <turnR>0</turnR>
+        <loops>0</loops>
+        <time>0</time>
+      </actions>
+    </waypoint>
+    <waypoint idx="3">
+      <altitude>100</altitude>
+      <type>0</type>
+      <latitude>47.259194168186234</latitude>
+      <longitude>11.362287998199463</longitude>
+      <actions>
+        <speed>0</speed>
+        <shot>0</shot>
+        <dshot>0</dshot>
+        <POI>0</POI>
+        <loiter>0</loiter>
+        <turnR>0</turnR>
+        <loops>0</loops>
+        <time>0</time>
+      </actions>
+    </waypoint>
+    <waypoint idx="4">
+      <altitude>100</altitude>
+      <type>0</type>
+      <latitude>47.26172806174943</latitude>
+      <longitude>11.354262828826904</longitude>
+      <actions>
+        <speed>0</speed>
+        <shot>0</shot>
+        <dshot>0</dshot>
+        <POI>0</POI>
+        <loiter>0</loiter>
+        <turnR>0</turnR>
+        <loops>0</loops>
+        <time>0</time>
+      </actions>
+    </waypoint>
+  </waypoints>
+</mission>

@@ -33,13 +33,17 @@ protected:
     }
 
 public:
+    virtual ~PhotoPlanner() {}
+
     bool IsCalculated() const { return isCalculated; }
     const PhotoPrints &GetPhotoPrints() const { return photoPrints_; }
     const GeoPoints &GetTrackPoints() const { return trackPoints_; }
+    const GeoPoints &GetFlightPoints() const  { return flightPoints_; }
 
 protected:
-    void CalculateTrack() {
+    void CalculateTrack(double h) {
         trackPoints_.clear();
+        flightPoints_.clear();
 
         int prevLine = -1;
         for(int i = 0; i<linedGeoPoints_.size(); ++i) {
@@ -47,16 +51,33 @@ protected:
             if(line.empty())
                 continue;
 
+            if(flightPoints_.empty()) {
+                const auto R = photoUav_.GetManeuverR();
+                if(R!=0) {
+                    auto startPointAt4R = linedGeoPoints_[i].front().atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    auto startPointAt2R = linedGeoPoints_[i].front().atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    flightPoints_.push_back(startPointAt4R);
+                    flightPoints_.push_back(startPointAt2R);
+                }
+            }
+
             if(prevLine>=0) {
                 ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_.GetAzimuth(prevLine), linedGeoPoints_[i].front(), linedGeoPoints_.GetAzimuth(i));
                 auto aligmentPoints = aligment.Calculate(photoUav_);
                 for(auto point : aligmentPoints)
                     trackPoints_.push_back(point);
+                for(auto point : aligment.GetFlightPoints())
+                    flightPoints_.push_back(point);
             }
 
             trackPoints_.push_back(line.front());
-            if(line.size()>1)
+            flightPoints_.push_back(line.front());
+            flightPoints_.back().setAltitude(h);
+            if(line.size()>1) {
                 trackPoints_.push_back(line.back());
+                flightPoints_.push_back(line.back());
+                flightPoints_.back().setAltitude(h);
+            }
             prevLine = i;
         }
 
@@ -68,6 +89,7 @@ protected:
     PhotoCameraModel photoCamera_;
     LinedGeoPoints linedGeoPoints_;
     GeoPoints trackPoints_;
+    GeoPoints flightPoints_;
     PhotoPrints photoPrints_;
 };
 
@@ -87,7 +109,7 @@ public:
         double Lx, Ly;
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
-        CalculateTrack();
+        CalculateTrack(h);
         return IsCalculated();
     }
 
@@ -112,7 +134,7 @@ public:
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
 
-        CalculateTrack();
+        CalculateTrack(h);
 
         return IsCalculated();
     }

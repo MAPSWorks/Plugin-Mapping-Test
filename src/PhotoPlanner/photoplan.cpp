@@ -17,7 +17,6 @@ PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
     m_speed                 = 80;
     m_width                 = 100;
     m_maxRoll               = 30;
-
 }
 
 
@@ -192,6 +191,24 @@ QVariantList PhotoPlan::photoPrints()
     return lst;
 }
 
+#undef D2R
+#undef R2D
+
+aero_photo::PhotoUavModel PhotoPlan::CreatePhotoUavModelFromGui() const {
+    qreal speedKmPerHour = speed();
+    qreal speedMPerSecond = speedKmPerHour * 1000 / 3600;
+    auto rollRadian = aero_photo::D2R(maxRoll());
+    return aero_photo::PhotoUavModel(speedMPerSecond, rollRadian);
+}
+
+aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
+    qreal focusM = qreal(focusRange()) / 100;
+    // Warning!!! This data items missed in GUI
+    qreal lxM = 0.015;
+    qreal lyM = 0.0225;
+    return aero_photo::PhotoCameraModel(focusM, lxM, lyM);
+}
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -218,16 +235,10 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
     PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
 //    auto photoCameraModel = CreatePhotoCameraModelFromGui();
     LinearPhotoRegion region(pathAoI);
-    LinearPhotoPlanner planner(uavModel, photoCameraModel, region);
-    planner.Calculate(altitude(), longitOverlap(), transverseOverlap(), 2);
+    m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
+    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), 2);
 
-    m_sourceTrack = planner.GetTrackPoints();
-    m_photoCenters.clear();
-    m_photoPrints.clear();
-    for (auto photoPrint : planner.GetPhotoPrints()) {
-        m_photoPrints.append(photoPrint.GetBorder());
-        m_photoCenters.append(photoPrint.GetCenter());
-    }
+    UpdatePhotoPlannerDraw();
 }
 
 void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
@@ -251,15 +262,37 @@ void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
     PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
 //    auto photoCameraModel = CreatePhotoCameraModelFromGui();
     AreaPhotoRegion region(pathAoI);
-    AreaPhotoPlanner planner(uavModel, photoCameraModel, region);
-    planner.Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
 
-    m_sourceTrack = planner.GetTrackPoints();
+    m_apPhotoPlanner.reset(new AreaPhotoPlanner(uavModel, photoCameraModel, region));
+    dynamic_cast<AreaPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
+
+    UpdatePhotoPlannerDraw();
+}
+
+void PhotoPlan::UpdatePhotoPlannerDraw()
+{
+    m_sourceTrack = m_apPhotoPlanner->GetTrackPoints();
     m_photoCenters.clear();
     m_photoPrints.clear();
-    for (auto photoPrint : planner.GetPhotoPrints()) {
+    for (auto photoPrint : m_apPhotoPlanner->GetPhotoPrints()) {
         m_photoPrints.append(photoPrint.GetBorder());
         m_photoCenters.append(photoPrint.GetCenter());
+    }
+}
+
+void PhotoPlan::saveFlightPlan(QVariant fileurl)
+{
+    auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
+    if (m_apPhotoPlanner) {
+        missionModel = new MissionModel(this);
+        for (auto &flightPoint : m_apPhotoPlanner->GetFlightPoints()) {
+            auto wp = missionModel->waypoints->createItem();
+            wp->f_latitude->setValue(flightPoint.latitude());
+            wp->f_longitude->setValue(flightPoint.longitude());
+            wp->f_altitude->setValue(flightPoint.altitude());
+        }
+
+        missionModel->saveToFile(fileurlcvt);
     }
 }
 

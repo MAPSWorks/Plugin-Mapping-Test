@@ -7,9 +7,13 @@
 #include <QVector>
 
 #include "PhotoPlanner/photoplanner.h"
+#include "MissionModel.h"
+#include <memory>
 
 class PhotoPlan : public QObject
 {
+    MissionModel *missionModel;
+
     Q_OBJECT
     Q_PROPERTY(QString cameraModel READ cameraModel WRITE setCameraModel NOTIFY cameraModelChanged)
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
@@ -32,6 +36,7 @@ public:
 
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
+    Q_INVOKABLE void saveFlightPlan(QVariant fileurl);
 
     QString cameraModel() const;
     void setCameraModel(const QString &cameraModel);
@@ -88,20 +93,8 @@ signals:
 public slots:
 
 private:
-    aero_photo::PhotoUavModel CreatePhotoUavModelFromGui() const {
-        qreal speedKmPerHour = speed();
-        qreal speedMPerSecond = speedKmPerHour * 1000 / 3600;
-        auto rollRadian = aero_photo::D2R(maxRoll());
-        return aero_photo::PhotoUavModel(speedMPerSecond, rollRadian);
-    }
-
-    aero_photo::PhotoCameraModel CreatePhotoCameraModelFromGui() const  {
-        qreal focusM = qreal(focusRange()) / 100;
-        // Warning!!! This data items missed in GUI
-        qreal lxM = 0.015;
-        qreal lyM = 0.0225;
-        return aero_photo::PhotoCameraModel(focusM, lxM, lyM);
-    }
+    aero_photo::PhotoUavModel CreatePhotoUavModelFromGui() const;
+    aero_photo::PhotoCameraModel CreatePhotoCameraModelFromGui() const;
 
     QString m_cameraModel;
     quint32 m_focusRange;
@@ -117,6 +110,9 @@ private:
     QVector<QGeoCoordinate> m_photoCenters;
     QVector<QGeoCoordinate> m_sourceTrack;
     QVector<QGeoCoordinate> m_photoPrints;
+
+    std::unique_ptr<aero_photo::PhotoPlanner> m_apPhotoPlanner;
+    void UpdatePhotoPlannerDraw();
 };
 
 #endif // PHOTOPLAN_H

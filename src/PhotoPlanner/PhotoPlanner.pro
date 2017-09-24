@@ -30,14 +30,38 @@ SOURCES += \
         photoplanner.cpp \
     photoplannerplugin.cpp \
     photoplannerwindow.cpp \
-    photoplan.cpp
+    photoplan.cpp \
+    MissionItem.cpp \
+    MissionItemArea.cpp \
+    MissionItemAreaPoint.cpp \
+    MissionItemCategory.cpp \
+    MissionItemField.cpp \
+    MissionItemObject.cpp \
+    MissionItemPi.cpp \
+    MissionItemRw.cpp \
+    MissionItemTw.cpp \
+    MissionItemWp.cpp \
+    MissionModel.cpp \
+    MissionPath.cpp
 
 HEADERS += \
         photoplanner.h \
         photoplanner_global.h \ 
     photoplannerplugin.h \
     photoplannerwindow.h \
-    photoplan.h
+    photoplan.h \
+    MissionItem.h \
+    MissionItemArea.h \
+    MissionItemAreaPoint.h \
+    MissionItemCategory.h \
+    MissionItemField.h \
+    MissionItemObject.h \
+    MissionItemPi.h \
+    MissionItemRw.h \
+    MissionItemTw.h \
+    MissionItemWp.h \
+    MissionModel.h \
+    MissionPath.h
 
 unix {
     target.path = /usr/lib

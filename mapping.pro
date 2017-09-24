@@ -1,6 +1,8 @@
-SUBDIRS = src \
+SUBDIRS = \
     PhotoPlanner \
-    PhotoPlannerTest
+    PhotoPlannerTest \
+    src/PhotoPlanner \
+
 TEMPLATE = subdirs
 
 message(Qt version $$[QT_VERSION])

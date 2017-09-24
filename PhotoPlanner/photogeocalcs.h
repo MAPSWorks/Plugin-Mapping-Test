@@ -203,9 +203,12 @@ public:
 
         ManeuverTrackAlignment enlargedEntry(pnt1_, az1_, pnt2_.atDistanceAndAzimuth(R, az2_ + Azimuth(180)), az2_);
         auto geoPoints = enlargedEntry.Calculate(uavModel);
+        flightAligment_ = enlargedEntry.GetFlightPoints();
         geoPoints.push_back(pnt2_);
         return geoPoints;
     }
+
+    GeoPoints GetFlightPoints() const { return flightAligment_; }
 
 private:
     GeoPoints CalculateMoreThen2RAligment(qreal R) {
@@ -252,6 +255,9 @@ private:
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
 
+        flightAligment_.push_back(t1mnv);
+        flightAligment_.push_back(t2mnv);
+
         GeoPoints points;
 
         auto azt1p1 = turn1.center.azimuthTo(pnt1_);
@@ -276,6 +282,9 @@ private:
         auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? -deltaAz : deltaAz);
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az + 180);
+
+        flightAligment_.push_back(t1mnv);
+        flightAligment_.push_back(t2mnv);
 
         GeoPoints points;
 
@@ -361,6 +370,8 @@ private:
 
     const qreal distance12_;
     const Azimuth az12_;
+
+    GeoPoints flightAligment_;
 };
 
 }

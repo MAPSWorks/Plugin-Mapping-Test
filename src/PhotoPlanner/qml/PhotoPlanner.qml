@@ -16,7 +16,6 @@ Item {
         PluginParameter { name: "mapping.cache.directory"; value: "/tmp/maps" }
     }
 
-
     Map {
         id: map
         anchors.fill: parent
@@ -346,9 +345,6 @@ Item {
 
             }
 
-
-
-
             ToolButton {
                 hoverEnabled:           parent.bHoverEnabled
                 ToolTip.delay:          parent.delay
@@ -372,6 +368,32 @@ Item {
                 }
                 onClicked: {
                     missionSelectorDialog.open();
+                }
+            }
+
+            ToolButton {
+                hoverEnabled:           parent.bHoverEnabled
+                ToolTip.delay:          parent.delay
+                ToolTip.timeout:        parent.timeout
+                ToolTip.visible:        hovered
+                ToolTip.text:           qsTr("Save generated flight plan")
+                Rectangle {
+                    anchors.centerIn: parent
+                    height: parent.background.height*1.5
+                    width:  parent.background.height*1.5
+                    color: "#6021be2b"
+                    radius: parent.background.height*1.5
+                    visible: parent.hovered
+                }
+                Image {
+                    fillMode: Image.PreserveAspectFit
+                    anchors.centerIn: parent
+                    sourceSize.height: parent.background.height - 2
+                    height: sourceSize.height
+                    source: "icons/unarchive.svg"
+                }
+                onClicked: {
+                    saveFlightPlanDialog.open();
                 }
             }
 
@@ -420,6 +442,16 @@ Item {
 
     FileDialog {
         id: missionSelectorDialog
+    }
+
+    FileDialog {
+        id: saveFlightPlanDialog
+        title: "Enter filename to save generated flight plan:"
+        selectExisting: false
+        modality: Qt.ApplicationModal
+        onAccepted: {
+            photoPlanner.saveFlightPlan(fileUrl);
+        }
     }
 
     Menu {
