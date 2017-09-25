@@ -185,32 +185,32 @@ private slots:
             LinearPhotoRegion photoRegion(track);
             LinearPhotoPrintsGenerator generator(photoRegion);
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 100, 100, 1);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(500, 100, 100, 1);
                 QCOMPARE(photoPrintsCenters.size(), 1);
                 QCOMPARE(photoPrintsCenters[0].size(), 11);
             }
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 100, 1000, 2);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(500, 100, 1000, 2);
                 QCOMPARE(photoPrintsCenters.size(), 2);
                 QCOMPARE(photoPrintsCenters[0].size(), 11);
                 QCOMPARE(photoPrintsCenters[1].size(), 11);
             }
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 100, 500, 9);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(500,  100, 500, 9);
                 QCOMPARE(photoPrintsCenters.size(), 9);
             }
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 50, 1000, 1);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(500,  50, 1000, 1);
                 QCOMPARE(photoPrintsCenters.size(), 1);
                 QCOMPARE(photoPrintsCenters[0].size(), 21);
             }
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 33, 1000, 1);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(1000, 33, 1000, 1);
                 QCOMPARE(photoPrintsCenters.size(), 1);
                 QCOMPARE(photoPrintsCenters[0].size(), 32);
             }
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 750, 1000, 1);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(1000, 750, 1000, 1);
                 QCOMPARE(photoPrintsCenters.size(), 1);
                 QCOMPARE(photoPrintsCenters[0].size(), 3);
             }

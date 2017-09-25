@@ -167,6 +167,7 @@ public:
     PhotoUavModel(qreal photoVelocityMPerSec, qreal photoRollRadian) : velocity_(photoVelocityMPerSec), roll_(photoRollRadian) { }
 
     qreal GetManeuverR() const { return velocity_ * velocity_ / 9.81 / tan(roll_); }
+    qreal velocity() const { return velocity_; }
 
 private:
     qreal velocity_;
@@ -178,6 +179,11 @@ class ManeuverTrackAlignment {
     struct TurnPointData {
         GeoPoint center;
         bool isTurnRight = true;
+    };
+
+    struct AligmentResult {
+        GeoPoints points;
+        GeoPoints flightPoints;
     };
 
 public:
@@ -217,7 +223,7 @@ private:
         auto t2R = GetTurnPointData(R, pnt2_, az2_, true);
         auto t2L = GetTurnPointData(R, pnt2_, az2_, false);
 
-        std::map<qreal, GeoPoints> maneuverLengths;
+        std::map<qreal, AligmentResult> maneuverLengths;
         auto addTurnPairsChecked = [this, &maneuverLengths, R](auto &&t1, auto &&t2) {
             auto distance = t1.center.distanceTo(t2.center);
             if ((t1.isTurnRight && !t2.isTurnRight) || (!t1.isTurnRight && t2.isTurnRight))
@@ -225,13 +231,13 @@ private:
                     return;
 
             qreal length = 0;
-            GeoPoints geoPoints;
+            AligmentResult result;
             if ( (t1.isTurnRight && !t2.isTurnRight) || (!t1.isTurnRight && t2.isTurnRight) )
-                geoPoints = CalculateTwoSideLine(t1, t2, R, length);
+                result = CalculateTwoSideLine(t1, t2, R, length);
             else
-                geoPoints = CalculateOneSideLine(t1, t2, R, length);
+                result = CalculateOneSideLine(t1, t2, R, length);
 
-            maneuverLengths[length] = geoPoints;
+            maneuverLengths[length] = result;
         };
         addTurnPairsChecked(t1R, t2R);
         addTurnPairsChecked(t1L, t2R);
@@ -241,7 +247,8 @@ private:
         if (maneuverLengths.empty())
             return GeoPoints();
 
-        return maneuverLengths.begin()->second;
+        flightAligment_ = maneuverLengths.begin()->second.flightPoints;
+        return maneuverLengths.begin()->second.points;
     }
 
 
@@ -250,59 +257,58 @@ private:
         return TurnPointData{turnPoint, isTurnRight};
     }
 
-    GeoPoints CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
+    AligmentResult CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
         auto az = Azimuth(turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? 270 : 90));
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
 
-        flightAligment_.push_back(t1mnv);
-        flightAligment_.push_back(t2mnv);
+        AligmentResult result;
+        result.flightPoints.push_back(t1mnv);
+        result.flightPoints.push_back(t2mnv);
 
-        GeoPoints points;
 
         auto azt1p1 = turn1.center.azimuthTo(pnt1_);
         auto azt1t1mnv = az;
-        AddManeuverTurn(points, R, turn1, azt1p1, azt1t1mnv);
+        AddManeuverTurn(result.points, R, turn1, azt1p1, azt1t1mnv);
         length += CalculateManeuverLength(R, turn1.isTurnRight, azt1p1, azt1t1mnv);
 
-        points.push_back(t1mnv);
-        points.push_back(t2mnv);
+        result.points.push_back(t1mnv);
+        result.points.push_back(t2mnv);
         length += t1mnv.distanceTo(t2mnv);
 
         auto azt2p1 = turn2.center.azimuthTo(pnt2_);
         auto azt2t2mnv = az;
-        AddManeuverTurn(points, R, turn2, azt2t2mnv, azt2p1);
+        AddManeuverTurn(result.points, R, turn2, azt2t2mnv, azt2p1);
         length += CalculateManeuverLength(R, turn2.isTurnRight, azt2t2mnv, azt2p1);
 
-        return points;
+        return result;
     }
-    GeoPoints CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
+    AligmentResult CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
         auto halfDistance = turn1.center.distanceTo(turn2.center) / 2.0;
         auto deltaAz = R2D(acos(R/halfDistance));
         auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? -deltaAz : deltaAz);
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az + 180);
 
-        flightAligment_.push_back(t1mnv);
-        flightAligment_.push_back(t2mnv);
-
-        GeoPoints points;
+        AligmentResult result;
+        result.flightPoints.push_back(t1mnv);
+        result.flightPoints.push_back(t2mnv);
 
         auto azt1p1 = turn1.center.azimuthTo(pnt1_);
         auto azt1t1mnv = az;
-        AddManeuverTurn(points, R, turn1, azt1p1, azt1t1mnv);
+        AddManeuverTurn(result.points, R, turn1, azt1p1, azt1t1mnv);
         length += CalculateManeuverLength(R, turn1.isTurnRight, azt1p1, azt1t1mnv);
 
-        points.push_back(t1mnv);
-        points.push_back(t2mnv);
+        result.points.push_back(t1mnv);
+        result.points.push_back(t2mnv);
         length += t1mnv.distanceTo(t2mnv);
 
         auto azt2p1 = turn2.center.azimuthTo(pnt2_);
         auto azt2t2mnv = az + 180;
-        AddManeuverTurn(points, R, turn2, azt2t2mnv, azt2p1);
+        AddManeuverTurn(result.points, R, turn2, azt2t2mnv, azt2p1);
         length += CalculateManeuverLength(R, turn2.isTurnRight, azt2t2mnv, azt2p1);
 
-        return points;
+        return result;
     }
 
     void AddManeuverTurn(GeoPoints &points, qreal R, auto &&turn, Azimuth az1A, Azimuth az2A) {

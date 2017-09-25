@@ -28,17 +28,19 @@ using CartesianPoint = QPointF;
 class FlightPoint : public GeoPoint {
 public:
     FlightPoint() {}
-    FlightPoint(const GeoPoint &geoPoint, int type)
+    FlightPoint(const GeoPoint &geoPoint, int type, qreal shotDistance = 0)
         : GeoPoint(geoPoint)
         , type_(type)
+        , shotDistance_(shotDistance)
     {
     }
 
-    void setType(int type) { type_ = type; }
     int type() const { return type_; }
+    qreal shotDistance() const { return shotDistance_; }
 
 private:
     int type_ = 0;
+    qreal shotDistance_ = 0;
 };
 
 using FlightPoints = QVector<FlightPoint>;
@@ -59,8 +61,10 @@ public:
     const GeoPoints &GetTrackPoints() const { return trackPoints_; }
     const FlightPoints &GetFlightPoints() const  { return flightPoints_; }
 
+    qreal velocity() const { return photoUav_.velocity(); }
+
 protected:
-    void CalculateTrack(double h) {
+    void CalculateTrack(double Bx) {
         trackPoints_.clear();
         flightPoints_.clear();
 
@@ -90,12 +94,10 @@ protected:
             }
 
             trackPoints_.push_back(line.front());
-            flightPoints_.push_back(FlightPoint(line.front(), 0));
-            flightPoints_.back().setAltitude(h);
+            flightPoints_.push_back(FlightPoint(line.front(), 0, Bx));
             if(line.size()>1) {
                 trackPoints_.push_back(line.back());
                 flightPoints_.push_back(FlightPoint(line.back(), 1));
-                flightPoints_.back().setAltitude(h);
             }
             prevLine = i;
         }
@@ -124,11 +126,11 @@ public:
         isCalculated = false;
         double Bx, By;
         photoCamera_.CalcBxBy(h, Px, Py, Bx, By);
-        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(Bx, By, totalRuns);
+        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(h, Bx, By, totalRuns);
         double Lx, Ly;
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
-        CalculateTrack(h);
+        CalculateTrack(Bx);
         return IsCalculated();
     }
 
@@ -153,7 +155,7 @@ public:
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
 
-        CalculateTrack(h);
+        CalculateTrack(Bx);
 
         return IsCalculated();
     }

@@ -94,7 +94,11 @@ public:
         trackTail_.pop_front();
     }
 
-    LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, size_t totalRuns) {
+    LinedGeoPoints GeneratePhotoPrintsCenters(qreal h, qreal Lxp, qreal Lyp, size_t totalRuns) {
+        trackHead_.setAltitude(h);
+        for(auto &tailPnt: trackTail_)
+            tailPnt.setAltitude(h);
+
         LinedGeoPoints linedGeoPoints(totalRuns * (trackTail_.size()));
         // !!! Both pntA & pntB must be copy of members
         auto pntA = trackHead_;
