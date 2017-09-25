@@ -290,6 +290,7 @@ void PhotoPlan::saveFlightPlan(QVariant fileurl)
             wp->f_latitude->setValue(flightPoint.latitude());
             wp->f_longitude->setValue(flightPoint.longitude());
             wp->f_altitude->setValue(flightPoint.altitude());
+            wp->f_type->setValue(flightPoint.type());
         }
 
         missionModel->saveToFile(fileurlcvt);

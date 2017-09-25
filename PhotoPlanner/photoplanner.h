@@ -25,6 +25,25 @@ using CartesianPoint = QPointF;
 //    double windBearing = 0;
 //};
 
+class FlightPoint : public GeoPoint {
+public:
+    FlightPoint() {}
+    FlightPoint(const GeoPoint &geoPoint, int type)
+        : GeoPoint(geoPoint)
+        , type_(type)
+    {
+    }
+
+    void setType(int type) { type_ = type; }
+    int type() const { return type_; }
+
+private:
+    int type_ = 0;
+};
+
+using FlightPoints = QVector<FlightPoint>;
+
+
 class PhotoPlanner {
 protected:
     PhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera)
@@ -38,7 +57,7 @@ public:
     bool IsCalculated() const { return isCalculated; }
     const PhotoPrints &GetPhotoPrints() const { return photoPrints_; }
     const GeoPoints &GetTrackPoints() const { return trackPoints_; }
-    const GeoPoints &GetFlightPoints() const  { return flightPoints_; }
+    const FlightPoints &GetFlightPoints() const  { return flightPoints_; }
 
 protected:
     void CalculateTrack(double h) {
@@ -54,10 +73,10 @@ protected:
             if(flightPoints_.empty()) {
                 const auto R = photoUav_.GetManeuverR();
                 if(R!=0) {
-                    auto startPointAt4R = linedGeoPoints_[i].front().atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    auto startPointAt2R = linedGeoPoints_[i].front().atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    flightPoints_.push_back(startPointAt4R);
-                    flightPoints_.push_back(startPointAt2R);
+                    auto startPointAt3R = linedGeoPoints_[i].front().atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    auto startPointAt1R = linedGeoPoints_[i].front().atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    flightPoints_.push_back(FlightPoint(startPointAt3R, 0));
+                    flightPoints_.push_back(FlightPoint(startPointAt1R, 1));
                 }
             }
 
@@ -67,15 +86,15 @@ protected:
                 for(auto point : aligmentPoints)
                     trackPoints_.push_back(point);
                 for(auto point : aligment.GetFlightPoints())
-                    flightPoints_.push_back(point);
+                    flightPoints_.push_back(FlightPoint(point, 0));
             }
 
             trackPoints_.push_back(line.front());
-            flightPoints_.push_back(line.front());
+            flightPoints_.push_back(FlightPoint(line.front(), 0));
             flightPoints_.back().setAltitude(h);
             if(line.size()>1) {
                 trackPoints_.push_back(line.back());
-                flightPoints_.push_back(line.back());
+                flightPoints_.push_back(FlightPoint(line.back(), 1));
                 flightPoints_.back().setAltitude(h);
             }
             prevLine = i;
@@ -89,7 +108,7 @@ protected:
     PhotoCameraModel photoCamera_;
     LinedGeoPoints linedGeoPoints_;
     GeoPoints trackPoints_;
-    GeoPoints flightPoints_;
+    FlightPoints flightPoints_;
     PhotoPrints photoPrints_;
 };
 
