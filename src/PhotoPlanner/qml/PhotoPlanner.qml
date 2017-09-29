@@ -10,10 +10,19 @@ Item {
     id:item
     Plugin {
         id:     mapPlugin
-        name:   "nokia"
-        PluginParameter { name: "here.app_id"; value: "0nq9YLyTnyFO4uiCkHQ4" }
-        PluginParameter { name: "here.token"; value: "iRlA2YudpvvSpwzXcrjnPg" }
-        PluginParameter { name: "mapping.cache.directory"; value: "/tmp/maps" }
+        name:  "mapbox" //"osm" // "mapbox" //"nokia"
+
+        PluginParameter { name: "mapbox.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
+        //PluginParameter { name: "mapboxgl.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
+        PluginParameter { name: "mapbox.mapping.cache.directory"; value: "/tmp/maps" }
+        PluginParameter { name: "style"; value: "mapbox://styles/mapbox/satellite-v9" }
+
+
+     //   PluginParameter { name: "here.app_id"; value: "0nq9YLyTnyFO4uiCkHQ4" }
+       // PluginParameter { name: "here.token"; value: "iRlA2YudpvvSpwzXcrjnPg" }
+        //PluginParameter { name: "mapping.cache.directory"; value: "/tmp/maps" }
+     //   preferred: ["here", "osm"]
+       // required: Plugin.AnyMappingFeatures
     }
 
     Map {
@@ -24,16 +33,16 @@ Item {
         property MapPolygon  areaPoI
         property MapPolyline track
 
+        property int missionType: 0
 
         plugin: mapPlugin
-        center: QtPositioning.coordinate(-27.47, 153.025)
+        center: QtPositioning.coordinate(53.90  , 28.01)
         zoomLevel: 14
 
 
         function addMarkers()
         {
             var count = photoPlanner.photoCenters.length;
-
             for(var i=0; i<count; i++)
             {
                 var marker = Qt.createQmlObject ('  import QtQuick 2.5;
@@ -43,42 +52,29 @@ Item {
                                                     sourceItem: Image {
                                                         fillMode: Image.PreserveAspectFit
                                                         anchors.centerIn: parent
-                                                        sourceSize.height: 10
+                                                        sourceSize.height: 14
                                                         height: sourceSize.height
                                                         source: "icons/settings.svg"
-                Text {
-                    text: "'+i+'"
-                    x:10
-                    y:10
-                    //anchors.centerIn: parent
-                }
-
-
+                                                        Text {
+                                                            id: markerText
+                                                            text: "'+i+'"
+                                                            x:10
+                                                            y:10
+                                                            //anchors.centerIn: parent
+                                                        }
+                                                        MouseArea {
+                                                            anchors.fill: parent
+                                                            onPressed {
+                                                                console.log(markerText)
+                                                            }
+                                                        }
                                                     }
 
                                                   }', map);
 
-                //import QtQuick 2.0;
-//                property string labelText
-
-            /*    var marker = Qt.createQmlObject ('  import QtLocation 5.6;
-                                                  MapCircle {
-
-                                                  }', map)
-*/
                 map.addMapItem(marker)
-
-                marker.z = map.z
-                //marker.coordinate = photoPlanner.photoCenters[i]
+                marker.z = map.z-1
                 marker.coordinate = photoPlanner.photoCenters[i];
-         //       marker.radius= 20
-           //     marker.border.width = 1;
-             //   marker.border.color =  '#8021be2b' //'red'
-               // marker.color =  '#2021be2b' // 'transparent'
-                //marker.color= 'green'
-                //marker. labelText = i;
-                //marker.circleText = i;
-               // console.log("11");
             }
         }
 
@@ -107,13 +103,6 @@ Item {
         }
 
         function startTrack() {
-/*
-            if(defined === map.track)
-            {
-                map.removeMapItem(map.track);
-            }
-  */
-
             map.removeMapItem(map.track);
             map.track = Qt.createQmlObject('import QtLocation 5.6; MapPolyline {}', item);
             map.track.line.width = 2;
@@ -129,6 +118,7 @@ Item {
             map.linearPoI.line.width = 2;
             map.linearPoI.line.color = 'green';
             map.addMapItem(map.linearPoI);
+            map.missionType=1;
         }
 
         function startAreaPoI() {
@@ -138,15 +128,36 @@ Item {
             map.areaPoI.border.width = 2;
             map.areaPoI.border.color = 'green';
             map.addMapItem(map.areaPoI);
+            map.missionType=2;
+        }
+
+        function calculatePhotoPlan () {
+            if(missionType === 0)
+                return;
+            if(missionType === 2)
+            {
+                photoPlanner.calcAreaPhotoPrints(map.areaPoI.path);
+            }
+            else //pathLength
+            {
+                photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
+            }
+            startTrack();
+            addMarkers();
+            addPhotoPrints();
         }
 
         MouseArea {
             id: mapMouseArea
             anchors.fill: parent
-            hoverEnabled: false
+            hoverEnabled: true
+
+            onPositionChanged: {
+                coordLabel.text = map.toCoordinate(Qt.point(mouseX, mouseY)).toString() //mouseX //map.toCoordinate(Qt.point(mouseX, mouseY)).x
+            }
 
             onPressed : {
-                if(linearMission.checked)
+                if(linearMission.checked && (map.missionType===1))
                 {
                     if(map.linearPoI === undefined)
                     {
@@ -157,8 +168,34 @@ Item {
                     {
                         map.linearPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
                     }
+
+
+                    var marker = Qt.createQmlObject ('  import QtQuick 2.5;
+                                                        import QtLocation 5.6;
+                                                        //property var itm : "111";
+                                                        MapQuickItem {
+                                                        sourceItem: Image {
+                                                            fillMode: Image.PreserveAspectFit
+                                                            anchors.centerIn: parent
+                                                            sourceSize.height: 10
+                                                            height: sourceSize.height
+                                                            source: "icons/place.svg"
+                                                            Text {
+                                                                text: "'+map.linearPoI.pathLength()+'"
+                                                                x:10
+                                                                y:10
+                                                                //anchors.centerIn: parent
+                                                            }
+                                                        }
+
+                                                      }', map);
+
+                    map.addMapItem(marker)
+                    marker.z = map.z
+                    marker.coordinate = map.toCoordinate(Qt.point(mouse.x, mouse.y));
+
                 }
-                else if (areaMission.checked)
+                else if (areaMission.checked && (map.missionType===2))
                 {
                     if(map.areaPoI===undefined)
                     {
@@ -173,14 +210,16 @@ Item {
             }
         }
     }
-/*
-    Rectangle {
-        anchors.fill: parent
-  //      width: 200
-    //    height:200
-        color: "blue"
+
+    Label {
+        id: coordLabel
+        anchors.left:   mainToolBar.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 5
+        color:          "#aa21be2b"
+        text: ""
     }
-*/
+
     ToolBar {
         id: mainToolBar
         width:          48
@@ -272,12 +311,12 @@ Item {
                     }
                     else
                     {
-                        photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
+          /*              photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
 
                         map.addPhotoPrints();
                         map.addMarkers();
                         map.startTrack();
-                    }
+*/                    }
 
                     //newMissionPopup.x = mouseX
                     //newMissionPopup.y = mouseY
@@ -323,13 +362,13 @@ Item {
                     else
                     {
               //          photoPlannerWindow.aoi = map.areaPoI.path;
-                        photoPlanner.calcAreaPhotoPrints(map.areaPoI.path);
+  /*                      photoPlanner.calcAreaPhotoPrints(map.areaPoI.path);
 
                         map.startTrack();
                         map.addMarkers();
                         map.addPhotoPrints();
                         //calculateAoI(map.areaPoI.path);
-                    }
+    */                }
 
 /*                    else
                     {
@@ -343,6 +382,35 @@ Item {
                     // map.start();
                 }
 
+            }
+
+            ToolButton {
+                hoverEnabled:           parent.bHoverEnabled
+                visible:                newMission.checked
+                checkable:              false
+                checked:                false
+                ToolTip.delay:          parent.delay
+                ToolTip.timeout:        parent.timeout
+                ToolTip.visible:        hovered
+                ToolTip.text:           qsTr("Calculate")
+                Rectangle {
+                    anchors.centerIn: parent
+                    height: parent.background.height*1.5
+                    width:  parent.background.height*1.5
+                    color: "#6021be2b"
+                    radius: parent.background.height*1.5
+                    visible: parent.hovered
+                }
+                Image {
+                    fillMode: Image.PreserveAspectFit
+                    anchors.centerIn: parent
+                    sourceSize.height: parent.background.height - 2
+                    height: sourceSize.height
+                    source: "icons/camera.svg"
+                }
+                onClicked: {
+                    map.calculatePhotoPlan();
+                }
             }
 
             ToolButton {
@@ -367,6 +435,7 @@ Item {
                     source: "icons/unarchive.svg"
                 }
                 onClicked: {
+                    missionSelectorDialog.folder = "/home/gcu/.gcu/flightplans"
                     missionSelectorDialog.open();
                 }
             }
@@ -393,6 +462,7 @@ Item {
                     source: "icons/unarchive.svg"
                 }
                 onClicked: {
+                    saveFlightPlanDialog.folder = "/home/gcu/.gcu/flightplans"
                     saveFlightPlanDialog.open();
                 }
             }
@@ -566,7 +636,7 @@ Item {
         anchors.top:    item.top
         anchors.bottom: item.bottom
         anchors.right:  item.right
-        color:          "#a021be2b"
+        color:          "#a0212121"
     }
 }
 

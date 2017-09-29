@@ -1,9 +1,15 @@
 #include "photoplannerwindow.h"
 #include <QQmlContext>
 #include <QDebug>
+#include <QTranslator>
+#include <QApplication>
 
 PhotoPlannerWindow::PhotoPlannerWindow()
 {
+    QTranslator* pTranslator = new QTranslator;
+    pTranslator->load("PhotoPlanner_ru.qm", QApplication::applicationDirPath()+"/translations/gcu/");
+    QApplication::installTranslator(pTranslator);
+
     setWindowTitle(tr("Photo Planner"));
     setSource(QUrl("qrc:/qml/PhotoPlanner.qml"));
 

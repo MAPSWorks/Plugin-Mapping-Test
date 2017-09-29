@@ -8,5 +8,7 @@
         <file>qml/CalculationsPanel.qml</file>
         <file>qml/icons/area.svg</file>
         <file>qml/icons/linear.svg</file>
+        <file>qml/icons/camera.svg</file>
+        <file>qml/icons/place.svg</file>
     </qresource>
 </RCC>

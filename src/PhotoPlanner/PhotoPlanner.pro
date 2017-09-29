@@ -44,6 +44,15 @@ SOURCES += \
     MissionModel.cpp \
     MissionPath.cpp
 
+TRANSLATIONS = PhotoPlanner_ru.ts
+
+lupdate_only{
+    SOURCES =   *.qml \
+                *.js \
+                qml/*.qml \
+                qml/*.js
+}
+
 HEADERS += \
         photoplanner.h \
         photoplanner_global.h \ 
@@ -70,3 +79,6 @@ unix {
 
 RESOURCES += \
     photoplanner.qrc
+
+DISTFILES += \
+    PhotoPlanner_ru.ts
