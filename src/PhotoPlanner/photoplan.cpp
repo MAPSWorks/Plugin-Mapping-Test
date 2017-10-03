@@ -1,5 +1,4 @@
 #include "photoplan.h"
-#include "PhotoPlanner/PhotoPrintsGenerator.h"
 
 #include <QVariant>
 #include <QtDebug>
@@ -212,6 +211,9 @@ aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
 #include <algorithm>
 #include <iostream>
 #include <vector>
+
+#include "PhotoPlannerMath/LinearPhotoPlanner.h"
+#include "PhotoPlannerMath/AreaPhotoPlanner.h"
 
 
 using namespace std;

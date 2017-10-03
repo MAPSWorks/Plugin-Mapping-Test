@@ -4,6 +4,7 @@
 #include "PhotoPlannerCore.h"
 #include "Azimuth.h"
 #include "PhotoUavModel.h"
+#include "PhotoGeoCalcs.h"
 
 #include <map>
 

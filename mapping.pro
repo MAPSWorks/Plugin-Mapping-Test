@@ -1,5 +1,5 @@
 SUBDIRS = \
-    PhotoPlanner \
+    PhotoPlannerMath \
     PhotoPlannerTest \
     src/PhotoPlanner \
 

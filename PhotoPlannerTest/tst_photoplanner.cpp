@@ -2,10 +2,11 @@
 
 // add necessary includes here
 
-#include "photogeocalcs.h"
-#include "PhotoPrintsGenerator.h"
-#include "photocamera.h"
-#include "photoplanner.h"
+#include "PhotoGeoCalcs.h"
+#include "PhotoPrintsGenerators.h"
+#include "PhotoCameraModel.h"
+#include "AreaPhotoPlanner.h"
+#include "LinearPhotoPlanner.h"
 
 class Tst_PhotoPlanner : public QObject
 {

@@ -6,7 +6,7 @@
 
 QT       += gui positioning
 
-TARGET = PhotoPlanner
+TARGET = PhotoPlannerMath
 TEMPLATE = lib
 CONFIG += staticlib
 CONFIG  += qt exception c++14
@@ -22,18 +22,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-SOURCES += \
-        photoplanner.cpp
-
-HEADERS += \
-        photoplanner.h \
-    photogeocalcs.h \
-    PhotoPrintsGenerator.h \
-    PhotoPlannerCore.h \
-    array2d.h \
-    nearfilter.h \
-    photocamera.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+HEADERS += \
+    AreaPhotoPlanner.h \
+    AreaPhotoPrintsGenerator.h \
+    Array2d.h \
+    Azimuth.h \
+    LinearPhotoPlanner.h \
+    LinearPhotoPrintsGenerator.h \
+    LinedGeoPoints.h \
+    LinePhotoPrintsGenerator.h \
+    ManeuverTrackAlignment.h \
+    NearFilter.h \
+    PhotoCameraModel.h \
+    PhotoGeoCalcs.h \
+    PhotoPlanner.h \
+    PhotoPlannerCore.h \
+    PhotoPrintsGenerators.h \
+    PhotoUavModel.h
+
+SOURCES += \
+    PhotoPlannerCore.cpp

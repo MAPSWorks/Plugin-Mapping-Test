@@ -5,7 +5,7 @@
 #include "PhotoPlanner.h"
 #include "AreaPhotoPrintsGenerator.h"
 
-namespace area_photo {
+namespace aero_photo {
 
 class AreaPhotoPlanner : public PhotoPlanner {
 public:
@@ -33,7 +33,7 @@ private:
     AreaPhotoPrintsGenerator photoPrintsGenerator_;
 };
 
-} // area_photo
+} // aero_photo
 
 #endif // AREAPHOTOPLANNER_H
 

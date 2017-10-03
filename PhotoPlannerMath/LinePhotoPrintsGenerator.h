@@ -2,6 +2,7 @@
 #define LINEPHOTOPRINTSGENERATOR_H
 
 #include "PhotoPlannerCore.h"
+#include "PhotoGeoCalcs.h"
 
 namespace aero_photo {
 
