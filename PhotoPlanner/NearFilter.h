@@ -1,7 +1,7 @@
 #ifndef NEARFILTER_H
 #define NEARFILTER_H
 
-#include "array2d.h"
+#include "Array2d.h"
 
 namespace aero_photo {
 

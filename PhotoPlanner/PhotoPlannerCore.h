@@ -3,6 +3,8 @@
 
 #include <QVector>
 #include <QGeoCoordinate>
+#include <QPoint>
+#include <QtDebug>
 
 namespace aero_photo {
 
@@ -32,6 +34,27 @@ private:
 
 using PhotoPrints = QVector<PhotoPrint>;
 
+
+class FlightPoint: public GeoPoint {
+public:
+    FlightPoint() {}
+    FlightPoint(const GeoPoint &geoPoint, int type, qreal shotDistance = 0)
+        : GeoPoint(geoPoint)
+        , type_(type)
+        , shotDistance_(shotDistance) {
+    }
+
+    int type() const { return type_; }
+    qreal shotDistance() const { return shotDistance_; }
+
+private:
+    int type_ = 0;
+    qreal shotDistance_ = 0;
+};
+
+using FlightPoints = QVector<FlightPoint>;
+
+
 class LinearPhotoRegion {
 public:
     explicit LinearPhotoRegion(const GeoPoints &track) : track_(track) { }
@@ -44,6 +67,7 @@ private:
     const GeoPoints track_;
 };
 
+
 class AreaPhotoRegion {
 public:
     explicit AreaPhotoRegion(const GeoPoints &border) : border_(border) { }
@@ -55,6 +79,9 @@ public:
 private:
     const GeoPoints border_;
 };
+
+
+
 
 }
 

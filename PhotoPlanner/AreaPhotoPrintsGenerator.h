@@ -5,8 +5,8 @@
 #include "LinedGeoPoints.h"
 #include "LinePhotoPrintsGenerator.h"
 
-#include "array2d.h"
-#include "nearfilter.h"
+#include "Array2d.h"
+#include "NearFilter.h"
 
 #include <vector>
 #include <stdint.h>

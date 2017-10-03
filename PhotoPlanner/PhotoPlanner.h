@@ -2,15 +2,13 @@
 #define PHOTOPLANNER_H
 
 #include "PhotoPlannerCore.h"
-#include "photocamera.h"
-#include "PhotoPrintsGenerator.h"
+#include "PhotoCameraModel.h"
+#include "PhotoUavModel.h"
+#include "LinedGeoPoints.h"
+#include "ManeuverTrackAlignment.h"
 
-#include <QPoint>
-#include <QtDebug>
 
 namespace aero_photo {
-
-using CartesianPoint = QPointF;
 
 //class Requirements {
 //public:
@@ -24,26 +22,6 @@ using CartesianPoint = QPointF;
 //    double windSpeed = 0;
 //    double windBearing = 0;
 //};
-
-class FlightPoint : public GeoPoint {
-public:
-    FlightPoint() {}
-    FlightPoint(const GeoPoint &geoPoint, int type, qreal shotDistance = 0)
-        : GeoPoint(geoPoint)
-        , type_(type)
-        , shotDistance_(shotDistance)
-    {
-    }
-
-    int type() const { return type_; }
-    qreal shotDistance() const { return shotDistance_; }
-
-private:
-    int type_ = 0;
-    qreal shotDistance_ = 0;
-};
-
-using FlightPoints = QVector<FlightPoint>;
 
 
 class PhotoPlanner {
@@ -112,56 +90,6 @@ protected:
     GeoPoints trackPoints_;
     FlightPoints flightPoints_;
     PhotoPrints photoPrints_;
-};
-
-class LinearPhotoPlanner : public PhotoPlanner {
-public:
-    LinearPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const LinearPhotoRegion &photoRegion)
-        : PhotoPlanner(photoUav, photoCamera)
-        , photoPrintsGenerator_(photoRegion) {
-        qDebug() << "Created photo planner for linear region: " << photoRegion.GetTrack();
-    }
-
-    bool Calculate(double h, double Px, double Py, size_t totalRuns) {
-        isCalculated = false;
-        double Bx, By;
-        photoCamera_.CalcBxBy(h, Px, Py, Bx, By);
-        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(h, Bx, By, totalRuns);
-        double Lx, Ly;
-        photoCamera_.CalcLxLy(h, Lx, Ly);
-        photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
-        CalculateTrack(Bx);
-        return IsCalculated();
-    }
-
-private:
-    LinearPhotoPrintsGenerator photoPrintsGenerator_;
-};
-
-class AreaPhotoPlanner : public PhotoPlanner {
-public:
-    AreaPhotoPlanner(const PhotoUavModel &photoUav, const PhotoCameraModel &photoCamera, const AreaPhotoRegion &photoRegion)
-        : PhotoPlanner(photoUav, photoCamera)
-        , photoPrintsGenerator_(photoRegion) {
-        qDebug() << "Created photo planner for area region: " << photoRegion.GetBorder();
-    }
-
-    bool Calculate(double h, double Px, double Py, qreal azimuth, size_t extentBorderValue) {
-        isCalculated = false;
-        double Bx, By;
-        photoCamera_.CalcBxBy(h, Px, Py, Bx, By);
-        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(Bx, By, azimuth, extentBorderValue);
-        double Lx, Ly;
-        photoCamera_.CalcLxLy(h, Lx, Ly);
-        photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
-
-        CalculateTrack(Bx);
-
-        return IsCalculated();
-    }
-
-private:
-    AreaPhotoPrintsGenerator photoPrintsGenerator_;
 };
 
 

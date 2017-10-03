@@ -1,5 +1,5 @@
-#ifndef PHOTOCAMERA_H
-#define PHOTOCAMERA_H
+#ifndef PHOTOCAMERAMODEL_H
+#define PHOTOCAMERAMODEL_H
 
 namespace aero_photo {
 
@@ -29,6 +29,6 @@ private:
     const double lx_, ly_;
 };
 
-}
+} // aero_photo
 
-#endif // PHOTOCAMERA_H
+#endif // PHOTOCAMERAMODEL_H
