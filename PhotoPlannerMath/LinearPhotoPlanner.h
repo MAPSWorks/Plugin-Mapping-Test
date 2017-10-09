@@ -15,10 +15,11 @@ public:
         qDebug() << "Created photo planner for linear region: " << photoRegion.GetTrack();
     }
 
-    bool Calculate(double h, double Px, double Py, size_t totalRuns) {
+    bool Calculate(double h, double Px, double Py, double width) {
         isCalculated = false;
         double Bx, By;
         photoCamera_.CalcBxBy(h, Px, Py, Bx, By);
+        auto totalRuns = ceil(width/By);
         linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(h, Bx, By, totalRuns);
         double Lx, Ly;
         photoCamera_.CalcLxLy(h, Lx, Ly);

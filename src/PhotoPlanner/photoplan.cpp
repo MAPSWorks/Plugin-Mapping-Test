@@ -238,7 +238,7 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
 //    auto photoCameraModel = CreatePhotoCameraModelFromGui();
     LinearPhotoRegion region(pathAoI);
     m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
-    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), 2);
+    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), width());
 
     UpdatePhotoPlannerDraw();
 }
