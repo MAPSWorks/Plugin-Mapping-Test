@@ -25,13 +25,24 @@ Item {
        // required: Plugin.AnyMappingFeatures
     }
 
+    Image {
+        id: poiImage
+        source: "icons/settings.svg"
+    }
+    MapQuickItem {
+        id: poiMarker
+        sourceItem: poiImage
+    }
+
     Map {
         id: map
         anchors.fill: parent
 
+
         property MapPolyline linearPoI
         property MapPolygon  areaPoI
         property MapPolyline track
+        property list<MapQuickItem> trackMarkers
 
         property int missionType: 0
 
@@ -40,41 +51,42 @@ Item {
         zoomLevel: 14
 
 
-        function addMarkers()
+        function addTrackMarkers()
         {
-            var count = photoPlanner.photoCenters.length;
+            var count = photoPlanner.trackMarkers.length // photoCenters.length;
             for(var i=0; i<count; i++)
             {
-                var marker = Qt.createQmlObject ('  import QtQuick 2.5;
-                                                    import QtLocation 5.6;
-                                                    //property var itm : "111";
-                                                    MapQuickItem {
-                                                    sourceItem: Image {
-                                                        fillMode: Image.PreserveAspectFit
-                                                        anchors.centerIn: parent
-                                                        sourceSize.height: 14
-                                                        height: sourceSize.height
-                                                        source: "icons/settings.svg"
-                                                        Text {
-                                                            id: markerText
-                                                            text: "'+i+'"
-                                                            x:10
-                                                            y:10
-                                                            //anchors.centerIn: parent
-                                                        }
-                                                        MouseArea {
-                                                            anchors.fill: parent
-                                                            onPressed {
-                                                                console.log(markerText)
-                                                            }
-                                                        }
-                                                    }
+                addMarkerTrack(photoPlanner.trackMarkers[i], i);
+//                var marker = Qt.createQmlObject ('  import QtQuick 2.5;
+//                                                    import QtLocation 5.6;
+//                                                    //property var itm : "111";
+//                                                    MapQuickItem {
+//                                                    sourceItem: Image {
+//                                                        fillMode: Image.PreserveAspectFit
+//                                                        anchors.centerIn: parent
+//                                                        sourceSize.height: 14
+//                                                        height: sourceSize.height
+//                                                        source: "icons/settings.svg"
+//                                                        Text {
+//                                                            id: markerText
+//                                                            text: "'+i+'"
+//                                                            x:10
+//                                                            y:10
+//                                                            //anchors.centerIn: parent
+//                                                        }
+//                                                        MouseArea {
+//                                                            anchors.fill: parent
+//                                                            onPressed {
+//                                                                console.log(markerText)
+//                                                            }
+//                                                        }
+//                                                    }
 
-                                                  }', map);
+//                                                  }', map);
 
-                map.addMapItem(marker)
-                marker.z = map.z-1
-                marker.coordinate = photoPlanner.photoCenters[i];
+//                map.addMapItem(marker)
+//                marker.z = map.z-1
+//                marker.coordinate = photoPlanner.photoCenters[i];
             }
         }
 
@@ -104,6 +116,9 @@ Item {
 
         function startTrack() {
             map.removeMapItem(map.track);
+            for(var i = 0; i<map.trackMarkers.length; i++)
+                map.removeMapItem(map.trackMarkers[i])
+            map.trackMarkers = null
             map.track = Qt.createQmlObject('import QtLocation 5.6; MapPolyline {}', item);
             map.track.line.width = 2;
             map.track.line.color = 'blue';
@@ -143,8 +158,42 @@ Item {
                 photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
             }
             startTrack();
-            addMarkers();
+            addTrackMarkers();
             addPhotoPrints();
+        }
+
+
+        function addMarker(coordinate, number, image) {
+            var marker = Qt.createQmlObject ('  import QtQuick 2.5;
+                                                import QtLocation 5.6;
+                                                //property var itm : "111";
+                                                MapQuickItem {
+                                                sourceItem: Image {
+                                                    fillMode: Image.PreserveAspectFit
+                                                    anchors.centerIn: parent
+                                                    sourceSize.height: 20
+                                                    height: sourceSize.height
+                                                    source: "' + image + '"
+                                                    Text {
+                                                        text: "'+number+'"
+                                                        x:20
+                                                        y:20
+                                                        //anchors.centerIn: parent
+                                                    }
+                                                }
+
+                                              }', map);
+            marker.coordinate = coordinate
+            map.addMapItem(marker)
+            return marker
+        }
+
+        function addMarkerPoI(coordinate, number) {
+            addMarker(coordinate, number, "icons/place.svg")
+        }
+        function addMarkerTrack(coordinate, number) {
+            var marker = addMarker(coordinate, number, "icons/place.svg")
+            trackMarkers.push(marker)
         }
 
         MouseArea {
@@ -157,55 +206,25 @@ Item {
             }
 
             onPressed : {
+                var mouseCoordinate = map.toCoordinate(Qt.point(mouse.x, mouse.y))
+
                 if(linearMission.checked && (map.missionType===1))
                 {
                     if(map.linearPoI === undefined)
                     {
                         map.startLinearPoI();
-                        map.linearPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
                     }
-                    else
-                    {
-                        map.linearPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
-                    }
-
-
-                    var marker = Qt.createQmlObject ('  import QtQuick 2.5;
-                                                        import QtLocation 5.6;
-                                                        //property var itm : "111";
-                                                        MapQuickItem {
-                                                        sourceItem: Image {
-                                                            fillMode: Image.PreserveAspectFit
-                                                            anchors.centerIn: parent
-                                                            sourceSize.height: 10
-                                                            height: sourceSize.height
-                                                            source: "icons/place.svg"
-                                                            Text {
-                                                                text: "'+map.linearPoI.pathLength()+'"
-                                                                x:10
-                                                                y:10
-                                                                //anchors.centerIn: parent
-                                                            }
-                                                        }
-
-                                                      }', map);
-
-                    map.addMapItem(marker)
-                    marker.z = map.z
-                    marker.coordinate = map.toCoordinate(Qt.point(mouse.x, mouse.y));
-
+                    map.linearPoI.addCoordinate(mouseCoordinate);
+                    map.addMarkerPoI(mouseCoordinate, map.linearPoI.path.length)
                 }
                 else if (areaMission.checked && (map.missionType===2))
                 {
                     if(map.areaPoI===undefined)
                     {
                         map.startAreaPoI();
-                        map.areaPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
                     }
-                    else
-                    {
-                        map.areaPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
-                    }
+                    map.areaPoI.addCoordinate(map.toCoordinate(Qt.point(mouse.x, mouse.y)));
+                    map.addMarkerPoI(mouseCoordinate, map.areaPoI.path.length)
                 }
             }
         }
@@ -462,8 +481,8 @@ Item {
                     source: "icons/unarchive.svg"
                 }
                 onClicked: {
-                    saveFlightPlanDialog.folder = "/home/gcu/.gcu/flightplans"
-                    saveFlightPlanDialog.open();
+                    saveFlightPlanDialog.open()
+
                 }
             }
 
@@ -518,7 +537,12 @@ Item {
         id: saveFlightPlanDialog
         title: "Enter filename to save generated flight plan:"
         selectExisting: false
-        modality: Qt.ApplicationModal
+        selectMultiple: false
+        selectFolder: false
+        folder: shortcuts.home + "/.gcu/flightplans"
+        modality: Qt.WindowModal
+        nameFilters: [ "Xml files (*.xml)", "All files (*)" ]
+        selectedNameFilter: "Xml files (*.xml)"
         onAccepted: {
             photoPlanner.saveFlightPlan(fileUrl);
         }
