@@ -190,6 +190,16 @@ QVariantList PhotoPlan::photoPrints()
     return lst;
 }
 
+QVariantList PhotoPlan::trackMarkers()
+{
+    QVariantList lst;
+
+    for(aero_photo::GeoPoint point : m_flightPoints) {
+        lst.append(QVariant::fromValue(point));
+    }
+    return lst;
+}
+
 #undef D2R
 #undef R2D
 
@@ -280,6 +290,7 @@ void PhotoPlan::UpdatePhotoPlannerDraw()
         m_photoPrints.append(photoPrint.GetBorder());
         m_photoCenters.append(photoPrint.GetCenter());
     }
+    m_flightPoints = m_apPhotoPlanner->GetFlightPoints();
 }
 
 void PhotoPlan::saveFlightPlan(QVariant fileurl)

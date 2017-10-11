@@ -29,6 +29,7 @@ class PhotoPlan : public QObject
     Q_PROPERTY(QVariantList track READ track NOTIFY trackChanged)
     Q_PROPERTY(QVariantList photoCenters READ photoCenters NOTIFY photoCentersChanged)
     Q_PROPERTY(QVariantList photoPrints READ photoPrints NOTIFY photoPrintsChanged)
+    Q_PROPERTY(QVariantList trackMarkers READ trackMarkers NOTIFY trackMarkersChanged)
 
 
 public:
@@ -74,6 +75,8 @@ public:
 
     QVariantList photoPrints();
 
+    QVariantList trackMarkers();
+
 signals:
 
     void cameraModelChanged();
@@ -89,6 +92,7 @@ signals:
     void trackChanged();
     void photoCentersChanged();
     void photoPrintsChanged();
+    void trackMarkersChanged();
 
 public slots:
 
@@ -110,6 +114,7 @@ private:
     QVector<QGeoCoordinate> m_photoCenters;
     QVector<QGeoCoordinate> m_sourceTrack;
     QVector<QGeoCoordinate> m_photoPrints;
+    aero_photo::FlightPoints m_flightPoints;
 
     std::unique_ptr<aero_photo::PhotoPlanner> m_apPhotoPlanner;
     void UpdatePhotoPlannerDraw();
