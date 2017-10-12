@@ -246,7 +246,7 @@ private slots:
             AreaPhotoRegion photoRegion(border);
             AreaPhotoPrintsGenerator generator(photoRegion);
             {
-                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters( 200, 90, 90);
+                auto photoPrintsCenters = generator.GeneratePhotoPrintsCenters(500, 200, 90, 90);
                 QCOMPARE(photoPrintsCenters.size(), 13);
                 QCOMPARE(photoPrintsCenters[0].size(), 0);
                 QCOMPARE(photoPrintsCenters[1].size(), 0);

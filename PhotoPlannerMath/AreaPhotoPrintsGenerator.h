@@ -29,8 +29,8 @@ class AreaPhotoPrintsGenerator {
         auto GetRadius() const { return geoRadius_; }
         auto GetPreferredAzimuth() const { return preferredAzimuth_; }
 
-        LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
-            auto geoPointsGrid = GeneratePhotoPrintsGrid(Lxp, Lyp, azimuth, extentBorderValue);
+        LinedGeoPoints GeneratePhotoPrintsCenters(qreal h, qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
+            auto geoPointsGrid = GeneratePhotoPrintsGrid(h, Lxp, Lyp, azimuth, extentBorderValue);
             return FilterPointsGrid(geoPointsGrid, extentBorderValue);
         }
 
@@ -115,10 +115,12 @@ class AreaPhotoPrintsGenerator {
             std::vector<bool> isRevertedGeoPoint_;
         };
 
-        GeoPointsGrid GeneratePhotoPrintsGrid(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
+        GeoPointsGrid GeneratePhotoPrintsGrid(qreal h, qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
             size_t totalRuns = ceil(GetRadius() * 2 / Lyp) + extentBorderValue;
             GeoPointsGrid geoPointsGrid(totalRuns, azimuth);
-            RunStartPointsCalc middlePointsCalc(GetCenter(), azimuth, Lyp, totalRuns);
+            auto centerPoint = GetCenter();
+            centerPoint.setAltitude(h);
+            RunStartPointsCalc middlePointsCalc(centerPoint, azimuth, Lyp, totalRuns);
             for (size_t i = 0; i < totalRuns; ++i) {
                 auto middlePoint = middlePointsCalc.Calculate(i);
                 const auto runAzimuth = azimuth ; // + 180 * ( i % 2 );
@@ -165,8 +167,8 @@ public:
     explicit AreaPhotoPrintsGenerator(const AreaPhotoRegion &area) : regionInternals_(area) {
     }
 
-    LinedGeoPoints GeneratePhotoPrintsCenters(qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue = 0) {
-        return regionInternals_.GeneratePhotoPrintsCenters(Lxp, Lyp, azimuth, extentBorderValue);
+    LinedGeoPoints GeneratePhotoPrintsCenters(qreal h, qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue = 0) {
+        return regionInternals_.GeneratePhotoPrintsCenters(h, Lxp, Lyp, azimuth, extentBorderValue);
     }
 
     PhotoPrints GeneratePhotoPrints(const LinedGeoPoints &linedGeoPoints, qreal Lx, qreal Ly) {

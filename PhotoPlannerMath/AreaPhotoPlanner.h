@@ -19,7 +19,7 @@ public:
         isCalculated = false;
         double Bx, By;
         photoCamera_.CalcBxBy(h, Px, Py, Bx, By);
-        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(Bx, By, azimuth, extentBorderValue);
+        linedGeoPoints_ = photoPrintsGenerator_.GeneratePhotoPrintsCenters(h, Bx, By, azimuth, extentBorderValue);
         double Lx, Ly;
         photoCamera_.CalcLxLy(h, Lx, Ly);
         photoPrints_ = photoPrintsGenerator_.GeneratePhotoPrints(linedGeoPoints_, Lx, Ly);
