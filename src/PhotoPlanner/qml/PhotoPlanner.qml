@@ -56,7 +56,7 @@ Item {
             var count = photoPlanner.trackMarkers.length // photoCenters.length;
             for(var i=0; i<count; i++)
             {
-                addMarkerTrack(photoPlanner.trackMarkers[i], i);
+                addMarkerTrack(photoPlanner.trackMarkers[i], i+1);
 //                var marker = Qt.createQmlObject ('  import QtQuick 2.5;
 //                                                    import QtLocation 5.6;
 //                                                    //property var itm : "111";
