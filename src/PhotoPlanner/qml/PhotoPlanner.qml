@@ -44,7 +44,7 @@ Item {
         property MapPolyline track
         property list<MapQuickItem> trackMarkers
 
-        property int missionType: 0
+        property string missionType
 
         plugin: mapPlugin
         center: QtPositioning.coordinate(53.90  , 28.01)
@@ -133,7 +133,7 @@ Item {
             map.linearPoI.line.width = 2;
             map.linearPoI.line.color = 'green';
             map.addMapItem(map.linearPoI);
-            map.missionType=1;
+            map.missionType="Linear";
         }
 
         function startAreaPoI() {
@@ -143,13 +143,11 @@ Item {
             map.areaPoI.border.width = 2;
             map.areaPoI.border.color = 'green';
             map.addMapItem(map.areaPoI);
-            map.missionType=2;
+            map.missionType="Area";
         }
 
         function calculatePhotoPlan () {
-            if(missionType === 0)
-                return;
-            if(missionType === 2)
+            if(missionType === "Area")
             {
                 photoPlanner.calcAreaPhotoPrints(map.areaPoI.path);
             }
@@ -208,7 +206,7 @@ Item {
             onPressed : {
                 var mouseCoordinate = map.toCoordinate(Qt.point(mouse.x, mouse.y))
 
-                if(linearMission.checked && (map.missionType===1))
+                if(linearMission.checked && (map.missionType==="Linear"))
                 {
                     if(map.linearPoI === undefined)
                     {
@@ -217,7 +215,7 @@ Item {
                     map.linearPoI.addCoordinate(mouseCoordinate);
                     map.addMarkerPoI(mouseCoordinate, map.linearPoI.path.length)
                 }
-                else if (areaMission.checked && (map.missionType===2))
+                else if (areaMission.checked && (map.missionType==="Area"))
                 {
                     if(map.areaPoI===undefined)
                     {
@@ -437,7 +435,32 @@ Item {
                 ToolTip.delay:          parent.delay
                 ToolTip.timeout:        parent.timeout
                 ToolTip.visible:        hovered
-                ToolTip.text:           qsTr("Saved Missions")
+                ToolTip.text:           qsTr("Load area ...")
+                Rectangle {
+                    anchors.centerIn: parent
+                    height: parent.background.height*1.5
+                    width:  parent.background.height*1.5
+                    color: "#6021be2b"
+                    radius: parent.background.height*1.5
+                    visible: parent.hovered
+                }
+                Image {
+                    fillMode: Image.PreserveAspectFit
+                    anchors.centerIn: parent
+                    sourceSize.height: parent.background.height - 2
+                    height: sourceSize.height
+                    source: "icons/archive.svg"
+                }
+                onClicked: {
+                    aoiLoadDialog.open();
+                }
+            }
+            ToolButton {
+                hoverEnabled:           parent.bHoverEnabled
+                ToolTip.delay:          parent.delay
+                ToolTip.timeout:        parent.timeout
+                ToolTip.visible:        hovered
+                ToolTip.text:           qsTr("Save area ...")
                 Rectangle {
                     anchors.centerIn: parent
                     height: parent.background.height*1.5
@@ -454,8 +477,7 @@ Item {
                     source: "icons/unarchive.svg"
                 }
                 onClicked: {
-                    missionSelectorDialog.folder = "/home/gcu/.gcu/flightplans"
-                    missionSelectorDialog.open();
+                    aoiSaveDialog.open();
                 }
             }
 
@@ -530,7 +552,42 @@ Item {
     }
 
     FileDialog {
-        id: missionSelectorDialog
+        id: aoiSaveDialog
+        title: "Enter filename to save area of interest"
+        selectExisting: false
+        selectMultiple: false
+        selectFolder: false
+        folder: shortcuts.home + "/.gcu/flightplans"
+        modality: Qt.WindowModal
+        nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
+        selectedNameFilter: "Aoi files (*.aoi)"
+        onAccepted: {
+            photoPlanner.saveAoi(fileUrl, map.missionType, map.linearPoI.path)
+        }
+    }
+
+    FileDialog {
+        id: aoiLoadDialog
+        title: "Enter filename to load area of interest"
+        selectExisting: true
+        selectMultiple: false
+        selectFolder: false
+        folder: shortcuts.home + "/.gcu/flightplans"
+        modality: Qt.WindowModal
+        nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
+        selectedNameFilter: "Aoi files (*.aoi)"
+        onAccepted: {
+            var loadedAoi = photoPlanner.loadAoi(fileUrl)
+            map.missionType = photoPlanner.missionType
+            if (map.missionType === "Linear") {
+                map.startLinearPoI()
+                map.linearPoI.path = loadedAoi
+            }
+            else {
+                map.startAreaPoI()
+                map.areaPoI.path = loadedAoi;
+            }
+        }
     }
 
     FileDialog {

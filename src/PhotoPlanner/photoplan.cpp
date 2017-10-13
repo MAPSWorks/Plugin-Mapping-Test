@@ -200,6 +200,20 @@ QVariantList PhotoPlan::trackMarkers()
     return lst;
 }
 
+QVariantList PhotoPlan::aoi()
+{
+    QVariantList lst;
+    for(aero_photo::GeoPoint point : m_aoi) {
+        lst.append(QVariant::fromValue(point));
+    }
+    return lst;
+}
+
+QString PhotoPlan::missionType() const
+{
+    return m_missionType;
+}
+
 #undef D2R
 #undef R2D
 
@@ -317,5 +331,36 @@ void PhotoPlan::saveFlightPlan(QVariant fileurl)
 
         missionModel->saveToFile(fileurlcvt);
     }
+}
+
+QVariantList PhotoPlan::loadAoi(QVariant fileurl)
+{
+    auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
+    QFile file(fileurlcvt);
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    in >> m_missionType;;
+    in >> m_aoi;
+
+    return aoi();
+}
+
+
+void PhotoPlan::saveAoi(QVariant fileurl, QString poiType, QVariantList aoi)
+{
+    m_missionType = poiType;
+    m_aoi.clear();
+    foreach(QVariant crd, aoi)
+    {
+        m_aoi.append(crd.value<QGeoCoordinate>());
+    }
+
+    auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
+    QFile file(fileurlcvt);
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+
+    out << m_missionType;
+    out << m_aoi;
 }
 

@@ -31,6 +31,8 @@ class PhotoPlan : public QObject
     Q_PROPERTY(QVariantList photoPrints READ photoPrints NOTIFY photoPrintsChanged)
     Q_PROPERTY(QVariantList trackMarkers READ trackMarkers NOTIFY trackMarkersChanged)
 
+    Q_PROPERTY(QVariantList aoi READ aoi NOTIFY aoiChanged)
+    Q_PROPERTY(QString missionType READ missionType)
 
 public:
     explicit PhotoPlan(QObject *parent = nullptr);
@@ -38,6 +40,10 @@ public:
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void saveFlightPlan(QVariant fileurl);
+
+    Q_INVOKABLE QVariantList loadAoi(QVariant fileurl);
+    Q_INVOKABLE void saveAoi(QVariant fileurl, QString poiType, QVariantList aoi);
+
 
     QString cameraModel() const;
     void setCameraModel(const QString &cameraModel);
@@ -77,6 +83,9 @@ public:
 
     QVariantList trackMarkers();
 
+    QVariantList aoi();
+    QString missionType() const;
+
 signals:
 
     void cameraModelChanged();
@@ -93,6 +102,7 @@ signals:
     void photoCentersChanged();
     void photoPrintsChanged();
     void trackMarkersChanged();
+    void aoiChanged();
 
 public slots:
 
@@ -115,6 +125,8 @@ private:
     QVector<QGeoCoordinate> m_sourceTrack;
     QVector<QGeoCoordinate> m_photoPrints;
     aero_photo::FlightPoints m_flightPoints;
+    QVector<QGeoCoordinate> m_aoi;
+    QString m_missionType;
 
     std::unique_ptr<aero_photo::PhotoPlanner> m_apPhotoPlanner;
     void UpdatePhotoPlannerDraw();
