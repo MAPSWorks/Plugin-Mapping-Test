@@ -10,5 +10,6 @@
         <file>qml/icons/linear.svg</file>
         <file>qml/icons/camera.svg</file>
         <file>qml/icons/place.svg</file>
+        <file>qml/icons/archive.svg</file>
     </qresource>
 </RCC>

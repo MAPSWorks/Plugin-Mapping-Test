@@ -435,32 +435,7 @@ Item {
                 ToolTip.delay:          parent.delay
                 ToolTip.timeout:        parent.timeout
                 ToolTip.visible:        hovered
-                ToolTip.text:           qsTr("Load area ...")
-                Rectangle {
-                    anchors.centerIn: parent
-                    height: parent.background.height*1.5
-                    width:  parent.background.height*1.5
-                    color: "#6021be2b"
-                    radius: parent.background.height*1.5
-                    visible: parent.hovered
-                }
-                Image {
-                    fillMode: Image.PreserveAspectFit
-                    anchors.centerIn: parent
-                    sourceSize.height: parent.background.height - 2
-                    height: sourceSize.height
-                    source: "icons/archive.svg"
-                }
-                onClicked: {
-                    aoiLoadDialog.open();
-                }
-            }
-            ToolButton {
-                hoverEnabled:           parent.bHoverEnabled
-                ToolTip.delay:          parent.delay
-                ToolTip.timeout:        parent.timeout
-                ToolTip.visible:        hovered
-                ToolTip.text:           qsTr("Save area ...")
+                ToolTip.text:           qsTr("Load photo region ...")
                 Rectangle {
                     anchors.centerIn: parent
                     height: parent.background.height*1.5
@@ -475,6 +450,31 @@ Item {
                     sourceSize.height: parent.background.height - 2
                     height: sourceSize.height
                     source: "icons/unarchive.svg"
+                }
+                onClicked: {
+                    aoiLoadDialog.open();
+                }
+            }
+            ToolButton {
+                hoverEnabled:           parent.bHoverEnabled
+                ToolTip.delay:          parent.delay
+                ToolTip.timeout:        parent.timeout
+                ToolTip.visible:        hovered
+                ToolTip.text:           qsTr("Save photo region ...")
+                Rectangle {
+                    anchors.centerIn: parent
+                    height: parent.background.height*1.5
+                    width:  parent.background.height*1.5
+                    color: "#6021be2b"
+                    radius: parent.background.height*1.5
+                    visible: parent.hovered
+                }
+                Image {
+                    fillMode: Image.PreserveAspectFit
+                    anchors.centerIn: parent
+                    sourceSize.height: parent.background.height - 2
+                    height: sourceSize.height
+                    source: "icons/archive.svg"
                 }
                 onClicked: {
                     aoiSaveDialog.open();
@@ -500,7 +500,7 @@ Item {
                     anchors.centerIn: parent
                     sourceSize.height: parent.background.height - 2
                     height: sourceSize.height
-                    source: "icons/unarchive.svg"
+                    source: "icons/archive.svg"
                 }
                 onClicked: {
                     saveFlightPlanDialog.open()
@@ -553,7 +553,7 @@ Item {
 
     FileDialog {
         id: aoiSaveDialog
-        title: "Enter filename to save area of interest"
+        title: "Enter filename to save photo region"
         selectExisting: false
         selectMultiple: false
         selectFolder: false
@@ -568,7 +568,7 @@ Item {
 
     FileDialog {
         id: aoiLoadDialog
-        title: "Enter filename to load area of interest"
+        title: "Enter filename to load photo region"
         selectExisting: true
         selectMultiple: false
         selectFolder: false
