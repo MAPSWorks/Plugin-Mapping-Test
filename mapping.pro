@@ -2,6 +2,7 @@ SUBDIRS = \
     PhotoPlannerMath \
     PhotoPlannerTest \
     src/PhotoPlanner \
+    Planner
 
 TEMPLATE = subdirs
 

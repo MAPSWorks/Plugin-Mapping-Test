@@ -42,7 +42,14 @@ SOURCES += \
     MissionItemTw.cpp \
     MissionItemWp.cpp \
     MissionModel.cpp \
-    MissionPath.cpp
+    MissionPath.cpp \
+    ../../lib/Mandala.cpp \
+    ../../lib/MandalaCore.cpp \
+    ../../lib/MatrixMath.cpp \
+    ../shared/QMandala.cpp \
+    ../shared/QMandalaField.cpp \
+    ../shared/QMandalaItem.cpp \
+    ../shared/FlightDataFile.cpp
 
 TRANSLATIONS = PhotoPlanner_ru.ts
 
@@ -70,7 +77,14 @@ HEADERS += \
     MissionItemTw.h \
     MissionItemWp.h \
     MissionModel.h \
-    MissionPath.h
+    MissionPath.h \
+    ../../lib/Mandala.h \
+    ../../lib/MandalaCore.h \
+    ../../lib/MatrixMath.h \
+    ../shared/QMandala.h \
+    ../shared/QMandalaField.h \
+    ../shared/QMandalaItem.h \
+    ../shared/FlightDataFile.h
 
 unix {
     target.path = /usr/lib
