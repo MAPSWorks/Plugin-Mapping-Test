@@ -11,5 +11,14 @@
         <file>qml/icons/camera.svg</file>
         <file>qml/icons/place.svg</file>
         <file>qml/icons/archive.svg</file>
+        <file>qml/PlannerToolBar.qml</file>
+        <file>qml/icons/scale.png</file>
+        <file>qml/icons/scale_end.png</file>
+        <file>qml/PlannerMap.qml</file>
+        <file>qml/MapPopupMenu.qml</file>
+        <file>qml/Marker.qml</file>
+        <file>qml/MarkerPopupMenu.qml</file>
+        <file>qml/PolygonItem.qml</file>
+        <file>qml/PolylineItem.qml</file>
     </qresource>
 </RCC>

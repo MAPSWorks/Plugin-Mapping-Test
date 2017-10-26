@@ -6,14 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
-    <height>513</height>
+    <width>1023</width>
+    <height>644</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>PhotoPlannerDialog</string>
+   <string>Photo Planner</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout"/>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

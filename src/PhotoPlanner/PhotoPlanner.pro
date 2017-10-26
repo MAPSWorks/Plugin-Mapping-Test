@@ -28,28 +28,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         photoplanner.cpp \
-    photoplannerplugin.cpp \
-    photoplannerwindow.cpp \
-    photoplan.cpp \
-    MissionItem.cpp \
-    MissionItemArea.cpp \
-    MissionItemAreaPoint.cpp \
-    MissionItemCategory.cpp \
-    MissionItemField.cpp \
-    MissionItemObject.cpp \
-    MissionItemPi.cpp \
-    MissionItemRw.cpp \
-    MissionItemTw.cpp \
-    MissionItemWp.cpp \
-    MissionModel.cpp \
-    MissionPath.cpp \
-    ../../lib/Mandala.cpp \
-    ../../lib/MandalaCore.cpp \
-    ../../lib/MatrixMath.cpp \
-    ../shared/QMandala.cpp \
-    ../shared/QMandalaField.cpp \
-    ../shared/QMandalaItem.cpp \
-    ../shared/FlightDataFile.cpp
+        photoplannerplugin.cpp \
+        photoplannerwindow.cpp \
+        photoplan.cpp \
+        MissionItem.cpp \
+        MissionItemArea.cpp \
+        MissionItemAreaPoint.cpp \
+        MissionItemCategory.cpp \
+        MissionItemField.cpp \
+        MissionItemObject.cpp \
+        MissionItemPi.cpp \
+        MissionItemRw.cpp \
+        MissionItemTw.cpp \
+        MissionItemWp.cpp \
+        MissionPath.cpp \
+        MissionModel.cpp \
+        ../../lib/Mandala.cpp \
+        ../../lib/MandalaCore.cpp \
+        ../../lib/MatrixMath.cpp \
+        ../shared/QMandala.cpp \
+        ../shared/QMandalaField.cpp \
+        ../shared/QMandalaItem.cpp \
+        ../shared/FlightDataFile.cpp
 
 TRANSLATIONS = PhotoPlanner_ru.ts
 
@@ -63,28 +63,28 @@ lupdate_only{
 HEADERS += \
         photoplanner.h \
         photoplanner_global.h \ 
-    photoplannerplugin.h \
-    photoplannerwindow.h \
-    photoplan.h \
-    MissionItem.h \
-    MissionItemArea.h \
-    MissionItemAreaPoint.h \
-    MissionItemCategory.h \
-    MissionItemField.h \
-    MissionItemObject.h \
-    MissionItemPi.h \
-    MissionItemRw.h \
-    MissionItemTw.h \
-    MissionItemWp.h \
-    MissionModel.h \
-    MissionPath.h \
-    ../../lib/Mandala.h \
-    ../../lib/MandalaCore.h \
-    ../../lib/MatrixMath.h \
-    ../shared/QMandala.h \
-    ../shared/QMandalaField.h \
-    ../shared/QMandalaItem.h \
-    ../shared/FlightDataFile.h
+        photoplannerplugin.h \
+        photoplannerwindow.h \
+        photoplan.h \
+        MissionItem.h \
+        MissionItemArea.h \
+        MissionItemAreaPoint.h \
+        MissionItemCategory.h \
+        MissionItemField.h \
+        MissionItemObject.h \
+        MissionItemPi.h \
+        MissionItemRw.h \
+        MissionItemTw.h \
+        MissionItemWp.h \
+        MissionModel.h \
+        MissionPath.h \
+        ../../lib/Mandala.h \
+        ../../lib/MandalaCore.h \
+        ../../lib/MatrixMath.h \
+        ../shared/QMandala.h \
+        ../shared/QMandalaField.h \
+        ../shared/QMandalaItem.h \
+        ../shared/FlightDataFile.h
 
 unix {
     target.path = /usr/lib
@@ -95,4 +95,5 @@ RESOURCES += \
     photoplanner.qrc
 
 DISTFILES += \
-    PhotoPlanner_ru.ts
+    PhotoPlanner_ru.ts \
+    qml/PlannerMap.qml

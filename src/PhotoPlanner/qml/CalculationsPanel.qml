@@ -1,17 +1,17 @@
 import QtQuick 2.7
+//import QtQuick.Controls 1.4
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
 
 Rectangle {
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 5
-
         SwipeView {
             id: swipeView
             Layout.fillWidth: true
+            Layout.fillHeight:  true
             currentIndex: tabBar.currentIndex
             GridLayout {
                 visible: swipeView.currentIndex === 0
@@ -197,18 +197,159 @@ Rectangle {
                         text: parent.value.toFixed(0)
                     }
                 }
-/*
-                Button {
-                    Layout.fillWidth:   true
-                    Layout.columnSpan:  2
-                    text:               qsTr("Calculate")
-                    onClicked: {
-             //           photoPlannerWindow.calculateAoI(map.areaPoI.path);
+            }
+
+            ListView {
+                id: markersList
+                height:200
+                Layout.fillWidth: true
+                model: map.markers
+
+                delegate: RowLayout{
+                    spacing:        1
+                    Label {
+                        text: index
+                        height: 20
+                    }
+                    Label {
+                        text: "Lat:"
+                    }
+                    TextField {
+                        activeFocusOnPress: true
+                        Layout.maximumWidth: 100
+                        wrapMode: TextInput.Wrap
+                        text: map.markers[index].coordinate.latitude.toString()
+                        onEditingFinished: {
+                            map.markers[index].coordinate.latitude = text
+                        }
+                    }
+                    Label {
+                        text: "Lon:"
+                    }
+                    TextField {
+                        activeFocusOnPress: true
+                        Layout.maximumWidth: 100
+                        wrapMode: TextInput.Wrap
+                        text: map.markers[index].coordinate.longitude.toString()
+                        onEditingFinished: {
+                            map.markers[index].coordinate.longitude = text
+                        }
+                    }
+                    Button {
+                        text:"1"
+                        Layout.maximumWidth: 20
+                        onClicked: {
+                            map.addMarker();
+                            console.log(map.markerCounter);
+                        }
+                    }
+                    Button {
+                        Layout.maximumWidth: 20
+                        text:"2"
+                        onClicked: {
+                            map.deleteMarker(index);
+                        }
+                    }
+
+                }
+                        /*
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                map.addMarker();
+                            }
+                        }*/
+                    }
+            /*
+            Rectangle {
+                visible: swipeView.currentIndex === 1
+                color: "red"
+                height: 100
+                width:  200
+            }
+
+            /* GridLayout {
+                visible: swipeView.currentIndex === 1
+                columns: 1
+                columnSpacing: 10
+                rowSpacing: 1
+                focus: true
+                Rectangle {
+                  //  Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    height: swipeView.height
+                  //  width: 200
+                    color: "red"
+                }
+*/
+
+            /*
+                TableView {
+                    id: tableView
+                    frameVisible: true
+                    sortIndicatorVisible: false
+                    height:swipeView.height
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+               //     anchors.fill: parent
+                    visible: swipeView.currentIndex === 1
+
+                    TableViewColumn {
+                               id: numberColumn
+                               title: "#"
+                               role: "num"
+                               movable: false
+                               resizable: false
+                               width: 20
+                           }
+
+                    TableViewColumn {
+                               id: latitudeColumn
+                               title: "latitude"
+                               role: "latitude"
+                               movable: false
+                               resizable: false
+                               width: 100
+                           }
+
+                    TableViewColumn {
+                               id: longitColumn
+                               title: "longitude"
+                               role: "longitude"
+                               movable: false
+                               resizable: false
+                               width: 100
+                           }
+
+                    ListModel {
+                               id: sourceModel
+                               ListElement {
+                                   num: 1
+                                   latitude: 38.7
+                                   longitude: 29.5
+                               }
+                               ListElement {
+                                   num: 2
+                                   latitude: 38.7
+                                   longitude: 29.5
+                               }
+                               ListElement {
+                                   num: 3
+                                   latitude: 38.7
+                                   longitude: 29.5
+                               }
+                    }
+                    model: sourceModel
+                    itemDelegate: Item{
+                        Text {
+                        text: styleData.value
+                        }
                     }
                 }
-  */          }
+*/
+  //          }
             GridLayout {
-               visible: swipeView.currentIndex === 1
+               visible: swipeView.currentIndex === 2
                anchors.margins: 5
                columns: 2
                columnSpacing: 10
@@ -257,7 +398,7 @@ Rectangle {
                }
             }
             GridLayout {
-                visible: swipeView.currentIndex === 2
+                visible: swipeView.currentIndex === 3
                 anchors.margins: 5
                 columns: 2
                 columnSpacing: 10
@@ -356,18 +497,22 @@ Rectangle {
             }
         }
 
-        Item {
+      /*  Item {
             Layout.fillHeight: true
         }
-
+*/
         TabBar {
             id: tabBar
             height: 50
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.bottom: parent.bottom
             currentIndex: swipeView.currentIndex
             TabButton {
                 text: qsTr("Calc")
+            }
+            TabButton {
+                text: qsTr("Coord")
             }
             TabButton {
                 text: qsTr("Cameras")

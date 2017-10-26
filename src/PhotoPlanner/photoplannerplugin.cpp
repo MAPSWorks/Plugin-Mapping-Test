@@ -7,5 +7,6 @@ QMandala *mandala;
 void PhotoPlannerPlugin::init(void)
 {
     QMandala *mandala = new QMandala();
+    Q_UNUSED(mandala);
     obj = new PhotoPlannerWindow();
 }
