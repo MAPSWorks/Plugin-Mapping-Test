@@ -43,13 +43,13 @@ import QtLocation 5.3
 //TODO: remove/refactor me when items are integrated
 
 MapPolyline {
-    line.color: "blue"
-    line.width: 4
+    line.color: "green"
+    line.width: 3
     opacity: 0.7
     smooth: true
 
     function setGeometry(markers, index){
-        for (var i = index; i<markers.length; i++){
+        for (var i = 0; i<markers.length; i++){
             addCoordinate(markers[i].coordinate)
         }
     }

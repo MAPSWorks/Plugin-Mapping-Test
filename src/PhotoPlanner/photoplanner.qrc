@@ -20,5 +20,8 @@
         <file>qml/MarkerPopupMenu.qml</file>
         <file>qml/PolygonItem.qml</file>
         <file>qml/PolylineItem.qml</file>
+        <file>qml/icons/add.svg</file>
+        <file>qml/icons/remove.svg</file>
+        <file>qml/icons/place_sel.svg</file>
     </qresource>
 </RCC>

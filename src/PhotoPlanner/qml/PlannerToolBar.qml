@@ -10,6 +10,8 @@ ToolBar {
     anchors.bottom: parent.bottom
 
     property alias settings: settings
+    property alias linearMission: linearMission
+    property alias areaMission: areaMission
 
     background: Rectangle {
        implicitWidth: 40
@@ -90,7 +92,12 @@ ToolBar {
             onClicked: {
                 if(checked)
                 {
-                    map.startLinearPoI();
+                 //   map.startLinearPoI();
+                    map.missionType="Linear";
+                    areaMission.checked=false;
+                    map.clearMapItems()
+                    map.clearTrack()
+                    map.deleteMarkers()
                 }
                 else
                 {
@@ -140,7 +147,11 @@ ToolBar {
 
                 if(checked)
                 {
-                    map.startAreaPoI();
+                    map.missionType="Area";
+                    linearMission.checked=false;
+                    map.clearMapItems()
+                    map.clearTrack()
+                    map.deleteMarkers()
                 }
                 else
                 {

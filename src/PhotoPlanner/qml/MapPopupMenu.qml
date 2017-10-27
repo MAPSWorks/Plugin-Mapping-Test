@@ -50,9 +50,8 @@ Menu {
     function update() {
         clear()
         addItem(qsTr("Add Marker")).triggered.connect(function(){itemClicked("addMarker")})
-        addItem(qsTr("Get coordinate")).triggered.connect(function(){itemClicked("getCoordinate")})
+//        addItem(qsTr("Get coordinate")).triggered.connect(function(){itemClicked("getCoordinate")})
         addItem(qsTr("Fit Viewport")).triggered.connect(function(){itemClicked("fitViewport")})
-
         if (markersCount > 0) {
             addItem(qsTr("Delete markers")).triggered.connect(function(){itemClicked("deleteMarkers")})
         }

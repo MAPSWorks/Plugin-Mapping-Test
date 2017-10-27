@@ -41,26 +41,19 @@
 import QtQuick 2.0;
 import QtLocation 5.3
 
-//! [mqi-top]
 MapQuickItem {
     id: marker
-//! [mqi-top]
     property alias lastMouseX: markerMouseArea.lastX
     property alias lastMouseY: markerMouseArea.lastY
-
-//! [mqi-anchor]
-    anchorPoint.x: image.width/4
+    anchorPoint.x: image.width/2
     anchorPoint.y: image.height
-
     sourceItem: Image {
         id: image
+        fillMode: Image.PreserveAspectFit
+        sourceSize.height: 24
+        height: sourceSize.height
+        source: markerMouseArea.pressed ? "icons/place_sel.svg" : "icons/place.svg"
 
-    fillMode: Image.PreserveAspectFit
-    sourceSize.height: 24
-    height: sourceSize.height
-
-//! [mqi-anchor]
-        source: markerMouseArea.pressed ? "icons/place.svg" : "icons/place.svg"
         MouseArea  {
             id: markerMouseArea
             property int pressX : -1
@@ -82,6 +75,19 @@ MapQuickItem {
                         map.currentMarker = i
                         break
                     }
+                }
+            }
+
+            onReleased: {
+                if(map.missionType === "Area")
+                {
+                    map.addGeoItem("PolygonItem")
+                    map.clearTrack()
+                }
+                else //pathLength
+                {
+                    map.addGeoItem("PolylineItem")
+                    map.clearTrack()
                 }
             }
 

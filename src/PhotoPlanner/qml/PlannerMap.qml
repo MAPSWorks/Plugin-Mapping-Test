@@ -1,5 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.3
+import QtQuick.Dialogs 1.2
+import QtQuick.Layouts 1.2
 import QtLocation 5.9
 import QtPositioning 5.8
 
@@ -18,6 +20,13 @@ Map {
     property int jitterThreshold : 30
     property bool followme: false
     property variant scaleLengths: [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000]
+    property string missionType
+
+    property MapPolyline linearPoI
+    property MapPolygon  areaPoI
+    property MapPolyline track
+    property list<MapQuickItem> trackMarkers
+
 
     signal showMainMenu(variant coordinate)
     signal showMarkerMenu(variant coordinate)
@@ -67,6 +76,18 @@ Map {
          }
          myArray.push(marker)
          markers = myArray
+
+         if(missionType === "Area")
+         {
+   //          photoPlanner.calcAreaPhotoPrints(myArray);
+             map.addGeoItem("PolygonItem")
+         }
+         else //pathLength
+         {
+     //        photoPlanner.calcLinearPhotoPrints(myArray);
+             map.addGeoItem("PolylineItem")
+
+         }
     }
 
     function deleteMarker(index)
@@ -106,7 +127,8 @@ Map {
             //update list of items
             var myArray = new Array()
             for (var i = 0; i<count; i++){
-                myArray.push(mapItems[i])
+                map.removeMapItem(mapItems[i]);
+                //myArray.push(mapItems[i])
             }
             myArray.push(o)
             mapItems = myArray
@@ -115,6 +137,56 @@ Map {
             console.log(item + " is not supported right now, please call us later.")
         }
     }
+
+    function calculatePhotoPlan () {
+
+        var myArray = new Array()
+        for (var i = 0; i<markerCounter; i++){
+            myArray.push(markers[i].coordinate)
+        }
+
+        if(missionType === "Area")
+        {
+            photoPlanner.calcAreaPhotoPrints(myArray);
+            map.addGeoItem("PolygonItem")
+        }
+        else //pathLength
+        {
+            photoPlanner.calcLinearPhotoPrints(myArray);
+            map.addGeoItem("PolylineItem")
+
+        }
+
+        clearTrack();
+        map.track = Qt.createQmlObject('import QtLocation 5.6; MapPolyline {}', item);
+        map.track.line.width = 2;
+        map.track.line.color = 'blue';
+        map.addMapItem(map.track);
+        map.track.path = photoPlanner.track; //map.areaPoI.path //photoPlanner.track;
+
+        var pathLength = 0;
+        for(var i =0; i < map.track.pathLength() -1; i++)
+        {
+            pathLength+=map.track.path[i].distanceTo(map.track.path[i+1]);
+        }
+        resultsDlg.flightPathLength.text = (pathLength/1000+0.5).toFixed(1);
+        resultsDlg.flightSpeed.text = photoPlanner.speed;
+        resultsDlg.flightTime.text = (pathLength*60/(1000*photoPlanner.speed)+0.5).toFixed(0);
+        resultsDlg.picturesCount.text = photoPlanner.photoCenters.length;
+        resultsDlg.open();
+ //       startTrack();
+   //     addTrackMarkers();
+     //   addPhotoPrints();
+    }
+
+    function clearTrack()
+    {
+        map.removeMapItem(map.track);
+        for(var i = 0; i<map.trackMarkers.length; i++)
+            map.removeMapItem(map.trackMarkers[i])
+        map.trackMarkers = null
+    }
+
 /*
     function calculateMarkerRoute()
     {
@@ -263,6 +335,7 @@ Map {
                 map.lastX = mouse.x
                 map.lastY = mouse.y
             }
+
             currX = mouse.x
             currY = mouse.y
         }
@@ -285,5 +358,63 @@ Map {
             }
         }
     }
+
+    Dialog {
+        id: resultsDlg
+//        visible: true
+        title: "Calculations"
+        property alias flightPathLength: flightPathLength
+        property alias flightTime:       flightTime
+        property alias flightSpeed:      flightSpeed
+        property alias picturesCount:    picturesCount
+        contentItem: Rectangle {
+            color: "gray"
+            implicitWidth: 400
+            implicitHeight: 100
+            GridLayout {
+                anchors.fill: parent
+                anchors.margins: 5
+                columns: 2
+                columnSpacing: 10
+                rowSpacing: 1
+                focus: true
+                Text {
+                   text: qsTr("Flight length, km")
+                }
+                Text {
+                   id: flightPathLength;
+                   text: qsTr("20")
+                }
+                Text {
+                   text: qsTr("Speed, KpH")
+                }
+                Text {
+                   id: flightSpeed
+                   text: qsTr("20")
+                }
+                Text {
+                   text: qsTr("Flight Time, min")
+                }
+                Text {
+                   id: flightTime;
+                   text: qsTr("20")
+                }
+                Text {
+                   text: qsTr("Pictures")
+                }
+                Text {
+                    id: picturesCount
+                   text: qsTr("20")
+                }
+                Text {
+                   text: qsTr("Photo Prints Area, SqKm")
+                }
+                Text {
+                   text: qsTr("20")
+                }
+            }
+       }
+    }
 }
+
 

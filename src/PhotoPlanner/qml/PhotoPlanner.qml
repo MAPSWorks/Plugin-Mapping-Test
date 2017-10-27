@@ -16,13 +16,6 @@ Item {
         //PluginParameter { name: "mapboxgl.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
         PluginParameter { name: "mapbox.mapping.cache.directory"; value: "/tmp/maps" }
         PluginParameter { name: "style"; value: "mapbox://styles/mapbox/satellite-v9" }
-
-
-     //   PluginParameter { name: "here.app_id"; value: "0nq9YLyTnyFO4uiCkHQ4" }
-       // PluginParameter { name: "here.token"; value: "iRlA2YudpvvSpwzXcrjnPg" }
-        //PluginParameter { name: "mapping.cache.directory"; value: "/tmp/maps" }
-     //   preferred: ["here", "osm"]
-       // required: Plugin.AnyMappingFeatures
     }
 
     Image {
@@ -34,6 +27,7 @@ Item {
         id: poiMarker
         sourceItem: poiImage
     }
+
     PlannerMap {
         id:             map
         anchors.fill:   parent
@@ -41,11 +35,14 @@ Item {
         zoomLevel:      14
 
         onShowMainMenu: {
-            mapPopupMenu.show(coordinate);
+            if(toolBar.linearMission.checked || toolBar.areaMission.checked)
+            {
+                map.addMarker()
+            }
+//          mapPopupMenu.show(coordinate);
         }
-
         onShowMarkerMenu: {
-            markerPopupMenu.show(coordinate);
+//          markerPopupMenu.show(coordinate);
         }
     }
 
@@ -64,9 +61,9 @@ Item {
                 case "addMarker":
                     map.addMarker()
                     break
-                case "getCoordinate":
-                    map.coordinatesCaptured(coordinate.latitude, coordinate.longitude)
-                    break
+//                case "getCoordinate":
+//                    map.coordinatesCaptured(coordinate.latitude, coordinate.longitude)
+//                    break
                 case "fitViewport":
                     map.fitViewportToMapItems()
                     break

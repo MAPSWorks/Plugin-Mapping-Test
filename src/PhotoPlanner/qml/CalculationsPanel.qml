@@ -1,6 +1,6 @@
 import QtQuick 2.7
-//import QtQuick.Controls 1.4
-import QtQuick.Controls 2.0
+import QtQuick.Controls 1.4
+import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
 
@@ -204,48 +204,88 @@ Rectangle {
                 height:200
                 Layout.fillWidth: true
                 model: map.markers
+                visible: swipeView.currentIndex === 1
 
                 delegate: RowLayout{
                     spacing:        1
                     Label {
-                        text: index
+                        text: index+1
                         height: 20
                     }
                     Label {
                         text: "Lat:"
                     }
-                    TextField {
+                    TextArea {
                         activeFocusOnPress: true
                         Layout.maximumWidth: 100
-                        wrapMode: TextInput.Wrap
-                        text: map.markers[index].coordinate.latitude.toString()
+                        horizontalAlignment: Text.AlignLeft
+                        cursorPosition: 0
+             //           wrapMode: TextInput.Wrap
+
+                        text: map.markers[index].coordinate.latitude
                         onEditingFinished: {
                             map.markers[index].coordinate.latitude = text
+                            if(map.missionType === "Area")
+                            {
+                                map.addGeoItem("PolygonItem")
+                                map.clearTrack()
+                            }
+                            else //pathLength
+                            {
+                                map.addGeoItem("PolylineItem")
+                                map.clearTrack()
+                            }
                         }
                     }
                     Label {
                         text: "Lon:"
                     }
-                    TextField {
+                    TextArea  {
                         activeFocusOnPress: true
                         Layout.maximumWidth: 100
-                        wrapMode: TextInput.Wrap
+                        horizontalAlignment: Text.AlignLeft
+               //         wrapMode: TextInput.Wrap
                         text: map.markers[index].coordinate.longitude.toString()
                         onEditingFinished: {
                             map.markers[index].coordinate.longitude = text
+                            if(map.missionType === "Area")
+                            {
+                                map.addGeoItem("PolygonItem")
+                                map.clearTrack()
+                            }
+                            else //pathLength
+                            {
+                                map.addGeoItem("PolylineItem")
+                                map.clearTrack()
+                            }
                         }
                     }
-                    Button {
-                        text:"1"
-                        Layout.maximumWidth: 20
+                    RoundButton {
+                        //text:"1"
+                        Layout.maximumWidth: 30
+                        Image {
+                            fillMode: Image.PreserveAspectFit
+                            anchors.centerIn: parent
+                            sourceSize.height: parent.background.height - 2
+                            height: sourceSize.height
+                            source: "icons/add.svg"
+                        }
+
                         onClicked: {
                             map.addMarker();
                             console.log(map.markerCounter);
                         }
                     }
-                    Button {
-                        Layout.maximumWidth: 20
-                        text:"2"
+                    RoundButton {
+                        radius: 30
+                        //text:"2"
+                        Image {
+                            fillMode: Image.PreserveAspectFit
+                            anchors.centerIn: parent
+                            sourceSize.height: parent.radius - 2
+                            height: sourceSize.height
+                            source: "icons/remove.svg"
+                        }
                         onClicked: {
                             map.deleteMarker(index);
                         }

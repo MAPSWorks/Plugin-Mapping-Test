@@ -51,13 +51,13 @@ MapPolygon {
     opacity: 0.5
 
     function setGeometry(markers, index){
-        for (var i = index; i<markers.length; i++){
+        for (var i = 0; i<markers.length; i++){
             addCoordinate(markers[i].coordinate)
         }
     }
     MouseArea {
         anchors.fill:parent
         id: mousearea
-        drag.target: parent
+       // drag.target: parent
     }
 }
