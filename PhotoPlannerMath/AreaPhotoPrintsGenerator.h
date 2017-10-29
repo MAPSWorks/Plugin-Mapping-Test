@@ -11,6 +11,9 @@
 #include <vector>
 #include <stdint.h>
 
+#include <QPolygonF>
+#include <QRectF>
+
 namespace aero_photo {
 
 class AreaPhotoPrintsGenerator {
