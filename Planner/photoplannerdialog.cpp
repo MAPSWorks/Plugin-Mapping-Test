@@ -21,8 +21,6 @@ PhotoPlannerDialog::PhotoPlannerDialog(QWidget *parent) :
                 PluginInterface* pi = qobject_cast<PluginInterface*>(plugin);
                 pi->init();
                 QObject* obj = pi->obj;
-                int k;
-                k=0;
                 ui->verticalLayout->addWidget((QQuickWidget*)obj);
         }
     }

@@ -1,5 +1,8 @@
 #include "photoplan.h"
 
+#include <QDataStream>
+#include <QFile>
+#include <QUrl>
 #include <QVariant>
 #include <QtDebug>
 
@@ -311,25 +314,10 @@ void PhotoPlan::saveFlightPlan(QVariant fileurl)
 {
     auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
     if (m_apPhotoPlanner) {
-        missionModel = new MissionModel(this);
-        bool isFirstPoint = true;
-        for (auto &flightPoint : m_apPhotoPlanner->GetFlightPoints()) {
-            auto wp = missionModel->waypoints->createItem();
-            wp->f_latitude->setValue(flightPoint.latitude());
-            wp->f_longitude->setValue(flightPoint.longitude());
-            wp->f_altitude->setValue(flightPoint.altitude());
-            wp->f_type->setValue(flightPoint.type());
-            if(isFirstPoint) {
-                isFirstPoint = false;
-                wp->f_speed->setValue(speed());
-            }
-            auto shotDistance = flightPoint.shotDistance();
-            if(shotDistance!=0) {
-                wp->f_shot->setValue("yes");
-            }
+        QFile xmlFile(fileurlcvt);
+        if (xmlFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            m_apPhotoPlanner->SaveToXml(&xmlFile);
         }
-
-        missionModel->saveToFile(fileurlcvt);
     }
 }
 

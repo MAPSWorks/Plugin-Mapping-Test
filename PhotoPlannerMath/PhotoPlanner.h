@@ -7,6 +7,8 @@
 #include "LinedGeoPoints.h"
 #include "ManeuverTrackAlignment.h"
 
+#include <QDateTime>
+#include <QXmlStreamWriter>
 
 namespace aero_photo {
 
@@ -41,7 +43,68 @@ public:
 
     qreal velocity() const { return photoUav_.velocity(); }
 
+    void SaveToXml(QIODevice *iodevice) {
+        QXmlStreamWriter stream(iodevice);
+        stream.setAutoFormatting(true);
+        stream.writeStartDocument();
+        SaveToXmlMission(stream);
+        stream.writeEndDocument();
+    }
+
 protected:
+    void SaveToXmlMission(QXmlStreamWriter &stream) {
+        stream.writeStartElement("mission");
+        stream.writeAttribute("version", "9.10.56");
+        stream.writeAttribute("href", "http://www.uavos.com/");
+        stream.writeAttribute("title", "mission");
+        stream.writeTextElement("hash", "f7c8603a8b1af004375ebc326a0ab6e");
+        stream.writeTextElement("timestamp", QDateTime::currentDateTime().toString());
+        if (!GetFlightPoints().empty())
+            SaveToXmlHome(stream, GetFlightPoints().front());
+        SaveToXmlWayPoints(stream);
+        stream.writeEndElement();
+    }
+    void SaveToXmlHome(QXmlStreamWriter &stream, const GeoPoint &homePoint) {
+        stream.writeStartElement("home");
+        stream.writeTextElement("lat", QString::number(homePoint.latitude(), 'f', 15));
+        stream.writeTextElement("lon", QString::number(homePoint.longitude(), 'f', 15));
+        stream.writeTextElement("hmsl", "0");
+        stream.writeEndElement();
+    }
+    void SaveToXmlWayPoints(QXmlStreamWriter &stream) {
+        stream.writeStartElement("waypoints");
+        stream.writeAttribute("cnt", QString::number(GetFlightPoints().size()));
+        size_t index = 0;
+        for (const auto &flightPoint : GetFlightPoints()) {
+            SaveToXmlOnePoint(stream, index++, flightPoint);
+        }
+        stream.writeEndElement();
+    }
+    void SaveToXmlOnePoint(QXmlStreamWriter &stream, int index, const FlightPoint &flightPoint) {
+        // Conversion???
+        stream.writeStartElement("waypoint");
+        stream.writeAttribute("idx", QString::number(index));
+        stream.writeTextElement("altitude", QString::number(flightPoint.altitude()));
+        stream.writeTextElement("type", QString::number(flightPoint.type()));
+        stream.writeTextElement("latitude", QString::number(flightPoint.latitude(), 'f', 15));
+        stream.writeTextElement("longitude", QString::number(flightPoint.longitude(), 'f', 15));
+        SaveToXmlOnePointActions(stream, flightPoint);
+        stream.writeEndElement();
+    }
+
+    void SaveToXmlOnePointActions(QXmlStreamWriter &stream, const FlightPoint &flightPoint) {
+        stream.writeStartElement("actions");
+        stream.writeTextElement("speed", QString::number(velocity() * 3600.0 / 1000.0 ));
+        stream.writeTextElement("shot", "0");
+        stream.writeTextElement("dshot", QString::number(flightPoint.shotDistance()));
+        stream.writeTextElement("POI", "0");
+        stream.writeTextElement("loiter", "0");
+        stream.writeTextElement("turnR", "0");
+        stream.writeTextElement("loops", "0");
+        stream.writeTextElement("time", "0");
+        stream.writeEndElement();
+    }
+
     void CalculateTrack(double Bx) {
         trackPoints_.clear();
         flightPoints_.clear();

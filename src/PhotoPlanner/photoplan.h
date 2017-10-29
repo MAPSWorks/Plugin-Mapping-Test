@@ -7,13 +7,10 @@
 #include <QVector>
 
 #include "PhotoPlannerMath/PhotoPlanner.h"
-#include "MissionModel.h"
 #include <memory>
 
 class PhotoPlan : public QObject
 {
-    MissionModel *missionModel;
-
     Q_OBJECT
     Q_PROPERTY(QString cameraModel READ cameraModel WRITE setCameraModel NOTIFY cameraModelChanged)
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
