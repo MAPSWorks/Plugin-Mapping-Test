@@ -60,6 +60,11 @@ Map {
       scaleText.text = text
     }
 
+    function loadMarker(loadedCoordinate) {
+        mouseArea.lastCoordinate = loadedCoordinate
+        addMarker()
+    }
+
     function addMarker()
     {
          var count = map.markers.length
@@ -138,23 +143,33 @@ Map {
         }
     }
 
+    function getAoiArray() {
+        var aoiArray = new Array()
+        for (var i = 0; i<markerCounter; i++){
+            aoiArray.push(markers[i].coordinate)
+        }
+        return aoiArray;
+    }
+
+    function startPoI() {
+        map.clearMapItems()
+        map.clearTrack()
+        map.deleteMarkers()
+    }
+
     function calculatePhotoPlan () {
 
-        var myArray = new Array()
-        for (var i = 0; i<markerCounter; i++){
-            myArray.push(markers[i].coordinate)
-        }
+        var aoiArray = getAoiArray()
 
         if(missionType === "Area")
         {
-            photoPlanner.calcAreaPhotoPrints(myArray);
+            photoPlanner.calcAreaPhotoPrints(aoiArray);
             map.addGeoItem("PolygonItem")
         }
         else //pathLength
         {
-            photoPlanner.calcLinearPhotoPrints(myArray);
+            photoPlanner.calcLinearPhotoPrints(aoiArray);
             map.addGeoItem("PolylineItem")
-
         }
 
         clearTrack();

@@ -92,12 +92,9 @@ ToolBar {
             onClicked: {
                 if(checked)
                 {
-                 //   map.startLinearPoI();
-                    map.missionType="Linear";
-                    areaMission.checked=false;
-                    map.clearMapItems()
-                    map.clearTrack()
-                    map.deleteMarkers()
+                    map.missionType="Linear"
+                    areaMission.checked=false
+                    map.startPoI()
                 }
                 else
                 {
@@ -147,11 +144,9 @@ ToolBar {
 
                 if(checked)
                 {
-                    map.missionType="Area";
-                    linearMission.checked=false;
-                    map.clearMapItems()
-                    map.clearTrack()
-                    map.deleteMarkers()
+                    map.missionType="Area"
+                    linearMission.checked=false
+                    map.startPoI()
                 }
                 else
                 {

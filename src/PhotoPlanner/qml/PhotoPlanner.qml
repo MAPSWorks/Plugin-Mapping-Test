@@ -362,7 +362,8 @@ Item {
         nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
         selectedNameFilter: "Aoi files (*.aoi)"
         onAccepted: {
-            photoPlanner.saveAoi(fileUrl, map.missionType, map.linearPoI.path)
+            var aoi = map.getAoiArray();
+            photoPlanner.saveAoi(fileUrl, map.missionType, aoi)
         }
     }
 
@@ -378,14 +379,13 @@ Item {
         selectedNameFilter: "Aoi files (*.aoi)"
         onAccepted: {
             var loadedAoi = photoPlanner.loadAoi(fileUrl)
+            map.clearTrack()
             map.missionType = photoPlanner.missionType
-            if (map.missionType === "Linear") {
-                map.startLinearPoI()
-                map.linearPoI.path = loadedAoi
-            }
-            else {
-                map.startAreaPoI()
-                map.areaPoI.path = loadedAoi;
+            map.startPoI(map.missionType)
+
+            var count = loadedAoi.length
+            for (var i = 0; i < count; i++) {
+                map.loadMarker(loadedAoi[i])
             }
         }
     }
