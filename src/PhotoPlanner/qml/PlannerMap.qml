@@ -9,24 +9,24 @@ Map {
     id: map
     property variant markers
     property variant mapItems
-    property int markerCounter: 0 // counter for total amount of markers. Resets to 0 when number of markers = 0
+
+    property int markerCounter:     0 // counter for total amount of markers. Resets to 0 when number of markers = 0
     property int currentMarker
-    property int lastX : -1
-    property int lastY : -1
-    property int currX : -1
-    property int currY : -1
-    property int pressX : -1
-    property int pressY : -1
-    property int jitterThreshold : 30
-    property bool followme: false
-    property variant scaleLengths: [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000]
+    property int lastX :            -1
+    property int lastY :            -1
+    property int currX :            -1
+    property int currY :            -1
+    property int pressX :           -1
+    property int pressY :           -1
+    property int jitterThreshold :  30
+    property bool followme:         false
+    property variant scaleLengths:  [5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000]
     property string missionType
 
-    property MapPolyline linearPoI
-    property MapPolygon  areaPoI
-    property MapPolyline track
-    property list<MapQuickItem> trackMarkers
-
+    property MapPolyline            linearPoI
+    property MapPolygon             areaPoI
+    property MapPolyline            track
+    property list<MapQuickItem>     trackMarkers
 
     signal showMainMenu(variant coordinate)
     signal showMarkerMenu(variant coordinate)
@@ -38,7 +38,6 @@ Map {
       coord1 = map.toCoordinate(Qt.point(0,scale.y))
       coord2 = map.toCoordinate(Qt.point(0+scaleImage.sourceSize.width,scale.y))
       dist = Math.round(coord1.distanceTo(coord2))
-
       if (dist === 0) {
           // not visible
       } else {
@@ -54,15 +53,9 @@ Map {
               dist = scaleLengths[i]
           }
       }
-
       text = dist
       scaleImage.width = (scaleImage.sourceSize.width * f) - 2 * scaleImageLeft.sourceSize.width
       scaleText.text = text
-    }
-
-    function loadMarker(loadedCoordinate) {
-        mouseArea.lastCoordinate = loadedCoordinate
-        addMarker()
     }
 
     function addMarker()
@@ -73,7 +66,6 @@ Map {
          map.addMapItem(marker)
          marker.z = map.z+1
          marker.coordinate = mouseArea.lastCoordinate
-
          //update list of markers
          var myArray = new Array()
          for (var i = 0; i<count; i++){
@@ -81,7 +73,34 @@ Map {
          }
          myArray.push(marker)
          markers = myArray
+         if(missionType === "Area")
+         {
+   //          photoPlanner.calcAreaPhotoPrints(myArray);
+             map.addGeoItem("PolygonItem")
+         }
+         else //pathLength
+         {
+     //        photoPlanner.calcLinearPhotoPrints(myArray);
+             map.addGeoItem("PolylineItem")
 
+         }
+    }
+
+    function addCoordinateMarker(coordinate)
+    {
+         var count = map.markers.length
+         markerCounter++
+         var marker = Qt.createQmlObject ('Marker {}', map)
+         map.addMapItem(marker)
+         marker.z = map.z+1
+         marker.coordinate = coordinate
+         //update list of markers
+         var myArray = new Array()
+         for (var i = 0; i<count; i++){
+             myArray.push(markers[i])
+         }
+         myArray.push(marker)
+         markers = myArray
          if(missionType === "Area")
          {
    //          photoPlanner.calcAreaPhotoPrints(myArray);
@@ -98,31 +117,43 @@ Map {
     function deleteMarker(index)
     {
          //update list of markers
+        clearTrack();
          var myArray = new Array()
          var count = map.markers.length
          for (var i = 0; i<count; i++){
              if (index != i) myArray.push(map.markers[i])
          }
-
          map.removeMapItem(map.markers[index])
          map.markers[index].destroy()
          map.markers = myArray
-         if (markers.length == 0) markerCounter = 0
+        if (markers.length == 0) markerCounter = 0
+
+         if(missionType === "Area")
+         {
+             map.addGeoItem("PolygonItem")
+         }
+         else
+         {
+             map.addGeoItem("PolylineItem")
+         }
     }
 
     function deleteMarkers()
     {
-         var count = map.markers.length
-         for (var i = 0; i<count; i++){
+        clearTrack();
+
+        var count = map.markers.length
+        for (var i = 0; i<count; i++){
              map.removeMapItem(map.markers[i])
              map.markers[i].destroy()
-         }
-         map.markers = []
-         markerCounter = 0
+        }
+        map.markers = []
+        markerCounter = 0
     }
 
     function addGeoItem(item)
     {
+        //mapItems = new Array();
         var count = map.mapItems.length
         var co = Qt.createComponent(item+'.qml')
         if (co.status == Component.Ready) {
@@ -135,6 +166,7 @@ Map {
                 map.removeMapItem(mapItems[i]);
                 //myArray.push(mapItems[i])
             }
+
             myArray.push(o)
             mapItems = myArray
 
@@ -143,33 +175,28 @@ Map {
         }
     }
 
-    function getAoiArray() {
-        var aoiArray = new Array()
-        for (var i = 0; i<markerCounter; i++){
-            aoiArray.push(markers[i].coordinate)
-        }
-        return aoiArray;
-    }
-
-    function startPoI() {
-        map.clearMapItems()
-        map.clearTrack()
-        map.deleteMarkers()
-    }
-
     function calculatePhotoPlan () {
 
-        var aoiArray = getAoiArray()
+        var myArray = new Array()
+        for (var i = 0; i<markers.length; i++){
+            myArray.push(markers[i].coordinate)
+        }
 
         if(missionType === "Area")
         {
-            photoPlanner.calcAreaPhotoPrints(aoiArray);
+            photoPlanner.calcAreaPhotoPrints(myArray);
             map.addGeoItem("PolygonItem")
+    /*        for(var i=0; i < photoPlanner.getFlightPointCount(); i++)
+            {
+                map.addCoordinateMarker(photoPlanner.getFlightPointCoord(i));
+            }
+      */
         }
         else //pathLength
         {
-            photoPlanner.calcLinearPhotoPrints(aoiArray);
+            photoPlanner.calcLinearPhotoPrints(myArray);
             map.addGeoItem("PolylineItem")
+
         }
 
         clearTrack();
@@ -215,20 +242,19 @@ Map {
         routeModel.update();
     }
   */
-
-    focus: true
-    zoomLevel: (maximumZoomLevel - minimumZoomLevel)/2
+    focus:                  true
+    zoomLevel:              (maximumZoomLevel - minimumZoomLevel)/2
 
     center {
         // The MSQ airport
-        latitude: 53.90
-        longitude: 28.01
+        latitude:           53.90
+        longitude:          28.01
     }
 
     onCenterChanged:{
         scaleTimer.restart()
         if (map.followme)
-            if (map.center != positionSource.position.coordinate)
+            if (map.center !== positionSource.position.coordinate)
                 map.followme = false
     }
     onZoomLevelChanged:{
@@ -267,6 +293,7 @@ Map {
 
     Slider {
          id: zoomSlider;
+         visible: !calculationsPanel.visible
          z: map.z + 3
          minimumValue:  map.minimumZoomLevel;
          maximumValue:  map.maximumZoomLevel;
@@ -284,7 +311,7 @@ Map {
     Item {
        id: scale
        z: map.z + 3
-       visible: scaleText.text != "0 m"
+       visible: !calculationsPanel.visible && scaleText.text != "0 m"
        anchors.bottom: parent.bottom;
        anchors.right: parent.right
        anchors.margins: 20
@@ -376,7 +403,8 @@ Map {
 
     Dialog {
         id: resultsDlg
-//        visible: true
+//        visible: truem
+        modality: Qt.ApplicationModal
         title: "Calculations"
         property alias flightPathLength: flightPathLength
         property alias flightTime:       flightTime

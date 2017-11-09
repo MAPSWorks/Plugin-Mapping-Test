@@ -9,6 +9,7 @@
 #include "PhotoPlannerMath/PhotoPlanner.h"
 #include <memory>
 
+
 class PhotoPlan : public QObject
 {
     Q_OBJECT
@@ -34,6 +35,7 @@ class PhotoPlan : public QObject
 public:
     explicit PhotoPlan(QObject *parent = nullptr);
 
+
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void saveFlightPlan(QVariant fileurl);
@@ -41,6 +43,9 @@ public:
     Q_INVOKABLE QVariantList loadAoi(QVariant fileurl);
     Q_INVOKABLE void saveAoi(QVariant fileurl, QString poiType, QVariantList aoi);
 
+    Q_INVOKABLE QGeoCoordinate getFlightPointCoord(int index);
+    Q_INVOKABLE quint8 getFlightPointType(int index);
+    Q_INVOKABLE quint32 getFlightPointCount();
 
     QString cameraModel() const;
     void setCameraModel(const QString &cameraModel);

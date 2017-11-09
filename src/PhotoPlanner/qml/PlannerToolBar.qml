@@ -14,15 +14,16 @@ ToolBar {
     property alias areaMission: areaMission
 
     background: Rectangle {
-       implicitWidth: 40
+       implicitWidth: 78
        color: "#2021be2b"
     }
 
     ColumnLayout {
         id:                             topToolBarLayout
         anchors.fill:                   parent
+        anchors.margins:                5
+        spacing:                        10
         focus:                          false
-        spacing:                        2
         property bool bHoverEnabled:    true
         property int  delay:            1000
         property int  timeout:          5000
@@ -38,9 +39,9 @@ ToolBar {
             ToolTip.text:           qsTr("New Mission")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
-                radius: parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 color: parent.checked? "#6021be2b" : "transparent"
                 border.width: 1
                 border.color: parent.hovered? "#F021be2b" : "#6021be2b"
@@ -53,13 +54,6 @@ ToolBar {
                 height: sourceSize.height
                 source: "icons/map.svg"
             }
-            onClicked: {
-                //newMissionPopup.x = mouseX
-                //newMissionPopup.y = mouseY
-                //newMissionPopup.open()
-           //       map.start();
-            }
-
         }
 
         ToolButton {
@@ -74,9 +68,9 @@ ToolBar {
             ToolTip.text:           qsTr("Linear Mission")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
-                radius: parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 color: parent.checked? "#6021be2b" : "transparent"
                 border.width: 1
                 border.color: parent.hovered? "#F021be2b" : "#6021be2b"
@@ -92,27 +86,14 @@ ToolBar {
             onClicked: {
                 if(checked)
                 {
-                    map.missionType="Linear"
-                    areaMission.checked=false
-                    map.startPoI()
+                    map.missionType="Linear";
+                    areaMission.checked=false;
+                    map.clearMapItems()
+                    map.clearTrack()
+                    map.deleteMarkers()
                 }
-                else
-                {
-      /*              photoPlanner.calcLinearPhotoPrints(map.linearPoI.path);
-
-                    map.addPhotoPrints();
-                    map.addMarkers();
-                    map.startTrack();
-*/                    }
-
-                //newMissionPopup.x = mouseX
-                //newMissionPopup.y = mouseY
-                //newMissionPopup.open()
-           //       map.start();
             }
-
         }
-
         ToolButton {
             id:                     areaMission
             hoverEnabled:           parent.bHoverEnabled
@@ -125,9 +106,9 @@ ToolBar {
             ToolTip.text:           qsTr("Area Mission")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
-                radius: parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 color: parent.checked? "#6021be2b" : "transparent"
                 border.width: 1
                 border.color: parent.hovered? "#F021be2b" : "#6021be2b"
@@ -144,9 +125,11 @@ ToolBar {
 
                 if(checked)
                 {
-                    map.missionType="Area"
-                    linearMission.checked=false
-                    map.startPoI()
+                    map.missionType="Area";
+                    linearMission.checked=false;
+                    map.clearMapItems()
+                    map.clearTrack()
+                    map.deleteMarkers()
                 }
                 else
                 {
@@ -184,10 +167,10 @@ ToolBar {
             ToolTip.text:           qsTr("Calculate")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
                 color: "#6021be2b"
-                radius: parent.background.height*1.5
+                radius: parent.background.height*1.2
                 visible: parent.hovered
             }
             Image {
@@ -210,10 +193,10 @@ ToolBar {
             ToolTip.text:           qsTr("Load photo region ...")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
                 color: "#6021be2b"
-                radius: parent.background.height*1.5
+                radius: parent.background.height*1.2
                 visible: parent.hovered
             }
             Image {
@@ -235,11 +218,11 @@ ToolBar {
             ToolTip.text:           qsTr("Save photo region ...")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
-                color: "#6021be2b"
-                radius: parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 visible: parent.hovered
+                color: "#6021be2b"
             }
             Image {
                 fillMode: Image.PreserveAspectFit
@@ -261,10 +244,10 @@ ToolBar {
             ToolTip.text:           qsTr("Save generated flight plan")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 color: "#6021be2b"
-                radius: parent.background.height*1.5
                 visible: parent.hovered
             }
             Image {
@@ -291,9 +274,9 @@ ToolBar {
             ToolTip.text:           qsTr("Settings")
             Rectangle {
                 anchors.centerIn: parent
-                height: parent.background.height*1.5
-                width:  parent.background.height*1.5
-                radius: parent.background.height*1.5
+                height: parent.background.height*1.2
+                width:  parent.background.height*1.2
+                radius: parent.background.height*1.2
                 color: parent.checked? "#6021be2b" : "transparent"
                 border.width: 1
                 border.color: parent.hovered? "#F021be2b" : "#6021be2b"

@@ -362,8 +362,11 @@ Item {
         nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
         selectedNameFilter: "Aoi files (*.aoi)"
         onAccepted: {
-            var aoi = map.getAoiArray();
-            photoPlanner.saveAoi(fileUrl, map.missionType, aoi)
+            var myArray = new Array()
+            for (var i = 0; i<map.markerCounter; i++){
+                myArray.push(map.markers[i].coordinate)
+            }
+            photoPlanner.saveAoi(fileUrl, map.missionType, myArray)
         }
     }
 
@@ -380,12 +383,12 @@ Item {
         onAccepted: {
             var loadedAoi = photoPlanner.loadAoi(fileUrl)
             map.clearTrack()
+            map.clearMapItems();
+            map.markers = []
+            map.markerCounter = 0
             map.missionType = photoPlanner.missionType
-            map.startPoI(map.missionType)
-
-            var count = loadedAoi.length
-            for (var i = 0; i < count; i++) {
-                map.loadMarker(loadedAoi[i])
+            for (var i = 0; i < loadedAoi.length; i++) {
+                 map.addCoordinateMarker(loadedAoi[i]);
             }
         }
     }
@@ -404,111 +407,6 @@ Item {
             photoPlanner.saveFlightPlan(fileUrl);
         }
     }
-/*
-    Menu {
-        id: newMissionPopup
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        //anchors.left: mainToolBar.right
-        x: mainToolBar.width
-        y: 10
-        ColumnLayout {
-             anchors.fill: parent
-             MenuItem {
-                 id: addFlightItem;
-                 text: qsTr("Linear object");
-                 onClicked: {
-                    console.log("Add");
-                    // flightsTableView.model.append({lineNo: "pmpt", participant:"LINEDIT"})
-                    newMissionPopup.close();
-                    //settingsDialog.open();
-                     //calculationDialog.open();
-                     //settingsDialog.visible = true
-                     calculationsPanel.visible = true;
-
-                 }
-             }
-             MenuItem {
-                 id: removeFlightItem;
-                 text: qsTr("Area object");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Remove");
-                     newMissionPopup.close();
-                     calcParamPopup.open()
-                 }
-             }
-        }
-    }
-
-    Menu {
-        id: calcParamPopup
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        //anchors.left: mainToolBar.right
-        x: mainToolBar.width
-        y: 10
-        height: loadItem.height*8
-        ColumnLayout {
-             anchors.fill: parent
-             MenuItem {
-                 id: loadItem
-                 text: qsTr("Load");
-                 onClicked: {
-                    console.log("Add");
-                    // flightsTableView.model.append({lineNo: "pmpt", participant:"LINEDIT"})
-                    calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Calculate");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Remove");
-                     calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Open File");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Remove");
-                     calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Save File");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Remove");
-                     calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Reverse");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Remove");
-                     calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Import kml");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Import kml");
-                     calcParamPopup.close();
-                 }
-             }
-             MenuItem {
-                 text: qsTr("Export kml");
-                 onClicked: {
-//                     flightsTableView.model.remove(flightsTableView.currentRow);
-                     console.log("Export kml");
-                     calcParamPopup.close();
-                 }
-             }
-        }
-    }
-*/
 
     CalculationsPanel {
         id:             calculationsPanel
@@ -517,7 +415,7 @@ Item {
         anchors.top:    item.top
         anchors.bottom: item.bottom
         anchors.right:  item.right
-        color:          "#a0212121"
+        color:          "#2021be2b"
     }
 }
 

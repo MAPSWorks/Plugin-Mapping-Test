@@ -65,8 +65,11 @@ Rectangle {
                         photoPlanner.longitOverlap = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -83,8 +86,11 @@ Rectangle {
                         photoPlanner.transverseOverlap = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -101,8 +107,11 @@ Rectangle {
                          photoPlanner.azimuth = value;
                      }
                      Label {
-                         anchors.fill: parent
+                         anchors.left: parent.left
+                         anchors.right: parent.right
+                         anchors.bottom: parent.top
                          horizontalAlignment: Text.AlignHCenter
+                         verticalAlignment: Text.AlignTop
                          text: parent.value.toFixed(0)
                      }
                 }
@@ -120,8 +129,11 @@ Rectangle {
                         photoPlanner.altitude = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -138,28 +150,13 @@ Rectangle {
                            photoPlanner.gsd = value;
                        }
                        Label {
-                           anchors.fill: parent
+                           anchors.left: parent.left
+                           anchors.right: parent.right
+                           anchors.bottom: parent.top
                            horizontalAlignment: Text.AlignHCenter
+                           verticalAlignment: Text.AlignTop
                            text: parent.value.toFixed(0)
                        }
-                }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Speed, KpH")
-                }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                  0
-                    to:                 1000
-                    value:               photoPlanner.speed
-                    onValueChanged: {
-                        photoPlanner.speed = value;
-                    }
-                    Label {
-                        anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        text: parent.value.toFixed(0)
-                    }
                 }
                 Label {
                     Layout.fillWidth:   true
@@ -174,8 +171,11 @@ Rectangle {
                         photoPlanner.width = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -192,8 +192,11 @@ Rectangle {
                         photoPlanner.maxRoll = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -209,7 +212,7 @@ Rectangle {
                 delegate: RowLayout{
                     spacing:        1
                     Label {
-                        text: index+1
+                        text: 'N: ' + (index+1).toString() + ' '
                         height: 20
                     }
                     Label {
@@ -261,8 +264,9 @@ Rectangle {
                         }
                     }
                     RoundButton {
-                        //text:"1"
-                        Layout.maximumWidth: 30
+                        radius: 15
+                        Layout.maximumHeight:   15
+                        Layout.maximumWidth:    15
                         Image {
                             fillMode: Image.PreserveAspectFit
                             anchors.centerIn: parent
@@ -277,8 +281,9 @@ Rectangle {
                         }
                     }
                     RoundButton {
-                        radius: 30
-                        //text:"2"
+                        radius: 15
+                        Layout.maximumHeight:   15
+                        Layout.maximumWidth:    15
                         Image {
                             fillMode: Image.PreserveAspectFit
                             anchors.centerIn: parent
@@ -292,102 +297,7 @@ Rectangle {
                     }
 
                 }
-                        /*
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                map.addMarker();
-                            }
-                        }*/
-                    }
-            /*
-            Rectangle {
-                visible: swipeView.currentIndex === 1
-                color: "red"
-                height: 100
-                width:  200
             }
-
-            /* GridLayout {
-                visible: swipeView.currentIndex === 1
-                columns: 1
-                columnSpacing: 10
-                rowSpacing: 1
-                focus: true
-                Rectangle {
-                  //  Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    height: swipeView.height
-                  //  width: 200
-                    color: "red"
-                }
-*/
-
-            /*
-                TableView {
-                    id: tableView
-                    frameVisible: true
-                    sortIndicatorVisible: false
-                    height:swipeView.height
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-               //     anchors.fill: parent
-                    visible: swipeView.currentIndex === 1
-
-                    TableViewColumn {
-                               id: numberColumn
-                               title: "#"
-                               role: "num"
-                               movable: false
-                               resizable: false
-                               width: 20
-                           }
-
-                    TableViewColumn {
-                               id: latitudeColumn
-                               title: "latitude"
-                               role: "latitude"
-                               movable: false
-                               resizable: false
-                               width: 100
-                           }
-
-                    TableViewColumn {
-                               id: longitColumn
-                               title: "longitude"
-                               role: "longitude"
-                               movable: false
-                               resizable: false
-                               width: 100
-                           }
-
-                    ListModel {
-                               id: sourceModel
-                               ListElement {
-                                   num: 1
-                                   latitude: 38.7
-                                   longitude: 29.5
-                               }
-                               ListElement {
-                                   num: 2
-                                   latitude: 38.7
-                                   longitude: 29.5
-                               }
-                               ListElement {
-                                   num: 3
-                                   latitude: 38.7
-                                   longitude: 29.5
-                               }
-                    }
-                    model: sourceModel
-                    itemDelegate: Item{
-                        Text {
-                        text: styleData.value
-                        }
-                    }
-                }
-*/
-  //          }
             GridLayout {
                visible: swipeView.currentIndex === 2
                anchors.margins: 5
@@ -490,8 +400,11 @@ Rectangle {
                         //photoPlanner.transverseOverlap = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -510,8 +423,11 @@ Rectangle {
                         //photoPlanner.transverseOverlap = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }
@@ -529,8 +445,32 @@ Rectangle {
                         //photoPlanner.transverseOverlap = value;
                     }
                     Label {
-                        anchors.fill: parent
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
                         horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
+                        text: parent.value.toFixed(0)
+                    }
+                }
+                Label {
+                    Layout.fillWidth:   true
+                    text: qsTr("Speed, KpH")
+                }
+                Slider {
+                    Layout.fillWidth:   true
+                    from:                  0
+                    to:                 1000
+                    value:               photoPlanner.speed
+                    onValueChanged: {
+                        photoPlanner.speed = value;
+                    }
+                    Label {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.top
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignTop
                         text: parent.value.toFixed(0)
                     }
                 }

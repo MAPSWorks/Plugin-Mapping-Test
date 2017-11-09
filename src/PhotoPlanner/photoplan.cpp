@@ -344,6 +344,10 @@ void PhotoPlan::saveAoi(QVariant fileurl, QString poiType, QVariantList aoi)
     }
 
     auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
+    if(!fileurlcvt.endsWith(".aoi"))
+    {
+        fileurlcvt.append(".aoi");
+    }
     QFile file(fileurlcvt);
     file.open(QIODevice::WriteOnly);
     QDataStream out(&file);
@@ -352,3 +356,15 @@ void PhotoPlan::saveAoi(QVariant fileurl, QString poiType, QVariantList aoi)
     out << m_aoi;
 }
 
+QGeoCoordinate PhotoPlan::getFlightPointCoord(int index)
+{
+    return QGeoCoordinate(m_flightPoints.at(index).latitude(),m_flightPoints.at(index).longitude());
+}
+quint8 PhotoPlan::getFlightPointType(int index)
+{
+    return m_flightPoints.at(index).type();
+}
+quint32 PhotoPlan::getFlightPointCount()
+{
+    return m_flightPoints.count();
+}
