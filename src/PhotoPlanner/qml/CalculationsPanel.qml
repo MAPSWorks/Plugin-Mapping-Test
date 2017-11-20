@@ -59,7 +59,7 @@ Rectangle {
                 Slider {
                     Layout.fillWidth:   true
                     from:                  0
-                    to:                  100
+                    to:                   95
                     value:              photoPlanner.longitOverlap
                     onValueChanged: {
                         photoPlanner.longitOverlap = value;
@@ -80,7 +80,7 @@ Rectangle {
                 Slider {
                     Layout.fillWidth:   true
                     from:               0
-                    to:                 100
+                    to:                 95
                     value:              photoPlanner.transverseOverlap
                     onValueChanged: {
                         photoPlanner.transverseOverlap = value;
@@ -164,7 +164,7 @@ Rectangle {
                 }
                 Slider {
                     Layout.fillWidth:   true
-                    from:                  0
+                    from:                 10
                     to:                 1000
                     value:               photoPlanner.width
                     onValueChanged: {
