@@ -57,5 +57,4 @@ RESOURCES += \
     photoplanner.qrc
 
 DISTFILES += \
-    PhotoPlanner_ru.ts \
-    qml/PlannerMap.qml
+    PhotoPlanner_ru.ts

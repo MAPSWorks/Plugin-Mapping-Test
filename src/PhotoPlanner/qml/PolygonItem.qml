@@ -44,9 +44,9 @@ import QtLocation 5.3
 
 MapPolygon {
 
-    color: "green"
+    color:  "#8021be2b"
     border.color: "darkgreen"
-    border.width: 4
+    border.width: 3
     smooth: true
     opacity: 0.5
 
@@ -56,7 +56,7 @@ MapPolygon {
         }
     }
     MouseArea {
-        anchors.fill:parent
+        anchors.fill: parent
         id: mousearea
        // drag.target: parent
     }

@@ -26,7 +26,8 @@ Map {
     property MapPolyline            linearPoI
     property MapPolygon             areaPoI
     property MapPolyline            track
-    property list<MapQuickItem>     trackMarkers
+    property var trackMarkers: []
+    property var photoPrints: []
 
     signal showMainMenu(variant coordinate)
     signal showMarkerMenu(variant coordinate)
@@ -84,6 +85,14 @@ Map {
              map.addGeoItem("PolylineItem")
 
          }
+
+//         var photoPrint = Qt.createQmlObject('PhotoPrint {}', map)
+//         photoPrint.setBorder(
+//                     mouseArea.lastCoordinate,
+//                     mouseArea.lastCoordinate.atDistanceAndAzimuth(1000, 90),
+//                     mouseArea.lastCoordinate.atDistanceAndAzimuth(2000, 180),
+//                     mouseArea.lastCoordinate.atDistanceAndAzimuth(3000, 235));
+//         map.addMapItem(photoPrint)
     }
 
     function addCoordinateMarker(coordinate)
@@ -199,34 +208,107 @@ Map {
 
         }
 
+        clearPhotoPrints();
         clearTrack();
+        clearTrackMarkers();
+
         map.track = Qt.createQmlObject('import QtLocation 5.6; MapPolyline {}', item);
         map.track.line.width = 2;
         map.track.line.color = 'blue';
         map.addMapItem(map.track);
         map.track.path = photoPlanner.track; //map.areaPoI.path //photoPlanner.track;
+        addTrackMarkers();
 
         var pathLength = 0;
         for(var i =0; i < map.track.pathLength() -1; i++)
         {
             pathLength+=map.track.path[i].distanceTo(map.track.path[i+1]);
         }
+
+        addPhotoPrints();
+
         resultsDlg.flightPathLength.text = (pathLength/1000+0.5).toFixed(1);
         resultsDlg.flightSpeed.text = photoPlanner.speed;
         resultsDlg.flightTime.text = (pathLength*60/(1000*photoPlanner.speed)+0.5).toFixed(0);
         resultsDlg.picturesCount.text = photoPlanner.photoCenters.length;
         resultsDlg.open();
- //       startTrack();
-   //     addTrackMarkers();
-     //   addPhotoPrints();
+    }
+
+    function addPhotoPrints()
+    {
+        var startTime = new Date()
+        var newPhotoPrints = [];
+        var photoprintspoints = photoPlanner.photoPrints;
+        var photoPrintsCount = photoprintspoints.length/4;
+        var getPhotoPrintsTime = new Date()
+        console.log("Get " + photoPrintsCount + " photoprints: " + (getPhotoPrintsTime.valueOf() - startTime.valueOf()))
+
+        for(var i=0; i < photoPrintsCount; i++)
+        {
+            var photoPrint = Qt.createQmlObject ('PhotoPrint {}', map)
+            newPhotoPrints.push(photoPrint)
+        }
+        var createTime = new Date()
+        console.log("Create photoprints: " + (createTime.valueOf() - startTime.valueOf()))
+
+        for(var i=0; i < photoPrintsCount; i++)
+        {
+            newPhotoPrints[i].setBorder(photoprintspoints[i*4], photoprintspoints[i*4+1], photoprintspoints[i*4+3], photoprintspoints[i*4+2]);
+        }
+        var setBorderTime = new Date()
+        console.log("Photoprints setBorder: " + (createTime.valueOf() - startTime.valueOf()))
+
+        for(var i=0; i < photoPrintsCount; i++)
+        {
+            map.addMapItem(newPhotoPrints[i])
+        }
+        var addedTime = new Date()
+        console.log("Added photoprints: " + (addedTime.valueOf() - startTime.valueOf()))
+
+        map.photoPrints = newPhotoPrints
+        var drawTime = new Date()
+        console.log("Saved photoprints: " + (drawTime.valueOf() - startTime.valueOf()))
+    }
+
+    function clearPhotoPrints() {
+        var oldPhotoPrints = map.photoPrints;
+        var count = oldPhotoPrints.length
+        map.photoPrints = [];
+        for(var i=0; i<count; i++) {
+           var removedPhotoPrint = oldPhotoPrints[i]
+           map.removeMapItem(removedPhotoPrint)
+        }
+    }
+
+    function addTrackMarkers()
+    {
+        var newTrackMarkers = []
+        var trackMarkersPoints = photoPlanner.trackMarkers
+        var trackMarkersCount = trackMarkersPoints.length
+        for(var i=0; i<trackMarkersCount; i++)
+        {
+            var trackMarker = Qt.createQmlObject ('TrackMarker {}', map)
+            trackMarker.setPosition(trackMarkersPoints[i])
+            trackMarker.setNumber(i+1)
+            newTrackMarkers.push(trackMarker)
+            map.addMapItem(trackMarker)
+        }
+        map.trackMarkers = newTrackMarkers
+    }
+
+    function clearTrackMarkers() {
+        var oldTrackMarkers = map.trackMarkers;
+        var count = oldTrackMarkers.length
+        map.trackMarkers = [];
+        for(var i=0; i<count; i++) {
+           var removedTrackMarker = oldTrackMarkers[i]
+           map.removeMapItem(removedTrackMarker)
+        }
     }
 
     function clearTrack()
     {
         map.removeMapItem(map.track);
-        for(var i = 0; i<map.trackMarkers.length; i++)
-            map.removeMapItem(map.trackMarkers[i])
-        map.trackMarkers = null
     }
 
 /*

@@ -382,6 +382,7 @@ Item {
         selectedNameFilter: "Aoi files (*.aoi)"
         onAccepted: {
             var loadedAoi = photoPlanner.loadAoi(fileUrl)
+
             map.clearTrack()
             map.clearMapItems();
             map.markers = []

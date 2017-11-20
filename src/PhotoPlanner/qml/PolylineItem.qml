@@ -43,9 +43,9 @@ import QtLocation 5.3
 //TODO: remove/refactor me when items are integrated
 
 MapPolyline {
-    line.color: "green"
+    line.color: "darkgreen"
     line.width: 3
-    opacity: 0.7
+    opacity: 0.5
     smooth: true
 
     function setGeometry(markers, index){

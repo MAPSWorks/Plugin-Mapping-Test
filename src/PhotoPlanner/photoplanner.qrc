@@ -23,5 +23,8 @@
         <file>qml/icons/add.svg</file>
         <file>qml/icons/remove.svg</file>
         <file>qml/icons/place_sel.svg</file>
+        <file>qml/PhotoPrint.qml</file>
+        <file>qml/PhotoPrints.qml</file>
+        <file>qml/TrackMarker.qml</file>
     </qresource>
 </RCC>
