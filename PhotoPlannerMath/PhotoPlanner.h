@@ -109,6 +109,9 @@ protected:
         trackPoints_.clear();
         flightPoints_.clear();
 
+        const auto R = photoUav_.GetManeuverR();
+        const bool addAdditionalEntryLine = (R!=0) && true;
+
         int prevLine = -1;
         for(int i = 0; i<linedGeoPoints_.size(); ++i) {
             auto &line = linedGeoPoints_[i];
@@ -116,7 +119,6 @@ protected:
                 continue;
 
             if(flightPoints_.empty()) {
-                const auto R = photoUav_.GetManeuverR();
                 if(R!=0) {
                     auto startPointAt3R = linedGeoPoints_[i].front().atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
                     auto startPointAt1R = linedGeoPoints_[i].front().atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
@@ -126,12 +128,30 @@ protected:
             }
 
             if(prevLine>=0) {
-                ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_.GetAzimuth(prevLine), linedGeoPoints_[i].front(), linedGeoPoints_.GetAzimuth(i));
+                GeoPoint additionalEntryStart;
+                GeoPoint additionalEntryEnd;
+                GeoPoint endAligmentPoint = linedGeoPoints_[i].front();
+
+                if (addAdditionalEntryLine) {
+                    additionalEntryStart = endAligmentPoint.atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    additionalEntryEnd = endAligmentPoint.atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
+                    endAligmentPoint = additionalEntryStart;
+                }
+
+                ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_.GetAzimuth(prevLine), endAligmentPoint, linedGeoPoints_.GetAzimuth(i));
                 auto aligmentPoints = aligment.Calculate(photoUav_);
                 for(auto point : aligmentPoints)
                     trackPoints_.push_back(point);
                 for(auto point : aligment.GetFlightPoints())
                     flightPoints_.push_back(FlightPoint(point, 0));
+
+                if (addAdditionalEntryLine) {
+                    trackPoints_.push_back(additionalEntryStart);
+                    trackPoints_.push_back(additionalEntryEnd);
+                    flightPoints_.push_back(FlightPoint(additionalEntryStart, 0));
+                    flightPoints_.push_back(FlightPoint(additionalEntryEnd, 1));
+                }
+
             }
 
             trackPoints_.push_back(line.front());
