@@ -50,6 +50,28 @@ void PhotoPlan::setFocusRange(const quint32 &focusRange)
     }
 }
 
+qreal PhotoPlan::cameraLx() const {
+    return m_cameraLx;
+}
+void PhotoPlan::setCameraLx(const qreal &value){
+    if(m_cameraLx != value)
+    {
+        m_cameraLx = value;
+        emit cameraLxChanged();
+    }
+}
+
+qreal PhotoPlan::cameraLy() const {
+    return m_cameraLy;
+}
+void PhotoPlan::setCameraLy(const qreal &value) {
+    if(m_cameraLy != value)
+    {
+        m_cameraLy = value;
+        emit cameraLyChanged();
+    }
+}
+
 quint32 PhotoPlan::longitOverlap() const
 {
     return m_longitOverlap;
@@ -229,9 +251,8 @@ aero_photo::PhotoUavModel PhotoPlan::CreatePhotoUavModelFromGui() const {
 
 aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
     qreal focusM = qreal(focusRange()) / 100;
-    // Warning!!! This data items missed in GUI
-    qreal lxM = 0.015;
-    qreal lyM = 0.0225;
+    qreal lxM = qreal(cameraLx()) / 100;
+    qreal lyM = qreal(cameraLy()) / 100;
     return aero_photo::PhotoCameraModel(focusM, lxM, lyM);
 }
 
@@ -261,8 +282,8 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
 
 //    PhotoUavModel uavModel(60, D2R(30));
     auto uavModel = CreatePhotoUavModelFromGui();
-    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
-//    auto photoCameraModel = CreatePhotoCameraModelFromGui();
+//    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
+    auto photoCameraModel = CreatePhotoCameraModelFromGui();
     LinearPhotoRegion region(pathAoI);
     m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
     dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), width());

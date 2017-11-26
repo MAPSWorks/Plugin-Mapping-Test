@@ -15,6 +15,8 @@ class PhotoPlan : public QObject
     Q_OBJECT
     Q_PROPERTY(QString cameraModel READ cameraModel WRITE setCameraModel NOTIFY cameraModelChanged)
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
+    Q_PROPERTY(qreal cameraLx READ cameraLx WRITE setCameraLx NOTIFY cameraLxChanged)
+    Q_PROPERTY(qreal cameraLy READ cameraLy WRITE setCameraLy NOTIFY cameraLyChanged)
     Q_PROPERTY(quint32 longitOverlap READ longitOverlap WRITE setLongitOverlap NOTIFY longitOverlapChanged)
     Q_PROPERTY(quint32 transverseOverlap READ transverseOverlap WRITE setTransverseOverlap NOTIFY transverseOverlapChanged)
     Q_PROPERTY(quint32 azimuth READ azimuth WRITE setAzimuth NOTIFY azimuthChanged)
@@ -52,6 +54,12 @@ public:
 
     quint32 focusRange() const;
     void setFocusRange(const quint32 &focusRange);
+
+    qreal cameraLx() const;
+    void setCameraLx(const qreal &value);
+
+    qreal cameraLy() const;
+    void setCameraLy(const qreal &value);
 
     quint32 longitOverlap() const;
     void setLongitOverlap(const quint32 &longitOverlap);
@@ -92,6 +100,8 @@ signals:
 
     void cameraModelChanged();
     void focusRangeChanged();
+    void cameraLxChanged();
+    void cameraLyChanged();
     void longitOverlapChanged();
     void transverseOverlapChanged();
     void azimuthChanged();
@@ -114,6 +124,8 @@ private:
 
     QString m_cameraModel;
     quint32 m_focusRange;
+    qreal m_cameraLx;
+    qreal m_cameraLy;
     quint32 m_longitOverlap;
     quint32 m_transverseOverlap;
     quint32 m_azimuth;
