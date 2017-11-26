@@ -209,6 +209,7 @@ Rectangle {
                 Layout.fillWidth: true
 
                 property int modelIndex: -1
+                property int prevModelIndex: -1
                 Component.onCompleted: {
                     modelIndex = 0
                 }
@@ -216,6 +217,7 @@ Rectangle {
                     paramCameraFocus.updatedModelIndex(modelIndex)
                     paramCameraLxMM.updatedModelIndex(modelIndex)
                     paramCameraLyMM.updatedModelIndex(modelIndex)
+                    prevModelIndex = modelIndex
                 }
 
                 ListModel {
@@ -269,12 +271,15 @@ Rectangle {
                    name: qsTr("Focus Range, mm")
                    from: 1
                    to: 100
+
                    signal updatedModelIndex(int newIndex)
                    onUpdatedModelIndex: {
                        value = camerasModel.get(newIndex).focusMM
                    }
                    onValueChanged: {
                        photoPlanner.focusRange = value
+                       if (camerasView.prevModelIndex == camerasView.modelIndex)
+                           camerasModel.setProperty(camerasView.modelIndex,"focusMM", value)
                    }
                }
                PhotoPlannerParamForm {
@@ -282,12 +287,15 @@ Rectangle {
                    name: qsTr("Sensor lx, mm")
                    from: 1
                    to: 100
+
                    signal updatedModelIndex(int newIndex)
                    onUpdatedModelIndex: {
                        value = camerasModel.get(newIndex).lxMM
                    }
                    onValueChanged: {
                        photoPlanner.cameraLx = value
+                       if (camerasView.prevModelIndex == camerasView.modelIndex)
+                           camerasModel.setProperty(camerasView.modelIndex,"lxMM", value)
                    }
                }
                PhotoPlannerParamForm {
@@ -295,16 +303,18 @@ Rectangle {
                    name: qsTr("Sensor ly, mm")
                    from: 1
                    to: 100
+
                    signal updatedModelIndex(int newIndex)
                    onUpdatedModelIndex: {
                        value = camerasModel.get(newIndex).lyMM
                    }
                    onValueChanged: {
                        photoPlanner.cameraLy = value
+                       if (camerasView.prevModelIndex == camerasView.modelIndex)
+                           camerasModel.setProperty(camerasView.modelIndex,"lyMM", value)
                    }
                }
             }
-
 
             ColumnLayout {
                 id: uavsView
@@ -312,6 +322,7 @@ Rectangle {
                 Layout.fillWidth: true
 
                 property int modelIndex: -1
+                property int prevModelIndex: -1
                 Component.onCompleted: {
                     modelIndex = 0
                 }
@@ -320,6 +331,7 @@ Rectangle {
                     paramUavComm.updatedModelIndex(modelIndex)
                     paramUavSpeed.updatedModelIndex(modelIndex)
                     paramUavRoll.updatedModelIndex(modelIndex)
+                    prevModelIndex = modelIndex
                 }
 
                 ListModel {
@@ -386,9 +398,14 @@ Rectangle {
                     name: qsTr("Flight Time, min")
                     from: 1
                     to: 240
+
                     signal updatedModelIndex(int newIndex)
                     onUpdatedModelIndex: {
                         value = uavsModel.get(newIndex).flightTimeMinutes
+                    }
+                    onValueChanged: {
+                        if (uavsView.prevModelIndex == uavsView.modelIndex)
+                            uavsModel.setProperty(uavsView.modelIndex,"flightTimeMinutes", value)
                     }
                 }
 
@@ -397,12 +414,15 @@ Rectangle {
                     name: qsTr("Flight Speed, kmph")
                     from: 1
                     to: 200
+
                     signal updatedModelIndex(int newIndex)
                     onUpdatedModelIndex: {
                         value = uavsModel.get(newIndex).flightSpeedKmPerH
                     }
                     onValueChanged: {
                         photoPlanner.speed = value;
+                        if (uavsView.prevModelIndex == uavsView.modelIndex)
+                            uavsModel.setProperty(uavsView.modelIndex,"flightSpeedKmPerH", value)
                     }
                 }
 
@@ -411,9 +431,14 @@ Rectangle {
                     name: qsTr("Comm Radius, km")
                     from: 1
                     to: 120
+
                     signal updatedModelIndex(int newIndex)
                     onUpdatedModelIndex: {
                         value = uavsModel.get(newIndex).commRadiusKm
+                    }
+                    onValueChanged: {
+                        if (uavsView.prevModelIndex == uavsView.modelIndex)
+                            uavsModel.setProperty(uavsView.modelIndex,"commRadiusKm", value)
                     }
                 }
 
@@ -422,11 +447,16 @@ Rectangle {
                     name: qsTr("Max Roll, \xB0")
                     from: 1
                     to: 90
+
                     signal updatedModelIndex(int newIndex)
                     onUpdatedModelIndex: {
                         value = uavsModel.get(newIndex).maxRollDeg
                     }
-                    onValueChanged: { photoPlanner.maxRoll = value }
+                    onValueChanged: {
+                        photoPlanner.maxRoll = value
+                        if (uavsView.prevModelIndex == uavsView.modelIndex)
+                            uavsModel.setProperty(uavsView.modelIndex,"maxRollDeg", value)
+                    }
                 }
 
             }
