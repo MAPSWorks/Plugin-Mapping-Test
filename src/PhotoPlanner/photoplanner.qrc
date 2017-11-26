@@ -25,5 +25,7 @@
         <file>qml/icons/place_sel.svg</file>
         <file>qml/PhotoPrint.qml</file>
         <file>qml/TrackMarker.qml</file>
+        <file>qml/PhotoPlannerParam.qml</file>
+        <file>qml/PhotoPlannerParamForm.ui.qml</file>
     </qresource>
 </RCC>

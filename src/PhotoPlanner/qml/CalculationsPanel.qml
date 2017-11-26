@@ -11,14 +11,12 @@ Rectangle {
         SwipeView {
             id: swipeView
             Layout.fillWidth: true
-            Layout.fillHeight:  true
+            Layout.fillHeight: true
             currentIndex: tabBar.currentIndex
-            GridLayout {
-                visible: swipeView.currentIndex === 0
-                columns: 2
-                columnSpacing: 10
-                rowSpacing: 1
-                focus: true
+
+            ColumnLayout {
+                visible: SwipeView.isCurrentItem
+                Layout.fillWidth: true
 
                 Label {
                     Layout.fillWidth:   true
@@ -27,187 +25,99 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                 }
 
-                Item {
-                    Layout.fillWidth:   true
-                    Layout.columnSpan:  2
-                    height:             10
-                }
+                RowLayout {
+                    spacing: 5
+                    Layout.margins: 10
 
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Camera Model")
-                }
-
-                Label {
-                    text: cbCameraItems.currentText
-                }
-
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Lens")
-                }
-
-                Label {
-                    text: cbFocusItems.currentText
-                }
-
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Longitudinal\noverlap, %")
-                }
-
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                  0
-                    to:                   95
-                    value:              photoPlanner.longitOverlap
-                    onValueChanged: {
-                        photoPlanner.longitOverlap = value;
+                    Label {
+                        Layout.fillWidth:   true
+                        horizontalAlignment: "AlignLeft"
+                        text: qsTr("Camera Model")
                     }
                     Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
+                        Layout.fillWidth:   true
+                        horizontalAlignment: "AlignLeft"
+                        text: cbCameraItems.currentText
                     }
                 }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Transverse\noverlap, %")
-                }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:               0
-                    to:                 95
-                    value:              photoPlanner.transverseOverlap
-                    onValueChanged: {
-                        photoPlanner.transverseOverlap = value;
-                    }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
-                    }
-                }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Azimuth, \xB0")
-                }
-                Slider {
-                     Layout.fillWidth:   true
-                     from:                  0
-                     to:                  359
-                     value:               photoPlanner.azimuth
-                     onValueChanged: {
-                         photoPlanner.azimuth = value;
-                     }
-                     Label {
-                         anchors.left: parent.left
-                         anchors.right: parent.right
-                         anchors.bottom: parent.top
-                         horizontalAlignment: Text.AlignHCenter
-                         verticalAlignment: Text.AlignTop
-                         text: parent.value.toFixed(0)
-                     }
-                }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Altitude, m")
 
-                }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                  0
-                    to:                 5000
-                    value:               photoPlanner.altitude
-                    onValueChanged: {
-                        photoPlanner.altitude = value;
+                RowLayout {
+                    spacing: 5
+                    Layout.margins: 10
+
+                    Label {
+                        Layout.fillWidth:   true
+                        text: qsTr("Lens")
                     }
                     Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
+                        horizontalAlignment: "AlignLeft"
+                        text: cbFocusItems.currentText
                     }
                 }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("GSD, px/sm")
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Longitudinal overlap, %")
+                    from: 0
+                    to: 95
+                    value: photoPlanner.longitOverlap
+                    onValueChanged: { photoPlanner.longitOverlap = value }
                 }
-                Slider {
-                       Layout.fillWidth:   true
-                       from:                  1
-                       to:                  300
-                       value:               photoPlanner.gsd
-                       onValueChanged: {
-                           photoPlanner.gsd = value;
-                       }
-                       Label {
-                           anchors.left: parent.left
-                           anchors.right: parent.right
-                           anchors.bottom: parent.top
-                           horizontalAlignment: Text.AlignHCenter
-                           verticalAlignment: Text.AlignTop
-                           text: parent.value.toFixed(0)
-                       }
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Transverse overlap, %")
+                    from: 0
+                    to: 95
+                    value: photoPlanner.transverseOverlap
+                    onValueChanged: { photoPlanner.transverseOverlap = value }
                 }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Whidth, m")
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Azimuth, \xB0")
+                    from: 0
+                    to: 359
+                    value: photoPlanner.azimuth
+                    onValueChanged: { photoPlanner.azimuth = value }
                 }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                 10
-                    to:                 1000
-                    value:               photoPlanner.width
-                    onValueChanged: {
-                        photoPlanner.width = value;
-                    }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
-                    }
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Altitude, m")
+                    from: 5
+                    to: 5000
+                    value: photoPlanner.altitude
+                    onValueChanged: { photoPlanner.altitude = value }
                 }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Max Roll, \xB0")
+
+                PhotoPlannerParamForm {
+                    name: qsTr("GSD, px/sm")
+                    from: 1
+                    to: 300
+                    value: photoPlanner.gsd
+                    onValueChanged: { photoPlanner.gsd = value }
                 }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                  0
-                    to:                   90
-                    value:               photoPlanner.maxRoll
-                    onValueChanged: {
-                        photoPlanner.maxRoll = value;
-                    }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
-                    }
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Width, m")
+                    from: 1
+                    to: 1000
+                    value: photoPlanner.width
+                    onValueChanged: { photoPlanner.width = value }
+                }
+
+                PhotoPlannerParamForm {
+                    name: qsTr("Max Roll, \xB0")
+                    from: 1
+                    to: 90
+                    value: photoPlanner.maxRoll
+                    onValueChanged: { photoPlanner.maxRoll = value }
                 }
             }
 
             ListView {
                 id: markersList
+                visible: SwipeView.isCurrentItem
                 height:200
                 Layout.fillWidth: true
                 model: map.markers
-                visible: swipeView.currentIndex === 1
 
                 delegate: RowLayout{
                     spacing:        1
@@ -298,8 +208,9 @@ Rectangle {
 
                 }
             }
+
             GridLayout {
-               visible: swipeView.currentIndex === 2
+               visible: SwipeView.isCurrentItem
                anchors.margins: 5
                columns: 2
                columnSpacing: 10
@@ -323,7 +234,9 @@ Rectangle {
                    model: ListModel {
                            ListElement { text: "Sony S600";}
                    }
-                   currentIndex: find(photoPlanner.cameraModel)
+                   Component.onCompleted: {
+                       currentIndex = find(photoPlanner.cameraModel);
+                   }
                    onCurrentTextChanged: {
                        photoPlanner.cameraModel = currentText;
                    }
@@ -347,8 +260,10 @@ Rectangle {
                    }
                }
             }
+
+
             GridLayout {
-                visible: swipeView.currentIndex === 3
+                visible: SwipeView.isCurrentItem
                 anchors.margins: 5
                 columns: 2
                 columnSpacing: 10
@@ -483,7 +398,7 @@ Rectangle {
 */
         TabBar {
             id: tabBar
-            height: 50
+            height: 75
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
