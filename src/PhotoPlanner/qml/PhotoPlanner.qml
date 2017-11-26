@@ -357,10 +357,14 @@ Item {
         selectExisting: false
         selectMultiple: false
         selectFolder: false
-        folder: shortcuts.home + "/.gcu/flightplans"
         modality: Qt.WindowModal
         nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
         selectedNameFilter: "Aoi files (*.aoi)"
+
+        Component.onCompleted: {
+            folder = shortcuts.home + "/.gcu/flightplans";
+        }
+
         onAccepted: {
             var myArray = new Array()
             for (var i = 0; i<map.markerCounter; i++){
@@ -376,10 +380,14 @@ Item {
         selectExisting: true
         selectMultiple: false
         selectFolder: false
-        folder: shortcuts.home + "/.gcu/flightplans"
         modality: Qt.WindowModal
         nameFilters: [ "Aoi files (*.aoi)", "All files (*)" ]
         selectedNameFilter: "Aoi files (*.aoi)"
+
+        Component.onCompleted: {
+            folder = shortcuts.home + "/.gcu/flightplans";
+        }
+
         onAccepted: {
             var loadedAoi = photoPlanner.loadAoi(fileUrl)
 
@@ -400,10 +408,14 @@ Item {
         selectExisting: false
         selectMultiple: false
         selectFolder: false
-        folder: shortcuts.home + "/.gcu/flightplans"
         modality: Qt.WindowModal
         nameFilters: [ "Xml files (*.xml)", "All files (*)" ]
         selectedNameFilter: "Xml files (*.xml)"
+
+        Component.onCompleted: {
+            folder = shortcuts.home + "/.gcu/flightplans";
+        }
+
         onAccepted: {
             photoPlanner.saveFlightPlan(fileUrl);
         }
