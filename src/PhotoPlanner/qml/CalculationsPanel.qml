@@ -20,7 +20,6 @@ Rectangle {
 
                 Label {
                     Layout.fillWidth:   true
-                    Layout.columnSpan:  2
                     text: qsTr("Calculate Photo Plan")
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -103,13 +102,6 @@ Rectangle {
                     onValueChanged: { photoPlanner.width = value }
                 }
 
-                PhotoPlannerParamForm {
-                    name: qsTr("Max Roll, \xB0")
-                    from: 1
-                    to: 90
-                    value: photoPlanner.maxRoll
-                    onValueChanged: { photoPlanner.maxRoll = value }
-                }
             }
 
             ListView {
@@ -262,13 +254,54 @@ Rectangle {
             }
 
 
-            GridLayout {
+            ColumnLayout {
+                id: uavsView
                 visible: SwipeView.isCurrentItem
-                anchors.margins: 5
-                columns: 2
-                columnSpacing: 10
-                rowSpacing: 5
-                focus: true
+                Layout.fillWidth: true
+
+                property int modelIndex: -1
+                Component.onCompleted: {
+                    modelIndex = 0
+                }
+                onModelIndexChanged: {
+                    paramUavTime.updatedModelIndex(modelIndex)
+                    paramUavComm.updatedModelIndex(modelIndex)
+                    paramUavSpeed.updatedModelIndex(modelIndex)
+                    paramUavRoll.updatedModelIndex(modelIndex)
+                }
+
+                ListModel {
+                    id: uavsModel
+
+                    ListElement {
+                        name: "Plane 1"
+                        flightTimeMinutes: 60
+                        flightSpeedKmPerH: 40
+                        maxRollDeg: 30
+                        commRadiusKm: 25
+                    }
+                    ListElement {
+                        name: "Plane 2"
+                        flightTimeMinutes: 120
+                        flightSpeedKmPerH: 60
+                        maxRollDeg: 30
+                        commRadiusKm: 50
+                    }
+                    ListElement {
+                        name: "Quadro 1"
+                        flightTimeMinutes: 40
+                        flightSpeedKmPerH: 30
+                        maxRollDeg: 90
+                        commRadiusKm: 5
+                    }
+                    ListElement {
+                        name: "Quadro 2"
+                        flightTimeMinutes: 60
+                        flightSpeedKmPerH: 60
+                        maxRollDeg: 90
+                        commRadiusKm: 15
+                    }
+                }
 
                 Label {
                     Layout.fillWidth:   true
@@ -276,126 +309,82 @@ Rectangle {
                     text: qsTr("UAV Parameters")
                     horizontalAlignment: Text.AlignHCenter
                 }
+
                 Item {
                     Layout.fillWidth:   true
                     Layout.columnSpan:  2
                     height:             10
                 }
 
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("UAV Model")
-                }
+                RowLayout {
+                    spacing: 5
+                    Layout.margins: 10
 
-                ComboBox {
-                    Layout.fillWidth:   true
-                    model: ListModel {
-                            id: cbUAVModels
-                            ListElement { text: "Quadro";}
-                            ListElement { text: "Plane 1";}
-                            ListElement { text: "Plane 2";}
-                    }
-                    //currentIndex: find(photoPlanner.cameraModel)
-                    onCurrentTextChanged: {
-                        //photoPlanner.cameraModel = currentText;
-                    }
-                }
-
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Flight Time, min")
-                }
-
-                Slider {
-                    Layout.fillWidth:   true
-                    from:               1
-                    to:                 120
-                    value:              40//photoPlanner.transverseOverlap
-                    onValueChanged: {
-                        //photoPlanner.transverseOverlap = value;
-                    }
                     Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
+                        Layout.fillWidth:   true
+                        text: qsTr("UAV Model")
+                    }
+                    ComboBox {
+                        Layout.fillWidth:   true
+                        model: uavsModel
+                        textRole: "name"
+                        onCurrentIndexChanged: {
+                            uavsView.modelIndex = currentIndex
+                        }
                     }
                 }
 
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Flight Speed, kmph")
+                PhotoPlannerParamForm {
+                    id: paramUavTime
+                    name: qsTr("Flight Time, min")
+                    from: 1
+                    to: 240
+                    signal updatedModelIndex(int newIndex)
+                    onUpdatedModelIndex: {
+                        value = uavsModel.get(newIndex).flightTimeMinutes
+                    }
                 }
 
-                Slider {
-                    Layout.fillWidth:   true
-                    from:               1
-                    to:                 120
-                    value:              40//photoPlanner.transverseOverlap
-                    onValueChanged: {
-                        //photoPlanner.transverseOverlap = value;
+                PhotoPlannerParamForm {
+                    id: paramUavSpeed
+                    name: qsTr("Flight Speed, kmph")
+                    from: 1
+                    to: 200
+                    signal updatedModelIndex(int newIndex)
+                    onUpdatedModelIndex: {
+                        value = uavsModel.get(newIndex).flightSpeedKmPerH
                     }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
-                    }
-                }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Comm Radius, km")
-                }
-
-                Slider {
-                    Layout.fillWidth:   true
-                    from:               1
-                    to:                 120
-                    value:              5//photoPlanner.transverseOverlap
-                    onValueChanged: {
-                        //photoPlanner.transverseOverlap = value;
-                    }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
-                    }
-                }
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Speed, KpH")
-                }
-                Slider {
-                    Layout.fillWidth:   true
-                    from:                  0
-                    to:                 1000
-                    value:               photoPlanner.speed
                     onValueChanged: {
                         photoPlanner.speed = value;
                     }
-                    Label {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.top
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignTop
-                        text: parent.value.toFixed(0)
+                }
+
+                PhotoPlannerParamForm {
+                    id: paramUavComm
+                    name: qsTr("Comm Radius, km")
+                    from: 1
+                    to: 120
+                    signal updatedModelIndex(int newIndex)
+                    onUpdatedModelIndex: {
+                        value = uavsModel.get(newIndex).commRadiusKm
                     }
                 }
+
+                PhotoPlannerParamForm {
+                    id: paramUavRoll
+                    name: qsTr("Max Roll, \xB0")
+                    from: 1
+                    to: 90
+                    signal updatedModelIndex(int newIndex)
+                    onUpdatedModelIndex: {
+                        value = uavsModel.get(newIndex).maxRollDeg
+                    }
+                    onValueChanged: { photoPlanner.maxRoll = value }
+                }
+
             }
         }
 
-      /*  Item {
-            Layout.fillHeight: true
-        }
-*/
         TabBar {
             id: tabBar
             height: 75
