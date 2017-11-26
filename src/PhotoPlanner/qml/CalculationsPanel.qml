@@ -30,13 +30,13 @@ Rectangle {
 
                     Label {
                         Layout.fillWidth:   true
-                        horizontalAlignment: "AlignLeft"
-                        text: qsTr("Camera Model")
+                        horizontalAlignment: Text.AlignLeft
+                        text: qsTr("Uav Model")
                     }
                     Label {
                         Layout.fillWidth:   true
-                        horizontalAlignment: "AlignLeft"
-                        text: cbCameraItems.currentText
+                        horizontalAlignment: Text.AlignLeft
+                        text: paramUavModelName.currentText
                     }
                 }
 
@@ -46,11 +46,13 @@ Rectangle {
 
                     Label {
                         Layout.fillWidth:   true
-                        text: qsTr("Lens")
+                        horizontalAlignment: Text.AlignLeft
+                        text: qsTr("Camera Model")
                     }
                     Label {
-                        horizontalAlignment: "AlignLeft"
-                        text: cbFocusItems.currentText
+                        Layout.fillWidth:   true
+                        horizontalAlignment: Text.AlignLeft
+                        text: paramCameraModelName.currentText
                     }
                 }
 
@@ -201,13 +203,38 @@ Rectangle {
                 }
             }
 
-            GridLayout {
-               visible: SwipeView.isCurrentItem
-               anchors.margins: 5
-               columns: 2
-               columnSpacing: 10
-               rowSpacing: 5
-               focus: true
+            ColumnLayout {
+                id: camerasView
+                visible: SwipeView.isCurrentItem
+                Layout.fillWidth: true
+
+                property int modelIndex: -1
+                Component.onCompleted: {
+                    modelIndex = 0
+                }
+                onModelIndexChanged: {
+                    paramCameraFocus.updatedModelIndex(modelIndex)
+                    paramCameraLxMM.updatedModelIndex(modelIndex)
+                    paramCameraLyMM.updatedModelIndex(modelIndex)
+                }
+
+                ListModel {
+                    id: camerasModel
+
+                    ListElement {
+                        name: "Sony S600 35"
+                        focusMM: 35
+                        lxMM: 15
+                        lyMM: 22.5
+                    }
+                    ListElement {
+                        name: "Sony S600 50"
+                        focusMM: 50
+                        lxMM: 15
+                        lyMM: 22.5
+                    }
+                }
+
                Label {
                    Layout.fillWidth:   true
                    Layout.columnSpan:  2
@@ -215,40 +242,65 @@ Rectangle {
                    horizontalAlignment: Text.AlignHCenter
                }
 
-               Label {
-                   Layout.fillWidth:   true
-                   text: qsTr("Camera Model")
+               RowLayout {
+                   spacing: 5
+                   Layout.margins: 10
+
+                   Label {
+                       Layout.fillWidth:   true
+                       text: qsTr("Camera Model")
+                   }
+                   ComboBox {
+                       id: paramCameraModelName
+                       Layout.fillWidth:   true
+                       model: camerasModel
+                       textRole: "name"
+                       onCurrentIndexChanged: {
+                           camerasView.modelIndex = currentIndex
+                       }
+                       onCurrentTextChanged: {
+                           photoPlanner.cameraModel = currentText;
+                       }
+                   }
                }
 
-               ComboBox {
-                   id: cbCameraItems
-                   Layout.fillWidth:   true
-                   model: ListModel {
-                           ListElement { text: "Sony S600";}
+               PhotoPlannerParamForm {
+                   id: paramCameraFocus
+                   name: qsTr("Focus Range, mm")
+                   from: 1
+                   to: 100
+                   signal updatedModelIndex(int newIndex)
+                   onUpdatedModelIndex: {
+                       value = camerasModel.get(newIndex).focusMM
                    }
-                   Component.onCompleted: {
-                       currentIndex = find(photoPlanner.cameraModel);
-                   }
-                   onCurrentTextChanged: {
-                       photoPlanner.cameraModel = currentText;
+                   onValueChanged: {
+                       photoPlanner.focusRange = value
                    }
                }
-
-               Label {
-                   Layout.fillWidth:   true
-                   text: qsTr("Focus Range, mm")
-               }
-
-               ComboBox {
-                   Layout.fillWidth:   true
-                   id: cbFocusItems
-                   model: ListModel {
-                           ListElement { text: "35";}
-                           ListElement { text: "50";}
+               PhotoPlannerParamForm {
+                   id: paramCameraLxMM
+                   name: qsTr("Sensor lx, mm")
+                   from: 1
+                   to: 100
+                   signal updatedModelIndex(int newIndex)
+                   onUpdatedModelIndex: {
+                       value = camerasModel.get(newIndex).lxMM
                    }
-                   currentIndex: find(photoPlanner.focusRange)
-                   onCurrentTextChanged: {
-                       photoPlanner.focusRange = currentText;
+                   onValueChanged: {
+                       photoPlanner.cameraLx = value
+                   }
+               }
+               PhotoPlannerParamForm {
+                   id: paramCameraLyMM
+                   name: qsTr("Sensor ly, mm")
+                   from: 1
+                   to: 100
+                   signal updatedModelIndex(int newIndex)
+                   onUpdatedModelIndex: {
+                       value = camerasModel.get(newIndex).lyMM
+                   }
+                   onValueChanged: {
+                       photoPlanner.cameraLy = value
                    }
                }
             }
@@ -310,12 +362,6 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                 }
 
-                Item {
-                    Layout.fillWidth:   true
-                    Layout.columnSpan:  2
-                    height:             10
-                }
-
                 RowLayout {
                     spacing: 5
                     Layout.margins: 10
@@ -325,6 +371,7 @@ Rectangle {
                         text: qsTr("UAV Model")
                     }
                     ComboBox {
+                        id: paramUavModelName
                         Layout.fillWidth:   true
                         model: uavsModel
                         textRole: "name"
