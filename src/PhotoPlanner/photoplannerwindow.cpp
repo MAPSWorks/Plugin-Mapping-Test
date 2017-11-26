@@ -10,11 +10,11 @@ PhotoPlannerWindow::PhotoPlannerWindow()
     pTranslator->load("PhotoPlanner_ru.qm", QApplication::applicationDirPath()+"/translations/gcu/");
     QApplication::installTranslator(pTranslator);
 
-    setWindowTitle(tr("Photo Planner"));
-    setSource(QUrl("qrc:/qml/PhotoPlanner.qml"));
-
     qmlRegisterType<PhotoPlan>("PhotoPlanner", 1, 0, "PhotoPlanner");
     rootContext()->setContextProperty("photoPlanner", &photoPlan);
+
+    setWindowTitle(tr("Photo Planner"));
+    setSource(QUrl("qrc:/qml/PhotoPlanner.qml"));
 
     setResizeMode(SizeRootObjectToView);
 }
