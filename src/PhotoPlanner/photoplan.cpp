@@ -21,6 +21,15 @@ PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
     m_maxRoll               = 30;
 }
 
+qreal PhotoPlan::calcPhotoParamGsdOnAltitude() {
+    auto photoModel = CreatePhotoCameraModelFromGui();
+    return photoModel.CalcGsd(altitude());
+}
+
+qreal PhotoPlan::calcPhotoParamAltitudeOnGsd() {
+    auto photoModel = CreatePhotoCameraModelFromGui();
+    return photoModel.CalcH(gsd());
+}
 
 QString PhotoPlan::cameraModel() const
 {
@@ -69,6 +78,28 @@ void PhotoPlan::setCameraLy(const qreal &value) {
     {
         m_cameraLy = value;
         emit cameraLyChanged();
+    }
+}
+
+qreal PhotoPlan::cameraAx() const {
+    return m_cameraAx;
+}
+void PhotoPlan::setCameraAx(const qreal &value){
+    if(m_cameraAx != value)
+    {
+        m_cameraAx = value;
+        emit cameraAxChanged();
+    }
+}
+
+qreal PhotoPlan::cameraAy() const {
+    return m_cameraAy;
+}
+void PhotoPlan::setCameraAy(const qreal &value) {
+    if(m_cameraAy != value)
+    {
+        m_cameraAy = value;
+        emit cameraAyChanged();
     }
 }
 
@@ -128,12 +159,12 @@ void PhotoPlan::setAltitude(const quint32 &altitude)
     }
 }
 
-quint32 PhotoPlan::gsd() const
+qreal PhotoPlan::gsd() const
 {
     return m_gsd;
 }
 
-void PhotoPlan::setGsd(const quint32 &gsd)
+void PhotoPlan::setGsd(const qreal &gsd)
 {
     if(m_gsd != gsd)
     {
@@ -253,7 +284,9 @@ aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
     qreal focusM = qreal(focusRange()) / 100;
     qreal lxM = qreal(cameraLx()) / 100;
     qreal lyM = qreal(cameraLy()) / 100;
-    return aero_photo::PhotoCameraModel(focusM, lxM, lyM);
+    qreal ax = cameraAx();
+    qreal ay = cameraAy();
+    return aero_photo::PhotoCameraModel(focusM, lxM, lyM, ax, ay);
 }
 
 #include <algorithm>
@@ -309,8 +342,8 @@ void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
 
 //    PhotoUavModel uavModel(60, D2R(30));
     auto uavModel = CreatePhotoUavModelFromGui();
-    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
-//    auto photoCameraModel = CreatePhotoCameraModelFromGui();
+//    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
+    auto photoCameraModel = CreatePhotoCameraModelFromGui();
     AreaPhotoRegion region(pathAoI);
 
     m_apPhotoPlanner.reset(new AreaPhotoPlanner(uavModel, photoCameraModel, region));

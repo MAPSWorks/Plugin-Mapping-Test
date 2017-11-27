@@ -17,11 +17,13 @@ class PhotoPlan : public QObject
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
     Q_PROPERTY(qreal cameraLx READ cameraLx WRITE setCameraLx NOTIFY cameraLxChanged)
     Q_PROPERTY(qreal cameraLy READ cameraLy WRITE setCameraLy NOTIFY cameraLyChanged)
+    Q_PROPERTY(qreal cameraAx READ cameraAx WRITE setCameraAx NOTIFY cameraAxChanged)
+    Q_PROPERTY(qreal cameraAy READ cameraAy WRITE setCameraAy NOTIFY cameraAyChanged)
     Q_PROPERTY(quint32 longitOverlap READ longitOverlap WRITE setLongitOverlap NOTIFY longitOverlapChanged)
     Q_PROPERTY(quint32 transverseOverlap READ transverseOverlap WRITE setTransverseOverlap NOTIFY transverseOverlapChanged)
     Q_PROPERTY(quint32 azimuth READ azimuth WRITE setAzimuth NOTIFY azimuthChanged)
     Q_PROPERTY(quint32 altitude READ altitude WRITE setAltitude NOTIFY altitudeChanged)
-    Q_PROPERTY(quint32 gsd READ gsd WRITE setGsd NOTIFY gsdChanged)
+    Q_PROPERTY(qreal gsd READ gsd WRITE setGsd NOTIFY gsdChanged)
     Q_PROPERTY(quint32 speed READ speed WRITE setSpeed NOTIFY speedChanged)
     Q_PROPERTY(quint32 width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(quint32 maxRoll READ maxRoll WRITE setMaxRoll NOTIFY maxRollChanged)
@@ -37,6 +39,8 @@ class PhotoPlan : public QObject
 public:
     explicit PhotoPlan(QObject *parent = nullptr);
 
+    Q_INVOKABLE qreal calcPhotoParamGsdOnAltitude();
+    Q_INVOKABLE qreal calcPhotoParamAltitudeOnGsd();
 
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
@@ -61,6 +65,12 @@ public:
     qreal cameraLy() const;
     void setCameraLy(const qreal &value);
 
+    qreal cameraAx() const;
+    void setCameraAx(const qreal &value);
+
+    qreal cameraAy() const;
+    void setCameraAy(const qreal &value);
+
     quint32 longitOverlap() const;
     void setLongitOverlap(const quint32 &longitOverlap);
 
@@ -73,8 +83,8 @@ public:
     quint32 altitude() const;
     void setAltitude(const quint32 &altitude);
 
-    quint32 gsd() const;
-    void setGsd(const quint32 &gsd);
+    qreal gsd() const;
+    void setGsd(const qreal &gsd);
 
     quint32 speed() const;
     void setSpeed(const quint32 &speed);
@@ -102,6 +112,8 @@ signals:
     void focusRangeChanged();
     void cameraLxChanged();
     void cameraLyChanged();
+    void cameraAxChanged();
+    void cameraAyChanged();
     void longitOverlapChanged();
     void transverseOverlapChanged();
     void azimuthChanged();
@@ -126,11 +138,13 @@ private:
     quint32 m_focusRange;
     qreal m_cameraLx;
     qreal m_cameraLy;
+    qreal m_cameraAx;
+    qreal m_cameraAy;
     quint32 m_longitOverlap;
     quint32 m_transverseOverlap;
     quint32 m_azimuth;
     quint32 m_altitude;
-    quint32 m_gsd;
+    qreal m_gsd;
     quint32 m_speed;
     quint32 m_width;
     quint32 m_maxRoll;

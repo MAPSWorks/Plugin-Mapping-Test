@@ -5,6 +5,34 @@ import QtQuick.Layouts 1.2
 import QtQuick.Dialogs 1.2
 
 Rectangle {
+    id: photoPlannerParamsView
+
+    signal calculateGsd()
+    signal calculateAltitude()
+
+    property bool isInitialized: false
+    Component.onCompleted: {
+        isInitialized = true
+        calculateGsd()
+    }
+
+    property bool isCalculateGsd: false
+    onCalculateGsd: {
+        if (isInitialized && !isCalculateAltitude) {
+            isCalculateGsd = true
+            paramCalcGsd.value = (photoPlanner.calcPhotoParamGsdOnAltitude() * 100).toFixed(2)
+            isCalculateGsd = false
+        }
+    }
+    property bool isCalculateAltitude: false
+    onCalculateAltitude: {
+        if (isInitialized && !isCalculateGsd) {
+            isCalculateAltitude = true
+            paramCalcAltitude.value = photoPlanner.calcPhotoParamAltitudeOnGsd().toFixed()
+            isCalculateAltitude = false
+        }
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 5
@@ -73,19 +101,26 @@ Rectangle {
                 }
 
                 PhotoPlannerParamForm {
+                    id: paramCalcAltitude
                     name: qsTr("Altitude, m")
                     from: 5
                     to: 5000
                     value: photoPlanner.altitude
-                    onValueChanged: { photoPlanner.altitude = value }
+                    onValueChanged: {
+                        photoPlanner.altitude = value
+                        photoPlannerParamsView.calculateGsd()
+                    }
                 }
 
                 PhotoPlannerParamForm {
-                    name: qsTr("GSD, px/sm")
+                    id: paramCalcGsd
+                    name: qsTr("GSD, sm/pix")
                     from: 1
                     to: 300
-                    value: photoPlanner.gsd
-                    onValueChanged: { photoPlanner.gsd = value }
+                    onValueChanged: {
+                        photoPlanner.gsd = value / 100
+                        calculateAltitude()
+                    }
                 }
 
                 PhotoPlannerParamForm {
@@ -219,23 +254,46 @@ Rectangle {
                     paramCameraFocus.updatedModelIndex(modelIndex)
                     paramCameraLxMM.updatedModelIndex(modelIndex)
                     paramCameraLyMM.updatedModelIndex(modelIndex)
+                    paramCameraAx.updatedModelIndex(modelIndex)
+                    paramCameraAy.updatedModelIndex(modelIndex)
                     prevModelIndex = modelIndex
+                    photoPlannerParamsView.calculateGsd()
                 }
 
                 ListModel {
                     id: camerasModel
 
                     ListElement {
+                        name: "Sony A6000 [Sel20F28]"
+                        focusMM: 20
+                        lxMM: 15
+                        lyMM: 22.5
+                        ax: 3648
+                        ay: 5472
+                    }
+                    ListElement {
+                        name: "Sony A6000 [Sel35F18]"
+                        focusMM: 35
+                        lxMM: 15
+                        lyMM: 22.5
+                        ax: 3648
+                        ay: 5472
+                    }
+                    ListElement {
                         name: "Sony S600 35"
                         focusMM: 35
                         lxMM: 15
                         lyMM: 22.5
+                        ax: 2112
+                        ay: 2816
                     }
                     ListElement {
                         name: "Sony S600 50"
                         focusMM: 50
                         lxMM: 15
                         lyMM: 22.5
+                        ax: 2112
+                        ay: 2816
                     }
                 }
 
@@ -246,25 +304,20 @@ Rectangle {
                    horizontalAlignment: Text.AlignHCenter
                }
 
-               RowLayout {
-                   spacing: 5
-                   Layout.margins: 10
-
-                   Label {
-                       Layout.fillWidth:   true
-                       text: qsTr("Camera Model")
+               Label {
+                   Layout.fillWidth:   true
+                   text: qsTr("Camera Model")
+               }
+               ComboBox {
+                   id: paramCameraModelName
+                   Layout.fillWidth:   true
+                   model: camerasModel
+                   textRole: "name"
+                   onCurrentIndexChanged: {
+                       camerasView.modelIndex = currentIndex
                    }
-                   ComboBox {
-                       id: paramCameraModelName
-                       Layout.fillWidth:   true
-                       model: camerasModel
-                       textRole: "name"
-                       onCurrentIndexChanged: {
-                           camerasView.modelIndex = currentIndex
-                       }
-                       onCurrentTextChanged: {
-                           photoPlanner.cameraModel = currentText;
-                       }
+                   onCurrentTextChanged: {
+                       photoPlanner.cameraModel = currentText;
                    }
                }
 
@@ -314,6 +367,38 @@ Rectangle {
                        photoPlanner.cameraLy = value
                        if (camerasView.prevModelIndex == camerasView.modelIndex)
                            camerasModel.setProperty(camerasView.modelIndex,"lyMM", value)
+                   }
+               }
+               PhotoPlannerParamForm {
+                   id: paramCameraAx
+                   name: qsTr("Sensor ax, pix")
+                   from: 500
+                   to: 10000
+
+                   signal updatedModelIndex(int newIndex)
+                   onUpdatedModelIndex: {
+                       value = camerasModel.get(newIndex).ax
+                   }
+                   onValueChanged: {
+                       photoPlanner.cameraAx = value
+                       if (camerasView.prevModelIndex == camerasView.modelIndex)
+                           camerasModel.setProperty(camerasView.modelIndex,"ax", value)
+                   }
+               }
+               PhotoPlannerParamForm {
+                   id: paramCameraAy
+                   name: qsTr("Sensor ay, pix")
+                   from: 500
+                   to: 10000
+
+                   signal updatedModelIndex(int newIndex)
+                   onUpdatedModelIndex: {
+                       value = camerasModel.get(newIndex).ay
+                   }
+                   onValueChanged: {
+                       photoPlanner.cameraAy = value
+                       if (camerasView.prevModelIndex == camerasView.modelIndex)
+                           camerasModel.setProperty(camerasView.modelIndex,"ay", value)
                    }
                }
             }
@@ -376,22 +461,17 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                 }
 
-                RowLayout {
-                    spacing: 5
-                    Layout.margins: 10
-
-                    Label {
-                        Layout.fillWidth:   true
-                        text: qsTr("UAV Model")
-                    }
-                    ComboBox {
-                        id: paramUavModelName
-                        Layout.fillWidth:   true
-                        model: uavsModel
-                        textRole: "name"
-                        onCurrentIndexChanged: {
-                            uavsView.modelIndex = currentIndex
-                        }
+                Label {
+                    Layout.fillWidth:   true
+                    text: qsTr("UAV Model")
+                }
+                ComboBox {
+                    id: paramUavModelName
+                    Layout.fillWidth:   true
+                    model: uavsModel
+                    textRole: "name"
+                    onCurrentIndexChanged: {
+                        uavsView.modelIndex = currentIndex
                     }
                 }
 

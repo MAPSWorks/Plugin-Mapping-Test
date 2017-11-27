@@ -116,7 +116,7 @@ private slots:
     }
 
     void test_PhotoCameraModel() {
-        aero_photo::PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
+        aero_photo::PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225, 480, 640);
         double Lx = 0, Ly = 0;
         sonyA6000.CalcLxLy(100, Lx, Ly);
         QCOMPARE(Lx, 75.0);
@@ -271,7 +271,7 @@ private slots:
         using namespace aero_photo;
 
         PhotoUavModel fakeUav(10, D2R(45));
-        PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225);
+        PhotoCameraModel sonyA6000(0.02, 0.015, 0.0225, 480, 640);
         GeoPoints track;
         GeoPoint startPoint(47.2589912414551, 11.3327512741089);
         track << startPoint;
