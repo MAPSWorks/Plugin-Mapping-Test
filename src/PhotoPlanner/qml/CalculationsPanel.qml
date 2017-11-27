@@ -73,14 +73,6 @@ Rectangle {
                 }
 
                 PhotoPlannerParamForm {
-                    name: qsTr("Azimuth, \xB0")
-                    from: 0
-                    to: 359
-                    value: photoPlanner.azimuth
-                    onValueChanged: { photoPlanner.azimuth = value }
-                }
-
-                PhotoPlannerParamForm {
                     name: qsTr("Altitude, m")
                     from: 5
                     to: 5000
@@ -97,6 +89,16 @@ Rectangle {
                 }
 
                 PhotoPlannerParamForm {
+                    visible: map.missionType == "Area"
+                    name: qsTr("Azimuth, \xB0")
+                    from: 0
+                    to: 359
+                    value: photoPlanner.azimuth
+                    onValueChanged: { photoPlanner.azimuth = value }
+                }
+
+                PhotoPlannerParamForm {
+                    visible: map.missionType == "Linear"
                     name: qsTr("Width, m")
                     from: 1
                     to: 1000
