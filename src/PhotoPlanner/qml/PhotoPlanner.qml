@@ -8,14 +8,20 @@ import QtQuick.Controls.Styles 1.4
 
 Item {
     id:item
+
     Plugin {
-        id:     mapPlugin
-        name:  "mapbox" //"osm" // "mapbox" //"nokia"
+        id:    defaultMapPlugin
+        name:  "mapbox"
 
         PluginParameter { name: "mapbox.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
         //PluginParameter { name: "mapboxgl.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
         PluginParameter { name: "mapbox.mapping.cache.directory"; value: "/tmp/maps" }
         PluginParameter { name: "style"; value: "mapbox://styles/mapbox/satellite-v9" }
+    }
+
+    Plugin {
+        id:     osmMapPlugin
+        name:  "osm"
     }
 
     Image {
@@ -31,7 +37,7 @@ Item {
     PlannerMap {
         id:             map
         anchors.fill:   parent
-        plugin:         mapPlugin
+        plugin:         defaultMapPlugin
         zoomLevel:      14
 
         onShowMainMenu: {
@@ -429,7 +435,7 @@ Item {
         anchors.top:    item.top
         anchors.bottom: item.bottom
         anchors.right:  item.right
-        color:          "#2021be2b"
+        color:          "#A021be2b"
     }
 }
 

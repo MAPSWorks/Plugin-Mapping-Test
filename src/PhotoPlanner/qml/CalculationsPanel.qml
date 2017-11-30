@@ -544,10 +544,38 @@ Rectangle {
             }
 
             ColumnLayout {
+                id: optionsView
                 visible: SwipeView.isCurrentItem
                 Layout.fillWidth: true
 
+                ListModel {
+                    id: mapTypesModel
+                    Component.onCompleted: {
+                        for (var i = 0; i<map.supportedMapTypes.length; i++){
+                            mapTypesModel.append(
+                                {"description":map.supportedMapTypes[i].description})
+                        }
+                    }
+                }
+
+                Label {
+                    text: qsTr("Choose map view type")
+                }
+
+                ComboBox {
+                    Layout.fillWidth: true
+                    model: mapTypesModel
+                    textRole: "description"
+                    Component.onCompleted: {
+                        currentIndex = 4
+                    }
+                    onCurrentIndexChanged: {
+                        map.activeMapType = map.supportedMapTypes[currentIndex]
+                    }
+                }
+
                 CheckBox {
+                    Layout.fillWidth: true
                     checked: map.photoPrintsVisible
                     text: qsTr("Enable photo prints")
                     onCheckedChanged: {
