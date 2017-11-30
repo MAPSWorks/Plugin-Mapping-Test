@@ -542,6 +542,21 @@ Rectangle {
                 }
 
             }
+
+            ColumnLayout {
+                visible: SwipeView.isCurrentItem
+                Layout.fillWidth: true
+
+                CheckBox {
+                    checked: map.photoPrintsVisible
+                    text: qsTr("Enable photo prints")
+                    onCheckedChanged: {
+                        if (checked != map.photoPrintsVisible)
+                            map.photoPrintsVisible = checked
+                    }
+
+                }
+            }
         }
 
         TabBar {
@@ -552,16 +567,19 @@ Rectangle {
             anchors.bottom: parent.bottom
             currentIndex: swipeView.currentIndex
             TabButton {
-                text: qsTr("Calc")
+                text: qsTr("Planner")
             }
             TabButton {
-                text: qsTr("Coord")
+                text: qsTr("Track")
             }
             TabButton {
-                text: qsTr("Cameras")
+                text: qsTr("Camera")
             }
             TabButton {
                 text: qsTr("UAV")
+            }
+            TabButton {
+                text: qsTr("Options")
             }
         }
     }

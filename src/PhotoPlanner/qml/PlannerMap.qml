@@ -27,10 +27,14 @@ Map {
     property MapPolygon             areaPoI
     property MapPolyline            track
     property var trackMarkers: []
+
     property var photoPrints: []
+    property bool photoPrintsVisible: false
 
     signal showMainMenu(variant coordinate)
     signal showMarkerMenu(variant coordinate)
+
+
 
     function calculateScale()
     {
@@ -225,13 +229,22 @@ Map {
             pathLength+=map.track.path[i].distanceTo(map.track.path[i+1]);
         }
 
-        addPhotoPrints();
+        if (photoPrintsVisible)
+            addPhotoPrints();
 
         resultsDlg.flightPathLength.text = (pathLength/1000+0.5).toFixed(1);
         resultsDlg.flightSpeed.text = photoPlanner.speed;
         resultsDlg.flightTime.text = (pathLength*60/(1000*photoPlanner.speed)+0.5).toFixed(0);
         resultsDlg.picturesCount.text = photoPlanner.photoCenters.length;
         resultsDlg.open();
+    }
+
+
+    onPhotoPrintsVisibleChanged: {
+        if (photoPrintsVisible)
+            addPhotoPrints()
+        else
+            clearPhotoPrints()
     }
 
     function addPhotoPrints()
