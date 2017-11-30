@@ -36,111 +36,117 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 5
+
         SwipeView {
             id: swipeView
             Layout.fillWidth: true
             Layout.fillHeight: true
+
             currentIndex: tabBar.currentIndex
 
-            ColumnLayout {
+            Item {
                 visible: SwipeView.isCurrentItem
-                Layout.fillWidth: true
-
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("Calculate Photo Plan")
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                RowLayout {
-                    spacing: 5
-                    Layout.margins: 10
+                ColumnLayout {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
 
                     Label {
                         Layout.fillWidth:   true
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("Uav Model")
+                        text: qsTr("Calculate Photo Plan")
+                        horizontalAlignment: Text.AlignHCenter
                     }
-                    Label {
-                        Layout.fillWidth:   true
-                        horizontalAlignment: Text.AlignLeft
-                        text: paramUavModelName.currentText
+
+                    RowLayout {
+                        spacing: 5
+                        Layout.margins: 10
+
+                        Label {
+                            Layout.fillWidth:   true
+                            horizontalAlignment: Text.AlignLeft
+                            text: qsTr("Uav Model")
+                        }
+                        Label {
+                            Layout.fillWidth:   true
+                            horizontalAlignment: Text.AlignLeft
+                            text: paramUavModelName.currentText
+                        }
                     }
-                }
 
-                RowLayout {
-                    spacing: 5
-                    Layout.margins: 10
+                    RowLayout {
+                        spacing: 5
+                        Layout.margins: 10
 
-                    Label {
-                        Layout.fillWidth:   true
-                        horizontalAlignment: Text.AlignLeft
-                        text: qsTr("Camera Model")
+                        Label {
+                            Layout.fillWidth:   true
+                            horizontalAlignment: Text.AlignLeft
+                            text: qsTr("Camera Model")
+                        }
+                        Label {
+                            Layout.fillWidth:   true
+                            horizontalAlignment: Text.AlignLeft
+                            text: paramCameraModelName.currentText
+                        }
                     }
-                    Label {
-                        Layout.fillWidth:   true
-                        horizontalAlignment: Text.AlignLeft
-                        text: paramCameraModelName.currentText
+
+                    PhotoPlannerParamForm {
+                        name: qsTr("Longitudinal overlap, %")
+                        from: 0
+                        to: 95
+                        value: photoPlanner.longitOverlap
+                        onValueChanged: { photoPlanner.longitOverlap = value }
                     }
-                }
 
-                PhotoPlannerParamForm {
-                    name: qsTr("Longitudinal overlap, %")
-                    from: 0
-                    to: 95
-                    value: photoPlanner.longitOverlap
-                    onValueChanged: { photoPlanner.longitOverlap = value }
-                }
-
-                PhotoPlannerParamForm {
-                    name: qsTr("Transverse overlap, %")
-                    from: 0
-                    to: 95
-                    value: photoPlanner.transverseOverlap
-                    onValueChanged: { photoPlanner.transverseOverlap = value }
-                }
-
-                PhotoPlannerParamForm {
-                    id: paramCalcAltitude
-                    name: qsTr("Altitude, m")
-                    from: 5
-                    to: 5000
-                    value: photoPlanner.altitude
-                    onValueChanged: {
-                        photoPlanner.altitude = value
-                        photoPlannerParamsView.calculateGsd()
+                    PhotoPlannerParamForm {
+                        name: qsTr("Transverse overlap, %")
+                        from: 0
+                        to: 95
+                        value: photoPlanner.transverseOverlap
+                        onValueChanged: { photoPlanner.transverseOverlap = value }
                     }
-                }
 
-                PhotoPlannerParamForm {
-                    id: paramCalcGsd
-                    name: qsTr("GSD, sm/pix")
-                    from: 1
-                    to: 300
-                    onValueChanged: {
-                        photoPlanner.gsd = value / 100
-                        calculateAltitude()
+                    PhotoPlannerParamForm {
+                        id: paramCalcAltitude
+                        name: qsTr("Altitude, m")
+                        from: 5
+                        to: 5000
+                        value: photoPlanner.altitude
+                        onValueChanged: {
+                            photoPlanner.altitude = value
+                            photoPlannerParamsView.calculateGsd()
+                        }
                     }
-                }
 
-                PhotoPlannerParamForm {
-                    visible: map.missionType == "Area"
-                    name: qsTr("Azimuth, \xB0")
-                    from: 0
-                    to: 359
-                    value: photoPlanner.azimuth
-                    onValueChanged: { photoPlanner.azimuth = value }
-                }
+                    PhotoPlannerParamForm {
+                        id: paramCalcGsd
+                        name: qsTr("GSD, sm/pix")
+                        from: 1
+                        to: 300
+                        onValueChanged: {
+                            photoPlanner.gsd = value / 100
+                            calculateAltitude()
+                        }
+                    }
 
-                PhotoPlannerParamForm {
-                    visible: map.missionType == "Linear"
-                    name: qsTr("Width, m")
-                    from: 1
-                    to: 1000
-                    value: photoPlanner.width
-                    onValueChanged: { photoPlanner.width = value }
-                }
+                    PhotoPlannerParamForm {
+                        visible: map.missionType == "Area"
+                        name: qsTr("Azimuth, \xB0")
+                        from: 0
+                        to: 359
+                        value: photoPlanner.azimuth
+                        onValueChanged: { photoPlanner.azimuth = value }
+                    }
 
+                    PhotoPlannerParamForm {
+                        visible: map.missionType == "Linear"
+                        name: qsTr("Width, m")
+                        from: 1
+                        to: 1000
+                        value: photoPlanner.width
+                        onValueChanged: { photoPlanner.width = value }
+                    }
+
+                }
             }
 
             ListView {
@@ -164,7 +170,7 @@ Rectangle {
                         Layout.maximumWidth: 100
                         horizontalAlignment: Text.AlignLeft
                         cursorPosition: 0
-             //           wrapMode: TextInput.Wrap
+                        //           wrapMode: TextInput.Wrap
 
                         text: map.markers[index].coordinate.latitude
                         onEditingFinished: {
@@ -188,7 +194,7 @@ Rectangle {
                         activeFocusOnPress: true
                         Layout.maximumWidth: 100
                         horizontalAlignment: Text.AlignLeft
-               //         wrapMode: TextInput.Wrap
+                        //         wrapMode: TextInput.Wrap
                         text: map.markers[index].coordinate.longitude.toString()
                         onEditingFinished: {
                             map.markers[index].coordinate.longitude = text
@@ -240,351 +246,377 @@ Rectangle {
                 }
             }
 
-            ColumnLayout {
-                id: camerasView
+            Item {
                 visible: SwipeView.isCurrentItem
-                Layout.fillWidth: true
+                ColumnLayout {
+                    id: camerasView
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
 
-                property int modelIndex: -1
-                property int prevModelIndex: -1
-                Component.onCompleted: {
-                    modelIndex = 0
-                }
-                onModelIndexChanged: {
-                    paramCameraFocus.updatedModelIndex(modelIndex)
-                    paramCameraLxMM.updatedModelIndex(modelIndex)
-                    paramCameraLyMM.updatedModelIndex(modelIndex)
-                    paramCameraAx.updatedModelIndex(modelIndex)
-                    paramCameraAy.updatedModelIndex(modelIndex)
-                    prevModelIndex = modelIndex
-                    photoPlannerParamsView.calculateGsd()
-                }
-
-                ListModel {
-                    id: camerasModel
-
-                    ListElement {
-                        name: "Sony A6000 [Sel20F28]"
-                        focusMM: 20
-                        lxMM: 15
-                        lyMM: 22.5
-                        ax: 3648
-                        ay: 5472
-                    }
-                    ListElement {
-                        name: "Sony A6000 [Sel35F18]"
-                        focusMM: 35
-                        lxMM: 15
-                        lyMM: 22.5
-                        ax: 3648
-                        ay: 5472
-                    }
-                    ListElement {
-                        name: "Sony S600 35"
-                        focusMM: 35
-                        lxMM: 15
-                        lyMM: 22.5
-                        ax: 2112
-                        ay: 2816
-                    }
-                    ListElement {
-                        name: "Sony S600 50"
-                        focusMM: 50
-                        lxMM: 15
-                        lyMM: 22.5
-                        ax: 2112
-                        ay: 2816
-                    }
-                }
-
-               Label {
-                   Layout.fillWidth:   true
-                   Layout.columnSpan:  2
-                   text: qsTr("Cameras Parameters")
-                   horizontalAlignment: Text.AlignHCenter
-               }
-
-               Label {
-                   Layout.fillWidth:   true
-                   text: qsTr("Camera Model")
-               }
-               ComboBox {
-                   id: paramCameraModelName
-                   Layout.fillWidth:   true
-                   model: camerasModel
-                   textRole: "name"
-                   onCurrentIndexChanged: {
-                       camerasView.modelIndex = currentIndex
-                   }
-                   onCurrentTextChanged: {
-                       photoPlanner.cameraModel = currentText;
-                   }
-               }
-
-               PhotoPlannerParamForm {
-                   id: paramCameraFocus
-                   name: qsTr("Focus Range, mm")
-                   from: 1
-                   to: 100
-
-                   signal updatedModelIndex(int newIndex)
-                   onUpdatedModelIndex: {
-                       value = camerasModel.get(newIndex).focusMM
-                   }
-                   onValueChanged: {
-                       photoPlanner.focusRange = value
-                       if (camerasView.prevModelIndex == camerasView.modelIndex)
-                           camerasModel.setProperty(camerasView.modelIndex,"focusMM", value)
-                   }
-               }
-               PhotoPlannerParamForm {
-                   id: paramCameraLxMM
-                   name: qsTr("Sensor lx, mm")
-                   from: 1
-                   to: 100
-
-                   signal updatedModelIndex(int newIndex)
-                   onUpdatedModelIndex: {
-                       value = camerasModel.get(newIndex).lxMM
-                   }
-                   onValueChanged: {
-                       photoPlanner.cameraLx = value
-                       if (camerasView.prevModelIndex == camerasView.modelIndex)
-                           camerasModel.setProperty(camerasView.modelIndex,"lxMM", value)
-                   }
-               }
-               PhotoPlannerParamForm {
-                   id: paramCameraLyMM
-                   name: qsTr("Sensor ly, mm")
-                   from: 1
-                   to: 100
-
-                   signal updatedModelIndex(int newIndex)
-                   onUpdatedModelIndex: {
-                       value = camerasModel.get(newIndex).lyMM
-                   }
-                   onValueChanged: {
-                       photoPlanner.cameraLy = value
-                       if (camerasView.prevModelIndex == camerasView.modelIndex)
-                           camerasModel.setProperty(camerasView.modelIndex,"lyMM", value)
-                   }
-               }
-               PhotoPlannerParamForm {
-                   id: paramCameraAx
-                   name: qsTr("Sensor ax, pix")
-                   from: 500
-                   to: 10000
-
-                   signal updatedModelIndex(int newIndex)
-                   onUpdatedModelIndex: {
-                       value = camerasModel.get(newIndex).ax
-                   }
-                   onValueChanged: {
-                       photoPlanner.cameraAx = value
-                       if (camerasView.prevModelIndex == camerasView.modelIndex)
-                           camerasModel.setProperty(camerasView.modelIndex,"ax", value)
-                   }
-               }
-               PhotoPlannerParamForm {
-                   id: paramCameraAy
-                   name: qsTr("Sensor ay, pix")
-                   from: 500
-                   to: 10000
-
-                   signal updatedModelIndex(int newIndex)
-                   onUpdatedModelIndex: {
-                       value = camerasModel.get(newIndex).ay
-                   }
-                   onValueChanged: {
-                       photoPlanner.cameraAy = value
-                       if (camerasView.prevModelIndex == camerasView.modelIndex)
-                           camerasModel.setProperty(camerasView.modelIndex,"ay", value)
-                   }
-               }
-            }
-
-            ColumnLayout {
-                id: uavsView
-                visible: SwipeView.isCurrentItem
-                Layout.fillWidth: true
-
-                property int modelIndex: -1
-                property int prevModelIndex: -1
-                Component.onCompleted: {
-                    modelIndex = 0
-                }
-                onModelIndexChanged: {
-                    paramUavTime.updatedModelIndex(modelIndex)
-                    paramUavComm.updatedModelIndex(modelIndex)
-                    paramUavSpeed.updatedModelIndex(modelIndex)
-                    paramUavRoll.updatedModelIndex(modelIndex)
-                    prevModelIndex = modelIndex
-                }
-
-                ListModel {
-                    id: uavsModel
-
-                    ListElement {
-                        name: "Plane 1"
-                        flightTimeMinutes: 60
-                        flightSpeedKmPerH: 40
-                        maxRollDeg: 30
-                        commRadiusKm: 25
-                    }
-                    ListElement {
-                        name: "Plane 2"
-                        flightTimeMinutes: 120
-                        flightSpeedKmPerH: 60
-                        maxRollDeg: 30
-                        commRadiusKm: 50
-                    }
-                    ListElement {
-                        name: "Quadro 1"
-                        flightTimeMinutes: 40
-                        flightSpeedKmPerH: 30
-                        maxRollDeg: 90
-                        commRadiusKm: 5
-                    }
-                    ListElement {
-                        name: "Quadro 2"
-                        flightTimeMinutes: 60
-                        flightSpeedKmPerH: 60
-                        maxRollDeg: 90
-                        commRadiusKm: 15
-                    }
-                }
-
-                Label {
-                    Layout.fillWidth:   true
-                    Layout.columnSpan:  2
-                    text: qsTr("UAV Parameters")
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                Label {
-                    Layout.fillWidth:   true
-                    text: qsTr("UAV Model")
-                }
-                ComboBox {
-                    id: paramUavModelName
-                    Layout.fillWidth:   true
-                    model: uavsModel
-                    textRole: "name"
-                    onCurrentIndexChanged: {
-                        uavsView.modelIndex = currentIndex
-                    }
-                }
-
-                PhotoPlannerParamForm {
-                    id: paramUavTime
-                    name: qsTr("Flight Time, min")
-                    from: 1
-                    to: 240
-
-                    signal updatedModelIndex(int newIndex)
-                    onUpdatedModelIndex: {
-                        value = uavsModel.get(newIndex).flightTimeMinutes
-                    }
-                    onValueChanged: {
-                        if (uavsView.prevModelIndex == uavsView.modelIndex)
-                            uavsModel.setProperty(uavsView.modelIndex,"flightTimeMinutes", value)
-                    }
-                }
-
-                PhotoPlannerParamForm {
-                    id: paramUavSpeed
-                    name: qsTr("Flight Speed, kmph")
-                    from: 1
-                    to: 200
-
-                    signal updatedModelIndex(int newIndex)
-                    onUpdatedModelIndex: {
-                        value = uavsModel.get(newIndex).flightSpeedKmPerH
-                    }
-                    onValueChanged: {
-                        photoPlanner.speed = value;
-                        if (uavsView.prevModelIndex == uavsView.modelIndex)
-                            uavsModel.setProperty(uavsView.modelIndex,"flightSpeedKmPerH", value)
-                    }
-                }
-
-                PhotoPlannerParamForm {
-                    id: paramUavComm
-                    name: qsTr("Comm Radius, km")
-                    from: 1
-                    to: 120
-
-                    signal updatedModelIndex(int newIndex)
-                    onUpdatedModelIndex: {
-                        value = uavsModel.get(newIndex).commRadiusKm
-                    }
-                    onValueChanged: {
-                        if (uavsView.prevModelIndex == uavsView.modelIndex)
-                            uavsModel.setProperty(uavsView.modelIndex,"commRadiusKm", value)
-                    }
-                }
-
-                PhotoPlannerParamForm {
-                    id: paramUavRoll
-                    name: qsTr("Max Roll, \xB0")
-                    from: 1
-                    to: 90
-
-                    signal updatedModelIndex(int newIndex)
-                    onUpdatedModelIndex: {
-                        value = uavsModel.get(newIndex).maxRollDeg
-                    }
-                    onValueChanged: {
-                        photoPlanner.maxRoll = value
-                        if (uavsView.prevModelIndex == uavsView.modelIndex)
-                            uavsModel.setProperty(uavsView.modelIndex,"maxRollDeg", value)
-                    }
-                }
-
-            }
-
-            ColumnLayout {
-                id: optionsView
-                visible: SwipeView.isCurrentItem
-                Layout.fillWidth: true
-
-                ListModel {
-                    id: mapTypesModel
+                    property int modelIndex: -1
+                    property int prevModelIndex: -1
                     Component.onCompleted: {
-                        for (var i = 0; i<map.supportedMapTypes.length; i++){
-                            mapTypesModel.append(
-                                {"description":map.supportedMapTypes[i].description})
+                        modelIndex = 0
+                    }
+                    onModelIndexChanged: {
+                        paramCameraFocus.updatedModelIndex(modelIndex)
+                        paramCameraLxMM.updatedModelIndex(modelIndex)
+                        paramCameraLyMM.updatedModelIndex(modelIndex)
+                        paramCameraAx.updatedModelIndex(modelIndex)
+                        paramCameraAy.updatedModelIndex(modelIndex)
+                        prevModelIndex = modelIndex
+                        photoPlannerParamsView.calculateGsd()
+                    }
+
+                    ListModel {
+                        id: camerasModel
+
+                        ListElement {
+                            name: "Sony A6000 [Sel20F28]"
+                            focusMM: 20
+                            lxMM: 15
+                            lyMM: 22.5
+                            ax: 3648
+                            ay: 5472
+                        }
+                        ListElement {
+                            name: "Sony A6000 [Sel35F18]"
+                            focusMM: 35
+                            lxMM: 15
+                            lyMM: 22.5
+                            ax: 3648
+                            ay: 5472
+                        }
+                        ListElement {
+                            name: "Sony S600 35"
+                            focusMM: 35
+                            lxMM: 15
+                            lyMM: 22.5
+                            ax: 2112
+                            ay: 2816
+                        }
+                        ListElement {
+                            name: "Sony S600 50"
+                            focusMM: 50
+                            lxMM: 15
+                            lyMM: 22.5
+                            ax: 2112
+                            ay: 2816
+                        }
+                    }
+
+                    Label {
+                        Layout.fillWidth:   true
+                        Layout.columnSpan:  2
+                        text: qsTr("Cameras Parameters")
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        Layout.fillWidth:   true
+                        text: qsTr("Camera Model")
+                    }
+                    ComboBox {
+                        id: paramCameraModelName
+                        Layout.fillWidth:   true
+                        model: camerasModel
+                        textRole: "name"
+                        onCurrentIndexChanged: {
+                            camerasView.modelIndex = currentIndex
+                        }
+                        onCurrentTextChanged: {
+                            photoPlanner.cameraModel = currentText;
+                        }
+                    }
+
+                    PhotoPlannerParamForm {
+                        id: paramCameraFocus
+                        name: qsTr("Focus Range, mm")
+                        from: 1
+                        to: 100
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = camerasModel.get(newIndex).focusMM
+                        }
+                        onValueChanged: {
+                            photoPlanner.focusRange = value
+                            if (camerasView.prevModelIndex == camerasView.modelIndex)
+                                camerasModel.setProperty(camerasView.modelIndex,"focusMM", value)
+                        }
+                    }
+                    PhotoPlannerParamForm {
+                        id: paramCameraLxMM
+                        name: qsTr("Sensor lx, mm")
+                        from: 1
+                        to: 100
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = camerasModel.get(newIndex).lxMM
+                        }
+                        onValueChanged: {
+                            photoPlanner.cameraLx = value
+                            if (camerasView.prevModelIndex == camerasView.modelIndex)
+                                camerasModel.setProperty(camerasView.modelIndex,"lxMM", value)
+                        }
+                    }
+                    PhotoPlannerParamForm {
+                        id: paramCameraLyMM
+                        name: qsTr("Sensor ly, mm")
+                        from: 1
+                        to: 100
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = camerasModel.get(newIndex).lyMM
+                        }
+                        onValueChanged: {
+                            photoPlanner.cameraLy = value
+                            if (camerasView.prevModelIndex == camerasView.modelIndex)
+                                camerasModel.setProperty(camerasView.modelIndex,"lyMM", value)
+                        }
+                    }
+                    PhotoPlannerParamForm {
+                        id: paramCameraAx
+                        name: qsTr("Sensor ax, pix")
+                        from: 500
+                        to: 10000
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = camerasModel.get(newIndex).ax
+                        }
+                        onValueChanged: {
+                            photoPlanner.cameraAx = value
+                            if (camerasView.prevModelIndex == camerasView.modelIndex)
+                                camerasModel.setProperty(camerasView.modelIndex,"ax", value)
+                        }
+                    }
+                    PhotoPlannerParamForm {
+                        id: paramCameraAy
+                        name: qsTr("Sensor ay, pix")
+                        from: 500
+                        to: 10000
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = camerasModel.get(newIndex).ay
+                        }
+                        onValueChanged: {
+                            photoPlanner.cameraAy = value
+                            if (camerasView.prevModelIndex == camerasView.modelIndex)
+                                camerasModel.setProperty(camerasView.modelIndex,"ay", value)
                         }
                     }
                 }
+            }
 
-                Label {
-                    text: qsTr("Choose map view type")
-                }
+            Item {
+                visible: SwipeView.isCurrentItem
+                ColumnLayout {
+                    id: uavsView
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
 
-                ComboBox {
-                    Layout.fillWidth: true
-                    model: mapTypesModel
-                    textRole: "description"
+                    property int modelIndex: -1
+                    property int prevModelIndex: -1
                     Component.onCompleted: {
-                        currentIndex = 4
+                        modelIndex = 0
                     }
-                    onCurrentIndexChanged: {
-                        map.activeMapType = map.supportedMapTypes[currentIndex]
+                    onModelIndexChanged: {
+                        paramUavTime.updatedModelIndex(modelIndex)
+                        paramUavComm.updatedModelIndex(modelIndex)
+                        paramUavSpeed.updatedModelIndex(modelIndex)
+                        paramUavRoll.updatedModelIndex(modelIndex)
+                        prevModelIndex = modelIndex
                     }
+
+                    ListModel {
+                        id: uavsModel
+
+                        ListElement {
+                            name: "Plane 1"
+                            flightTimeMinutes: 60
+                            flightSpeedKmPerH: 40
+                            maxRollDeg: 30
+                            commRadiusKm: 25
+                        }
+                        ListElement {
+                            name: "Plane 2"
+                            flightTimeMinutes: 120
+                            flightSpeedKmPerH: 60
+                            maxRollDeg: 30
+                            commRadiusKm: 50
+                        }
+                        ListElement {
+                            name: "Quadro 1"
+                            flightTimeMinutes: 40
+                            flightSpeedKmPerH: 30
+                            maxRollDeg: 90
+                            commRadiusKm: 5
+                        }
+                        ListElement {
+                            name: "Quadro 2"
+                            flightTimeMinutes: 60
+                            flightSpeedKmPerH: 60
+                            maxRollDeg: 90
+                            commRadiusKm: 15
+                        }
+                    }
+
+                    Label {
+                        Layout.fillWidth:   true
+                        Layout.columnSpan:  2
+                        text: qsTr("UAV Parameters")
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        Layout.fillWidth:   true
+                        text: qsTr("UAV Model")
+                    }
+                    ComboBox {
+                        id: paramUavModelName
+                        Layout.fillWidth:   true
+                        model: uavsModel
+                        textRole: "name"
+                        onCurrentIndexChanged: {
+                            uavsView.modelIndex = currentIndex
+                        }
+                    }
+
+                    PhotoPlannerParamForm {
+                        id: paramUavTime
+                        name: qsTr("Flight Time, min")
+                        from: 1
+                        to: 240
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = uavsModel.get(newIndex).flightTimeMinutes
+                        }
+                        onValueChanged: {
+                            if (uavsView.prevModelIndex == uavsView.modelIndex)
+                                uavsModel.setProperty(uavsView.modelIndex,"flightTimeMinutes", value)
+                        }
+                    }
+
+                    PhotoPlannerParamForm {
+                        id: paramUavSpeed
+                        name: qsTr("Flight Speed, kmph")
+                        from: 1
+                        to: 200
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = uavsModel.get(newIndex).flightSpeedKmPerH
+                        }
+                        onValueChanged: {
+                            photoPlanner.speed = value;
+                            if (uavsView.prevModelIndex == uavsView.modelIndex)
+                                uavsModel.setProperty(uavsView.modelIndex,"flightSpeedKmPerH", value)
+                        }
+                    }
+
+                    PhotoPlannerParamForm {
+                        id: paramUavComm
+                        name: qsTr("Comm Radius, km")
+                        from: 1
+                        to: 120
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = uavsModel.get(newIndex).commRadiusKm
+                        }
+                        onValueChanged: {
+                            if (uavsView.prevModelIndex == uavsView.modelIndex)
+                                uavsModel.setProperty(uavsView.modelIndex,"commRadiusKm", value)
+                        }
+                    }
+
+                    PhotoPlannerParamForm {
+                        id: paramUavRoll
+                        name: qsTr("Max Roll, \xB0")
+                        from: 1
+                        to: 90
+
+                        signal updatedModelIndex(int newIndex)
+                        onUpdatedModelIndex: {
+                            value = uavsModel.get(newIndex).maxRollDeg
+                        }
+                        onValueChanged: {
+                            photoPlanner.maxRoll = value
+                            if (uavsView.prevModelIndex == uavsView.modelIndex)
+                                uavsModel.setProperty(uavsView.modelIndex,"maxRollDeg", value)
+                        }
+                    }
+
                 }
 
-                CheckBox {
-                    Layout.fillWidth: true
-                    checked: map.photoPrintsVisible
-                    text: qsTr("Enable photo prints")
-                    onCheckedChanged: {
-                        if (checked != map.photoPrintsVisible)
-                            map.photoPrintsVisible = checked
+            }
+            Item {
+                visible: SwipeView.isCurrentItem
+
+                ColumnLayout {
+                    id: optionsView
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+
+                    ListModel {
+                        id: mapTypesModel
+                        Component.onCompleted: {
+                            for (var i = 0; i<map.supportedMapTypes.length; i++){
+                                mapTypesModel.append(
+                                            {"description":map.supportedMapTypes[i].description})
+                            }
+                        }
                     }
 
+                    Label {
+                        Layout.fillWidth:   true
+                        text: qsTr("Common options")
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+
+                    Label {
+                        Layout.margins: 10
+                        text: qsTr("Choose map view type")
+                    }
+
+                    ComboBox {
+                        Layout.fillWidth:   true
+                        model: mapTypesModel
+                        textRole: "description"
+                        Component.onCompleted: {
+                            currentIndex = 4
+                        }
+                        onCurrentIndexChanged: {
+                            map.activeMapType = map.supportedMapTypes[currentIndex]
+                        }
+                    }
+
+                    Item {
+                        height: 10
+                    }
+
+                    CheckBox {
+                        Layout.fillWidth: true
+                        checked: map.photoPrintsVisible
+                        text: qsTr("Enable photo prints")
+                        onCheckedChanged: {
+                            if (checked != map.photoPrintsVisible)
+                                map.photoPrintsVisible = checked
+                        }
+
+                    }
                 }
             }
+
         }
 
         TabBar {

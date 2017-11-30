@@ -14,8 +14,7 @@ ToolBar {
     property alias areaMission: areaMission
 
     background: Rectangle {
-       implicitWidth: 78
-       color: "#2021be2b"
+       color: "#A021be2b"
     }
 
     ColumnLayout {

@@ -498,7 +498,6 @@ Map {
 
     Dialog {
         id: resultsDlg
-//        visible: truem
         modality: Qt.ApplicationModal
         title: "Calculations"
         property alias flightPathLength: flightPathLength
