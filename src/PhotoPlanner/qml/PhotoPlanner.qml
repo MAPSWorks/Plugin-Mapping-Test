@@ -399,6 +399,7 @@ Item {
             for (var i = 0; i < loadedAoi.length; i++) {
                  map.addCoordinateMarker(loadedAoi[i]);
             }
+            map.fitViewportToMapItems()
         }
     }
 
