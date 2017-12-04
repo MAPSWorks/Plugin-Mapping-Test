@@ -274,8 +274,7 @@ QString PhotoPlan::missionType() const
 #undef R2D
 
 aero_photo::PhotoUavModel PhotoPlan::CreatePhotoUavModelFromGui() const {
-    qreal speedKmPerHour = speed();
-    qreal speedMPerSecond = speedKmPerHour * 1000 / 3600;
+    qreal speedMPerSecond = speed();
     auto rollRadian = aero_photo::D2R(maxRoll());
     return aero_photo::PhotoUavModel(speedMPerSecond, rollRadian);
 }

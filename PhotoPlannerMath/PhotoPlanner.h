@@ -94,7 +94,7 @@ protected:
 
     void SaveToXmlOnePointActions(QXmlStreamWriter &stream, const FlightPoint &flightPoint) {
         stream.writeStartElement("actions");
-        stream.writeTextElement("speed", QString::number(velocity() * 3600.0 / 1000.0 ));
+        stream.writeTextElement("speed", QString::number(velocity()));
         stream.writeTextElement("shot", "0");
         stream.writeTextElement("dshot", QString::number(flightPoint.shotDistance()));
         stream.writeTextElement("POI", "0");

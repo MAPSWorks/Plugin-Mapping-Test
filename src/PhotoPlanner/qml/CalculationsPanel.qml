@@ -440,28 +440,28 @@ Rectangle {
                         ListElement {
                             name: "Plane 1"
                             flightTimeMinutes: 60
-                            flightSpeedKmPerH: 40
+                            flightSpeedMPerS: 15
                             maxRollDeg: 30
                             commRadiusKm: 25
                         }
                         ListElement {
                             name: "Plane 2"
                             flightTimeMinutes: 120
-                            flightSpeedKmPerH: 60
+                            flightSpeedMPerS: 20
                             maxRollDeg: 30
                             commRadiusKm: 50
                         }
                         ListElement {
                             name: "Quadro 1"
                             flightTimeMinutes: 40
-                            flightSpeedKmPerH: 30
+                            flightSpeedMPerS: 10
                             maxRollDeg: 90
                             commRadiusKm: 5
                         }
                         ListElement {
                             name: "Quadro 2"
                             flightTimeMinutes: 60
-                            flightSpeedKmPerH: 60
+                            flightSpeedMPerS: 30
                             maxRollDeg: 90
                             commRadiusKm: 15
                         }
@@ -506,18 +506,18 @@ Rectangle {
 
                     PhotoPlannerParamForm {
                         id: paramUavSpeed
-                        name: qsTr("Flight Speed, kmph")
+                        name: qsTr("Flight Speed, mps")
                         from: 1
                         to: 200
 
                         signal updatedModelIndex(int newIndex)
                         onUpdatedModelIndex: {
-                            value = uavsModel.get(newIndex).flightSpeedKmPerH
+                            value = uavsModel.get(newIndex).flightSpeedMPerS
                         }
                         onValueChanged: {
                             photoPlanner.speed = value;
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.setProperty(uavsView.modelIndex,"flightSpeedKmPerH", value)
+                                uavsModel.setProperty(uavsView.modelIndex,"flightSpeedMPerS", value)
                         }
                     }
 
