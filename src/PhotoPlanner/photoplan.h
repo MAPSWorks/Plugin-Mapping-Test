@@ -26,7 +26,8 @@ class PhotoPlan : public QObject
     Q_PROPERTY(qreal gsd READ gsd WRITE setGsd NOTIFY gsdChanged)
     Q_PROPERTY(quint32 speed READ speed WRITE setSpeed NOTIFY speedChanged)
     Q_PROPERTY(quint32 width READ width WRITE setWidth NOTIFY widthChanged)
-    Q_PROPERTY(quint32 maxRoll READ maxRoll WRITE setMaxRoll NOTIFY maxRollChanged)
+    Q_PROPERTY(qreal maxRoll READ maxRoll WRITE setMaxRoll NOTIFY maxRollChanged)
+    Q_PROPERTY(qreal uavManeuverR READ uavManeuverR WRITE setUavManeuverR NOTIFY uavManeuverRChanged)
 
     Q_PROPERTY(QVariantList track READ track NOTIFY trackChanged)
     Q_PROPERTY(QVariantList photoCenters READ photoCenters NOTIFY photoCentersChanged)
@@ -41,6 +42,9 @@ public:
 
     Q_INVOKABLE qreal calcPhotoParamGsdOnAltitude();
     Q_INVOKABLE qreal calcPhotoParamAltitudeOnGsd();
+
+    Q_INVOKABLE qreal calcUavManeuverROnMaxRoll();
+    Q_INVOKABLE qreal calcUavMaxRollOnManeuverR();
 
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
@@ -92,8 +96,11 @@ public:
     quint32 width() const;
     void setWidth(const quint32 &width);
 
-    quint32 maxRoll() const;
-    void setMaxRoll(const quint32 &maxRoll);
+    qreal maxRoll() const;
+    void setMaxRoll(const qreal &maxRoll);
+
+    qreal uavManeuverR() const;
+    void setUavManeuverR(const qreal &value);
 
     QVariantList track();
 
@@ -122,6 +129,7 @@ signals:
     void speedChanged();
     void widthChanged();
     void maxRollChanged();
+    void uavManeuverRChanged();
     void trackChanged();
     void photoCentersChanged();
     void photoPrintsChanged();
@@ -147,7 +155,8 @@ private:
     qreal m_gsd;
     quint32 m_speed;
     quint32 m_width;
-    quint32 m_maxRoll;
+    qreal m_maxRoll;
+    qreal m_maneuverR;
 
     QVector<QGeoCoordinate> m_photoCenters;
     QVector<QGeoCoordinate> m_sourceTrack;

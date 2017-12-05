@@ -6,7 +6,6 @@
 #include <QVariant>
 #include <QtDebug>
 
-
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
 {
     m_cameraModel           = "Sony S600";
@@ -29,6 +28,16 @@ qreal PhotoPlan::calcPhotoParamGsdOnAltitude() {
 qreal PhotoPlan::calcPhotoParamAltitudeOnGsd() {
     auto photoModel = CreatePhotoCameraModelFromGui();
     return photoModel.CalcH(gsd());
+}
+
+qreal PhotoPlan::calcUavManeuverROnMaxRoll() {
+    auto uavModel = CreatePhotoUavModelFromGui();
+    return uavModel.CalcUavManeuverROnMaxRoll(aero_photo::D2R(maxRoll()));
+}
+
+qreal PhotoPlan::calcUavMaxRollOnManeuverR() {
+    auto uavModel = CreatePhotoUavModelFromGui();
+    return aero_photo::R2D(uavModel.CalcUavMaxRollOnManeuverR(uavManeuverR()));
 }
 
 QString PhotoPlan::cameraModel() const
@@ -201,17 +210,31 @@ void PhotoPlan::setWidth(const quint32 &width)
     }
 }
 
-quint32 PhotoPlan::maxRoll() const
+qreal PhotoPlan::maxRoll() const
 {
     return m_maxRoll;
 }
 
-void PhotoPlan::setMaxRoll(const quint32 &maxRoll)
+void PhotoPlan::setMaxRoll(const qreal &maxRoll)
 {
     if(m_maxRoll != maxRoll)
     {
         m_maxRoll = maxRoll;
         emit maxRollChanged();
+    }
+}
+
+qreal PhotoPlan::uavManeuverR() const
+{
+    return m_maneuverR;
+}
+
+void PhotoPlan::setUavManeuverR(const qreal &value)
+{
+    if(value != m_maneuverR)
+    {
+        m_maneuverR = value;
+        emit uavManeuverRChanged();
     }
 }
 
@@ -269,9 +292,6 @@ QString PhotoPlan::missionType() const
 {
     return m_missionType;
 }
-
-#undef D2R
-#undef R2D
 
 aero_photo::PhotoUavModel PhotoPlan::CreatePhotoUavModelFromGui() const {
     qreal speedMPerSecond = speed();

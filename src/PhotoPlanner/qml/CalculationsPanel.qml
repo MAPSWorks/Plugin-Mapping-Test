@@ -9,11 +9,14 @@ Rectangle {
 
     signal calculateGsd()
     signal calculateAltitude()
+    signal calculateUavR()
+    signal calculateUavRoll()
 
     property bool isInitialized: false
     Component.onCompleted: {
         isInitialized = true
         calculateGsd()
+        calculateUavR()
     }
 
     property bool isCalculateGsd: false
@@ -30,6 +33,23 @@ Rectangle {
             isCalculateAltitude = true
             paramCalcAltitude.value = photoPlanner.calcPhotoParamAltitudeOnGsd().toFixed()
             isCalculateAltitude = false
+        }
+    }
+
+    property bool isCalculateUavR: false
+    onCalculateUavR: {
+        if (isInitialized && !isCalculateUavRoll) {
+            isCalculateUavR = true
+            paramUavR.value = photoPlanner.calcUavManeuverROnMaxRoll().toFixed(2)
+            isCalculateUavR = false
+        }
+    }
+    property bool isCalculateUavRoll: false
+    onCalculateUavRoll: {
+        if (isInitialized && !isCalculateUavR) {
+            isCalculateUavRoll = true
+            paramUavRoll.value = photoPlanner.calcUavMaxRollOnManeuverR().toFixed(2)
+            isCalculateUavRoll = false
         }
     }
 
@@ -431,7 +451,9 @@ Rectangle {
                         paramUavComm.updatedModelIndex(modelIndex)
                         paramUavSpeed.updatedModelIndex(modelIndex)
                         paramUavRoll.updatedModelIndex(modelIndex)
+                        paramUavR.updatedModelIndex(modelIndex)
                         prevModelIndex = modelIndex
+                        calculateUavR()
                     }
 
                     ListModel {
@@ -518,6 +540,7 @@ Rectangle {
                             photoPlanner.speed = value;
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
                                 uavsModel.setProperty(uavsView.modelIndex,"flightSpeedMPerS", value)
+                            calculateUavR()
                         }
                     }
 
@@ -551,9 +574,22 @@ Rectangle {
                             photoPlanner.maxRoll = value
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
                                 uavsModel.setProperty(uavsView.modelIndex,"maxRollDeg", value)
+                            calculateUavR()
                         }
                     }
 
+                    PhotoPlannerParamForm {
+                        id: paramUavR
+                        name: qsTr("Maneuver R, m")
+                        from: 0
+                        to: 5000
+
+                        signal updatedModelIndex(int newIndex)
+                        onValueChanged: {
+                            photoPlanner.uavManeuverR = value
+                            calculateUavRoll()
+                        }
+                    }
                 }
 
             }
