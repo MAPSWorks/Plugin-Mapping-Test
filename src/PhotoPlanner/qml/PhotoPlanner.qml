@@ -15,8 +15,8 @@ Item {
 
         PluginParameter { name: "mapbox.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
         //PluginParameter { name: "mapboxgl.access_token"; value:"pk.eyJ1IjoiZ2Zyb2wiLCJhIjoiY2o4NXlidWNpMGxocTMyc2I4N2diZjltNSJ9.Syw1X8CQ2nR_7cYOqIFkfA" }
-        PluginParameter { name: "mapbox.mapping.cache.directory"; value: "/tmp/maps" }
-        PluginParameter { name: "style"; value: "mapbox://styles/mapbox/satellite-v9" }
+        //PluginParameter { name: "mapbox.mapping.cache.directory"; value: "/tmp/maps" }
+        //PluginParameter { name: "style"; value: "mapbox://styles/mapbox/satellite-v9" }
     }
 
     Plugin {
