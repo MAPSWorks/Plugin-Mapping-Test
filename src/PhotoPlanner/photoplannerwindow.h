@@ -4,6 +4,7 @@
 #include <QQuickWidget>
 #include <QGeoCoordinate>
 #include "photoplan.h"
+#include "camerasmodel.h"
 
 class PhotoPlannerWindow : public QQuickWidget
 {
@@ -15,7 +16,7 @@ public slots:
     bool aboutToQuit();
 
 private:
-
+    QCamerasModel camerasModel;
     PhotoPlan photoPlan;
 };
 

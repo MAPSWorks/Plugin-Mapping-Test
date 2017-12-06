@@ -289,43 +289,6 @@ Rectangle {
                         photoPlannerParamsView.calculateGsd()
                     }
 
-                    ListModel {
-                        id: camerasModel
-
-                        ListElement {
-                            name: "Sony A6000 [Sel20F28]"
-                            focusMM: 20
-                            lxMM: 15
-                            lyMM: 22.5
-                            ax: 3648
-                            ay: 5472
-                        }
-                        ListElement {
-                            name: "Sony A6000 [Sel35F18]"
-                            focusMM: 35
-                            lxMM: 15
-                            lyMM: 22.5
-                            ax: 3648
-                            ay: 5472
-                        }
-                        ListElement {
-                            name: "Sony S600 35"
-                            focusMM: 35
-                            lxMM: 15
-                            lyMM: 22.5
-                            ax: 2112
-                            ay: 2816
-                        }
-                        ListElement {
-                            name: "Sony S600 50"
-                            focusMM: 50
-                            lxMM: 15
-                            lyMM: 22.5
-                            ax: 2112
-                            ay: 2816
-                        }
-                    }
-
                     Label {
                         Layout.fillWidth:   true
                         Layout.columnSpan:  2
@@ -362,8 +325,9 @@ Rectangle {
                         }
                         onValueChanged: {
                             photoPlanner.focusRange = value
-                            if (camerasView.prevModelIndex == camerasView.modelIndex)
-                                camerasModel.setProperty(camerasView.modelIndex,"focusMM", value)
+                            if (camerasView.prevModelIndex == camerasView.modelIndex) {
+                                camerasModel.get(camerasView.modelIndex).focusMM = value
+                            }
                         }
                     }
                     PhotoPlannerParamForm {
@@ -379,7 +343,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.cameraLx = value
                             if (camerasView.prevModelIndex == camerasView.modelIndex)
-                                camerasModel.setProperty(camerasView.modelIndex,"lxMM", value)
+                                camerasModel.get(camerasView.modelIndex).lxMM = value
                         }
                     }
                     PhotoPlannerParamForm {
@@ -395,7 +359,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.cameraLy = value
                             if (camerasView.prevModelIndex == camerasView.modelIndex)
-                                camerasModel.setProperty(camerasView.modelIndex,"lyMM", value)
+                                camerasModel.get(camerasView.modelIndex).lyMM = value
                         }
                     }
                     PhotoPlannerParamForm {
@@ -411,7 +375,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.cameraAx = value
                             if (camerasView.prevModelIndex == camerasView.modelIndex)
-                                camerasModel.setProperty(camerasView.modelIndex,"ax", value)
+                                camerasModel.get(camerasView.modelIndex).ax = value
                         }
                     }
                     PhotoPlannerParamForm {
@@ -427,7 +391,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.cameraAy = value
                             if (camerasView.prevModelIndex == camerasView.modelIndex)
-                                camerasModel.setProperty(camerasView.modelIndex,"ay", value)
+                                camerasModel.get(camerasView.modelIndex).ay = value
                         }
                     }
                 }

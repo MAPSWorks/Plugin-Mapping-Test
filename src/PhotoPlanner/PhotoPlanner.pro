@@ -40,6 +40,7 @@ HEADERS += \
         photoplannerplugin.h \
         photoplannerwindow.h \
         photoplan.h \
+    camerasmodel.h
 
 unix {
     target.path = /usr/lib
