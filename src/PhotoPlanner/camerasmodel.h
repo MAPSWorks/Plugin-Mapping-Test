@@ -1,11 +1,7 @@
 #ifndef CAMERASMODEL_H
 #define CAMERASMODEL_H
 
-#include <QObject>
-#include <QList>
-#include <QAbstractListModel>
-
-class QCamerasModel;
+#include "dataitemsmodel.h"
 
 class QCameraData : public QObject
 {
@@ -49,7 +45,7 @@ public:
     }
 
     qreal lxMM() const { return lxMM_; }
-    void setLxMM(const qint32 value) {
+    void setLxMM(const qreal value) {
         if (value != lxMM_) {
             lxMM_ = value;
             emit lxMMChanged();
@@ -57,7 +53,7 @@ public:
     }
 
     qreal lyMM() const { return lyMM_; }
-    void setLyMM(const qint32 value) {
+    void setLyMM(const qreal value) {
         if (value != lyMM_) {
             lyMM_ = value;
             emit lyMMChanged();
@@ -119,7 +115,7 @@ inline QDataStream &operator>>(QDataStream &stream, QCameraData &cameraData) {
     return cameraData.Read(stream);
 }
 
-class QCamerasModel : public QAbstractListModel {
+class QCamerasModel : public QDataItemsModel<QCameraData> {
       Q_OBJECT
   public:
       enum CamerasRoles {
@@ -131,24 +127,15 @@ class QCamerasModel : public QAbstractListModel {
           Ay,
       };
 
-      QCamerasModel(QObject *parent = nullptr) : QAbstractListModel(parent) { }
+      QCamerasModel(QObject *parent = nullptr) : QDataItemsModel<QCameraData>(parent) { }
 
-      void AddCamera(QCameraData *camera) {
-          beginInsertRows(QModelIndex(), rowCount(), rowCount());
-          cameras_ << camera;
-          endInsertRows();
-      }
-
-      int rowCount(const QModelIndex & parent = QModelIndex()) const {
-          Q_UNUSED(parent);
-          return cameras_.count();
-      }
+      Q_INVOKABLE QCameraData* get(int index) { return dataitems_[index]; }
 
       QVariant data(const QModelIndex & index, int role) const {
-          if (index.row() < 0 || index.row() >= cameras_.count())
+          if (index.row() < 0 || index.row() >= dataitems_.count())
               return QVariant();
 
-          auto &&camera = cameras_[index.row()];
+          auto &&camera = dataitems_[index.row()];
           switch(role) {
           case Name: return camera->name();
           case FocusMM: return camera->focusMM();
@@ -161,8 +148,6 @@ class QCamerasModel : public QAbstractListModel {
           }
       }
 
-      Q_INVOKABLE QCameraData* get(int index) { return cameras_[index]; }
-
       QHash<int, QByteArray> roleNames() const {
           QHash<int, QByteArray> roles;
           roles[Name] = "name";
@@ -173,36 +158,14 @@ class QCamerasModel : public QAbstractListModel {
           roles[Ay] = "ay";
           return roles;
       }
+};
 
-      QDataStream &Read(QDataStream &stream) {
-          int size = 0;
-          stream >> size;
-          for (int i = 0; i < size; i++) {
-              auto camera = new QCameraData(this);
-              camera->Read(stream);
-              AddCamera(camera);
-          }
-          return stream;
-      }
-
-      QDataStream &Write(QDataStream &stream) const {
-          stream << cameras_.count();
-          for (auto &&camera : cameras_) {
-              camera->Write(stream);
-          }
-          return stream;
-      }
-
-  private:
-      QList<QCameraData *> cameras_;
-  };
-
-inline QDataStream &operator<<(QDataStream &stream, const QCamerasModel &camerasModel) {
-    return camerasModel.Write(stream);
+inline QDataStream &operator<<(QDataStream &stream, const QCamerasModel &dataitemsModel) {
+    return dataitemsModel.Write(stream);
 }
 
-inline QDataStream &operator>>(QDataStream &stream, QCamerasModel &camerasModel) {
-    return camerasModel.Read(stream);
+inline QDataStream &operator>>(QDataStream &stream, QCamerasModel &dataitemsModel) {
+    return dataitemsModel.Read(stream);
 }
 
 #endif // CAMERASMODEL_H

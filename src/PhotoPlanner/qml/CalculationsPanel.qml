@@ -420,39 +420,6 @@ Rectangle {
                         calculateUavR()
                     }
 
-                    ListModel {
-                        id: uavsModel
-
-                        ListElement {
-                            name: "Plane 1"
-                            flightTimeMinutes: 60
-                            flightSpeedMPerS: 15
-                            maxRollDeg: 30
-                            commRadiusKm: 25
-                        }
-                        ListElement {
-                            name: "Plane 2"
-                            flightTimeMinutes: 120
-                            flightSpeedMPerS: 20
-                            maxRollDeg: 30
-                            commRadiusKm: 50
-                        }
-                        ListElement {
-                            name: "Quadro 1"
-                            flightTimeMinutes: 40
-                            flightSpeedMPerS: 10
-                            maxRollDeg: 90
-                            commRadiusKm: 5
-                        }
-                        ListElement {
-                            name: "Quadro 2"
-                            flightTimeMinutes: 60
-                            flightSpeedMPerS: 30
-                            maxRollDeg: 90
-                            commRadiusKm: 15
-                        }
-                    }
-
                     Label {
                         Layout.fillWidth:   true
                         Layout.columnSpan:  2
@@ -486,7 +453,7 @@ Rectangle {
                         }
                         onValueChanged: {
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.setProperty(uavsView.modelIndex,"flightTimeMinutes", value)
+                                uavsModel.get(uavsView.modelIndex).flightTimeMinutes = value
                         }
                     }
 
@@ -503,7 +470,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.speed = value;
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.setProperty(uavsView.modelIndex,"flightSpeedMPerS", value)
+                                uavsModel.get(uavsView.modelIndex).flightSpeedMPerS = value
                             calculateUavR()
                         }
                     }
@@ -520,7 +487,7 @@ Rectangle {
                         }
                         onValueChanged: {
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.setProperty(uavsView.modelIndex,"commRadiusKm", value)
+                                uavsModel.get(uavsView.modelIndex).commRadiusKm = value
                         }
                     }
 
@@ -537,7 +504,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.maxRoll = value
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.setProperty(uavsView.modelIndex,"maxRollDeg", value)
+                                uavsModel.get(uavsView.modelIndex).maxRollDeg, value
                             calculateUavR()
                         }
                     }
