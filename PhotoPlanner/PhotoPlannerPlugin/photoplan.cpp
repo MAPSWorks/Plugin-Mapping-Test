@@ -319,8 +319,8 @@ aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
 #include <iostream>
 #include <vector>
 
-#include "PhotoPlannerMath/LinearPhotoPlanner.h"
-#include "PhotoPlannerMath/AreaPhotoPlanner.h"
+#include "PhotoPlanner/PhotoPlannerMath/LinearPhotoPlanner.h"
+#include "PhotoPlanner/PhotoPlannerMath/AreaPhotoPlanner.h"
 
 
 using namespace std;

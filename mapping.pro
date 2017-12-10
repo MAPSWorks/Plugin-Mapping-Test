@@ -1,8 +1,8 @@
 SUBDIRS = \
-    PhotoPlannerMath \
-    PhotoPlannerTest \
-    src/PhotoPlanner \
-    Planner
+    PhotoPlanner/PhotoPlannerMath \
+    PhotoPlanner/PhotoPlannerTest \
+    PhotoPlanner/PhotoPlannerPlugin \
+    PhotoPlanner/Planner
 
 TEMPLATE = subdirs
 

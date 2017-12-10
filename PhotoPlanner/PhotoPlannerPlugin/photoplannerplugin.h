@@ -1,7 +1,7 @@
 #ifndef PHOTOPLANNERPLUGIN_H
 #define PHOTOPLANNERPLUGIN_H
 
-#include <plugin_interface.h>
+#include "src/shared/plugin_interface.h"
 #include "photoplannerwindow.h"
 
 class PhotoPlannerPlugin : public PluginInterface

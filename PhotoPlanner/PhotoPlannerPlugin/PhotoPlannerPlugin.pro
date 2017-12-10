@@ -26,6 +26,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += ../..
+HEADER += src/shared/plugin_interface.h
+
 SOURCES += \
         photoplanner.cpp \
         photoplannerplugin.cpp \
@@ -42,7 +45,8 @@ HEADERS += \
         photoplan.h \
     camerasmodel.h \
     uavsmodel.h \
-    dataitemsmodel.h
+    dataitemsmodel.h \
+    ../../src/shared/plugin_interface.h
 
 unix {
     target.path = /usr/lib

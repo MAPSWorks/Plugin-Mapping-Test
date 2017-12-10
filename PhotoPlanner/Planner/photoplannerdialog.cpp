@@ -5,7 +5,7 @@
 #include <QString>
 #include <QPluginLoader>
 #include <QQuickWidget>
-#include "../src/shared/plugin_interface.h"
+#include "src/shared/plugin_interface.h"
 
 PhotoPlannerDialog::PhotoPlannerDialog(QWidget *parent) :
     QDialog(parent),

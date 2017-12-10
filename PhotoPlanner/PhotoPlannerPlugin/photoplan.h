@@ -6,7 +6,7 @@
 #include <QVariantList>
 #include <QVector>
 
-#include "PhotoPlannerMath/PhotoPlanner.h"
+#include "PhotoPlanner/PhotoPlannerMath/PhotoPlanner.h"
 #include <memory>
 
 
