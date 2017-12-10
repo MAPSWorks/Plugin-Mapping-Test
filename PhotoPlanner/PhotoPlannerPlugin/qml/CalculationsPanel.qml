@@ -12,6 +12,24 @@ Rectangle {
     signal calculateUavR()
     signal calculateUavRoll()
 
+    Connections {
+        target: photoPlanner
+        onCameraModelNameChanged: {
+            var newIndex = paramCameraModelName.find(photoPlanner.cameraModelName)
+            if (newIndex !== -1)
+                paramCameraModelName.currentIndex = newIndex
+        }
+    }
+
+    Connections {
+        target: photoPlanner
+        onUavModelNameChanged: {
+            var newIndex = paramUavModelName.find(photoPlanner.uavModelName)
+            if (newIndex !== -1)
+                paramUavModelName.currentIndex = newIndex
+        }
+    }
+
     property bool isInitialized: false
     Component.onCompleted: {
         isInitialized = true
