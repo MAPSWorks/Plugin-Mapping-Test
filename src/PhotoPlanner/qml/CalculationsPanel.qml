@@ -83,13 +83,19 @@ Rectangle {
 
                         Label {
                             Layout.fillWidth:   true
-                            horizontalAlignment: Text.AlignLeft
-                            text: qsTr("Uav Model")
+                            text: qsTr("UAV Model")
                         }
-                        Label {
-                            Layout.fillWidth:   true
-                            horizontalAlignment: Text.AlignLeft
-                            text: paramUavModelName.currentText
+                        ComboBox {
+                            id: paramUavModelName
+                            Layout.minimumWidth: swipeView.width * 0.6
+                            model: uavsModel
+                            textRole: "name"
+                            onCurrentIndexChanged: {
+                                uavsView.modelIndex = currentIndex
+                            }
+                            onCurrentTextChanged: {
+                                photoPlanner.uavModelName = currentText;
+                            }
                         }
                     }
 
@@ -99,13 +105,19 @@ Rectangle {
 
                         Label {
                             Layout.fillWidth:   true
-                            horizontalAlignment: Text.AlignLeft
                             text: qsTr("Camera Model")
                         }
-                        Label {
-                            Layout.fillWidth:   true
-                            horizontalAlignment: Text.AlignLeft
-                            text: paramCameraModelName.currentText
+                        ComboBox {
+                            id: paramCameraModelName
+                            Layout.minimumWidth: swipeView.width * 0.6
+                            model: camerasModel
+                            textRole: "name"
+                            onCurrentIndexChanged: {
+                                camerasView.modelIndex = currentIndex
+                            }
+                            onCurrentTextChanged: {
+                                photoPlanner.cameraModelName = currentText;
+                            }
                         }
                     }
 
@@ -280,6 +292,7 @@ Rectangle {
                         modelIndex = 0
                     }
                     onModelIndexChanged: {
+                        paramCameraModelNameEdit.updatedModelIndex(modelIndex)
                         paramCameraFocus.updatedModelIndex(modelIndex)
                         paramCameraLxMM.updatedModelIndex(modelIndex)
                         paramCameraLyMM.updatedModelIndex(modelIndex)
@@ -296,20 +309,24 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                    Label {
-                        Layout.fillWidth:   true
-                        text: qsTr("Camera Model")
-                    }
-                    ComboBox {
-                        id: paramCameraModelName
-                        Layout.fillWidth:   true
-                        model: camerasModel
-                        textRole: "name"
-                        onCurrentIndexChanged: {
-                            camerasView.modelIndex = currentIndex
+                    RowLayout {
+                        spacing: 5
+                        Layout.margins: 10
+
+                        Label {
+                            Layout.fillWidth:   true
+                            text: qsTr("Camera Model")
                         }
-                        onCurrentTextChanged: {
-                            photoPlanner.cameraModel = currentText;
+                        TextField {
+                            id: paramCameraModelNameEdit
+                            Layout.fillWidth:   true
+                            signal updatedModelIndex(int newIndex)
+                            onUpdatedModelIndex: {
+                                text = camerasModel.get(newIndex).name
+                            }
+                            onEditingFinished: {
+                                camerasModel.get(camerasView.modelIndex).name=text
+                            }
                         }
                     }
 
@@ -411,6 +428,7 @@ Rectangle {
                         modelIndex = 0
                     }
                     onModelIndexChanged: {
+                        paramUavModelNameEdit.updatedModelIndex(modelIndex)
                         paramUavTime.updatedModelIndex(modelIndex)
                         paramUavComm.updatedModelIndex(modelIndex)
                         paramUavSpeed.updatedModelIndex(modelIndex)
@@ -427,17 +445,24 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
-                    Label {
-                        Layout.fillWidth:   true
-                        text: qsTr("UAV Model")
-                    }
-                    ComboBox {
-                        id: paramUavModelName
-                        Layout.fillWidth:   true
-                        model: uavsModel
-                        textRole: "name"
-                        onCurrentIndexChanged: {
-                            uavsView.modelIndex = currentIndex
+                    RowLayout {
+                        spacing: 5
+                        Layout.margins: 10
+
+                        Label {
+                            Layout.fillWidth:   true
+                            text: qsTr("UAV Model")
+                        }
+                        TextField {
+                            id: paramUavModelNameEdit
+                            Layout.fillWidth:   true
+                            signal updatedModelIndex(int newIndex)
+                            onUpdatedModelIndex: {
+                                text = uavsModel.get(newIndex).name
+                            }
+                            onEditingFinished: {
+                                uavsModel.get(uavsView.modelIndex).name=text
+                            }
                         }
                     }
 
