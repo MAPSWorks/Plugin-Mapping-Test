@@ -8,7 +8,7 @@
 
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
 {
-    m_cameraModel           = "Sony S600";
+    m_cameraModelName           = "Sony S600";
     m_focusRange            = 35;
     m_longitOverlap         = 20;
     m_transverseOverlap     = 20;
@@ -40,17 +40,29 @@ qreal PhotoPlan::calcUavMaxRollOnManeuverR() {
     return aero_photo::R2D(uavModel.CalcUavMaxRollOnManeuverR(uavManeuverR()));
 }
 
-QString PhotoPlan::cameraModel() const
+QString PhotoPlan::cameraModelName() const
 {
-    return m_cameraModel;
+    return m_cameraModelName;
+}
+void PhotoPlan::setCameraModelName(const QString &value)
+{
+    if(value != m_cameraModelName)
+    {
+        m_cameraModelName = value;
+        emit cameraModelNameChanged();
+    }
 }
 
-void PhotoPlan::setCameraModel(const QString &cameraModel)
+QString PhotoPlan::uavModelName() const
 {
-    if(m_cameraModel != cameraModel)
+    return m_uavModelName;
+}
+void PhotoPlan::setUavModelName(const QString &value)
+{
+    if(value != m_uavModelName)
     {
-        m_cameraModel = cameraModel;
-        emit cameraModelChanged();
+        m_uavModelName = value;
+        emit uavModelNameChanged();
     }
 }
 
@@ -59,11 +71,11 @@ quint32 PhotoPlan::focusRange() const
     return m_focusRange;
 }
 
-void PhotoPlan::setFocusRange(const quint32 &focusRange)
+void PhotoPlan::setFocusRange(const quint32 value)
 {
-    if(m_focusRange != focusRange)
+    if(value != m_focusRange)
     {
-        m_focusRange = focusRange;
+        m_focusRange = value;
         emit focusRangeChanged();
     }
 }
@@ -71,8 +83,8 @@ void PhotoPlan::setFocusRange(const quint32 &focusRange)
 qreal PhotoPlan::cameraLx() const {
     return m_cameraLx;
 }
-void PhotoPlan::setCameraLx(const qreal &value){
-    if(m_cameraLx != value)
+void PhotoPlan::setCameraLx(const qreal value){
+    if(value != m_cameraLx)
     {
         m_cameraLx = value;
         emit cameraLxChanged();
@@ -82,8 +94,8 @@ void PhotoPlan::setCameraLx(const qreal &value){
 qreal PhotoPlan::cameraLy() const {
     return m_cameraLy;
 }
-void PhotoPlan::setCameraLy(const qreal &value) {
-    if(m_cameraLy != value)
+void PhotoPlan::setCameraLy(const qreal value) {
+    if(value != m_cameraLy)
     {
         m_cameraLy = value;
         emit cameraLyChanged();
@@ -93,8 +105,8 @@ void PhotoPlan::setCameraLy(const qreal &value) {
 qreal PhotoPlan::cameraAx() const {
     return m_cameraAx;
 }
-void PhotoPlan::setCameraAx(const qreal &value){
-    if(m_cameraAx != value)
+void PhotoPlan::setCameraAx(const qreal value){
+    if(value != m_cameraAx)
     {
         m_cameraAx = value;
         emit cameraAxChanged();
@@ -104,8 +116,8 @@ void PhotoPlan::setCameraAx(const qreal &value){
 qreal PhotoPlan::cameraAy() const {
     return m_cameraAy;
 }
-void PhotoPlan::setCameraAy(const qreal &value) {
-    if(m_cameraAy != value)
+void PhotoPlan::setCameraAy(const qreal value) {
+    if(value != m_cameraAy)
     {
         m_cameraAy = value;
         emit cameraAyChanged();
@@ -117,11 +129,11 @@ quint32 PhotoPlan::longitOverlap() const
     return m_longitOverlap;
 }
 
-void PhotoPlan::setLongitOverlap(const quint32 &longitOverlap)
+void PhotoPlan::setLongitOverlap(const quint32 value)
 {
-    if(m_longitOverlap != longitOverlap)
+    if(value != m_longitOverlap)
     {
-        m_longitOverlap = longitOverlap;
+        m_longitOverlap = value;
         emit longitOverlapChanged();
     }
 }
@@ -131,11 +143,11 @@ quint32 PhotoPlan::transverseOverlap() const
     return m_transverseOverlap;
 }
 
-void PhotoPlan::setTransverseOverlap(const quint32 &transverseOverlap)
+void PhotoPlan::setTransverseOverlap(const quint32 value)
 {
-    if(m_transverseOverlap != transverseOverlap)
+    if(value != m_transverseOverlap)
     {
-        m_transverseOverlap = transverseOverlap;
+        m_transverseOverlap = value;
         emit transverseOverlapChanged();
     }
 }
@@ -145,11 +157,11 @@ quint32 PhotoPlan::azimuth() const
     return m_azimuth;
 }
 
-void PhotoPlan::setAzimuth(const quint32 &azimuth)
+void PhotoPlan::setAzimuth(const quint32 value)
 {
-    if(m_azimuth != azimuth)
+    if(value != m_azimuth)
     {
-        m_azimuth = azimuth;
+        m_azimuth = value;
         emit azimuthChanged();
     }
 }
@@ -159,11 +171,11 @@ quint32 PhotoPlan::altitude() const
     return m_altitude;
 }
 
-void PhotoPlan::setAltitude(const quint32 &altitude)
+void PhotoPlan::setAltitude(const quint32 value)
 {
-    if(m_altitude != altitude)
+    if(value != m_altitude)
     {
-        m_altitude = altitude;
+        m_altitude = value;
         emit altitudeChanged();
     }
 }
@@ -172,12 +184,11 @@ qreal PhotoPlan::gsd() const
 {
     return m_gsd;
 }
-
-void PhotoPlan::setGsd(const qreal &gsd)
+void PhotoPlan::setGsd(const qreal value)
 {
-    if(m_gsd != gsd)
+    if(value != m_gsd)
     {
-        m_gsd = gsd;
+        m_gsd = value;
         emit gsdChanged();
     }
 }
@@ -186,12 +197,11 @@ quint32 PhotoPlan::speed() const
 {
     return m_speed;
 }
-
-void PhotoPlan::setSpeed(const quint32 &speed)
+void PhotoPlan::setSpeed(const quint32 value)
 {
-    if(m_speed != speed)
+    if(value != m_speed)
     {
-        m_speed = speed;
+        m_speed = value;
         emit speedChanged();
     }
 }
@@ -200,12 +210,11 @@ quint32 PhotoPlan::width() const
 {
     return m_width;
 }
-
-void PhotoPlan::setWidth(const quint32 &width)
+void PhotoPlan::setWidth(const quint32 value)
 {
-    if(m_width != width)
+    if(value != m_width)
     {
-        m_width = width;
+        m_width = value;
         emit widthChanged();
     }
 }
@@ -214,12 +223,11 @@ qreal PhotoPlan::maxRoll() const
 {
     return m_maxRoll;
 }
-
-void PhotoPlan::setMaxRoll(const qreal &maxRoll)
+void PhotoPlan::setMaxRoll(const qreal value)
 {
-    if(m_maxRoll != maxRoll)
+    if(value != m_maxRoll)
     {
-        m_maxRoll = maxRoll;
+        m_maxRoll = value;
         emit maxRollChanged();
     }
 }
@@ -228,8 +236,7 @@ qreal PhotoPlan::uavManeuverR() const
 {
     return m_maneuverR;
 }
-
-void PhotoPlan::setUavManeuverR(const qreal &value)
+void PhotoPlan::setUavManeuverR(const qreal value)
 {
     if(value != m_maneuverR)
     {
@@ -394,15 +401,40 @@ void PhotoPlan::saveFlightPlan(QVariant fileurl)
     }
 }
 
+const char *PhotoPlanSerializationSignature = "PhotoPlannerTrack";
 QVariantList PhotoPlan::loadAoi(QVariant fileurl)
 {
+    m_aoi.clear();
     auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
+    {
+        QFile file(fileurlcvt);
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        in.setVersion(QDataStream::Qt_5_9);
+
+        QString magicString;
+        in >> magicString;
+        if (magicString == PhotoPlanSerializationSignature) {
+            quint32 version;
+            in >> version;
+            if (version == 1) {
+                QString cameraModelName, uavModelName;
+                in >> cameraModelName >> uavModelName;
+                setCameraModelName(cameraModelName);
+                setUavModelName(uavModelName);
+                in >> m_missionType;
+                in >> m_aoi;
+            }
+            return aoi();
+        }
+    }
+
+    // Read outdated format
     QFile file(fileurlcvt);
     file.open(QIODevice::ReadOnly);
     QDataStream in(&file);
-    in >> m_missionType;;
+    in >> m_missionType;
     in >> m_aoi;
-
     return aoi();
 }
 
@@ -421,10 +453,17 @@ void PhotoPlan::saveAoi(QVariant fileurl, QString poiType, QVariantList aoi)
     {
         fileurlcvt.append(".aoi");
     }
+
     QFile file(fileurlcvt);
     file.open(QIODevice::WriteOnly);
     QDataStream out(&file);
+    out.setVersion(QDataStream::Qt_5_9);
 
+    out<<QString("PhotoPlannerTrack");
+    out<<quint32(1);
+
+    out << m_cameraModelName;
+    out << m_uavModelName;
     out << m_missionType;
     out << m_aoi;
 }

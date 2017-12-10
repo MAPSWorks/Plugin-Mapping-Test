@@ -13,7 +13,9 @@
 class PhotoPlan : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString cameraModel READ cameraModel WRITE setCameraModel NOTIFY cameraModelChanged)
+    Q_PROPERTY(QString cameraModelName READ cameraModelName WRITE setCameraModelName NOTIFY cameraModelNameChanged)
+    Q_PROPERTY(QString uavModelName READ uavModelName WRITE setUavModelName NOTIFY uavModelNameChanged)
+
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
     Q_PROPERTY(qreal cameraLx READ cameraLx WRITE setCameraLx NOTIFY cameraLxChanged)
     Q_PROPERTY(qreal cameraLy READ cameraLy WRITE setCameraLy NOTIFY cameraLyChanged)
@@ -57,50 +59,53 @@ public:
     Q_INVOKABLE quint8 getFlightPointType(int index);
     Q_INVOKABLE quint32 getFlightPointCount();
 
-    QString cameraModel() const;
-    void setCameraModel(const QString &cameraModel);
+    QString cameraModelName() const;
+    void setCameraModelName(const QString &value);
+
+    QString uavModelName() const;
+    void setUavModelName(const QString &value);
 
     quint32 focusRange() const;
-    void setFocusRange(const quint32 &focusRange);
+    void setFocusRange(const quint32 value);
 
     qreal cameraLx() const;
-    void setCameraLx(const qreal &value);
+    void setCameraLx(const qreal value);
 
     qreal cameraLy() const;
-    void setCameraLy(const qreal &value);
+    void setCameraLy(const qreal value);
 
     qreal cameraAx() const;
-    void setCameraAx(const qreal &value);
+    void setCameraAx(const qreal value);
 
     qreal cameraAy() const;
-    void setCameraAy(const qreal &value);
+    void setCameraAy(const qreal value);
 
     quint32 longitOverlap() const;
-    void setLongitOverlap(const quint32 &longitOverlap);
+    void setLongitOverlap(const quint32 value);
 
     quint32 transverseOverlap() const;
-    void setTransverseOverlap(const quint32 &transverseOverlap);
+    void setTransverseOverlap(const quint32 value);
 
     quint32 azimuth() const;
-    void setAzimuth(const quint32 &azimuth);
+    void setAzimuth(const quint32 value);
 
     quint32 altitude() const;
-    void setAltitude(const quint32 &altitude);
+    void setAltitude(const quint32 value);
 
     qreal gsd() const;
-    void setGsd(const qreal &gsd);
+    void setGsd(const qreal value);
 
     quint32 speed() const;
-    void setSpeed(const quint32 &speed);
+    void setSpeed(const quint32 value);
 
     quint32 width() const;
-    void setWidth(const quint32 &width);
+    void setWidth(const quint32 value);
 
     qreal maxRoll() const;
-    void setMaxRoll(const qreal &maxRoll);
+    void setMaxRoll(const qreal value);
 
     qreal uavManeuverR() const;
-    void setUavManeuverR(const qreal &value);
+    void setUavManeuverR(const qreal value);
 
     QVariantList track();
 
@@ -115,7 +120,8 @@ public:
 
 signals:
 
-    void cameraModelChanged();
+    void cameraModelNameChanged();
+    void uavModelNameChanged();
     void focusRangeChanged();
     void cameraLxChanged();
     void cameraLyChanged();
@@ -142,7 +148,8 @@ private:
     aero_photo::PhotoUavModel CreatePhotoUavModelFromGui() const;
     aero_photo::PhotoCameraModel CreatePhotoCameraModelFromGui() const;
 
-    QString m_cameraModel;
+    QString m_cameraModelName;
+    QString m_uavModelName;
     quint32 m_focusRange;
     qreal m_cameraLx;
     qreal m_cameraLy;
