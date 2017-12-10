@@ -23,10 +23,10 @@ public:
         , maxRollDeg_(maxRollDeg)
         , commRadiusKm_(commRadiusKm)
     {
-
     }
 
     QString name() const { return name_; }
+    void setName(const QVariant &value) { setName(value.toString()); }
     void setName(const QString &value) {
         if (value != name_) {
             name_ = value;
@@ -35,6 +35,7 @@ public:
     }
 
     qint32 flightTimeMinutes() const { return flightTimeMinutes_; }
+    void setFlightTimeMinutes(const QVariant &value) { setFlightTimeMinutes(value.toUInt()); }
     void setFlightTimeMinutes(const qint32 value) {
         if (value != flightTimeMinutes_) {
             flightTimeMinutes_ = value;
@@ -43,6 +44,7 @@ public:
     }
 
     qint32 flightSpeedMPerS() const { return flightSpeedMPerS_; }
+    void setFlightSpeedMPerS(const QVariant &value) { setFlightSpeedMPerS(value.toUInt()); }
     void setFlightSpeedMPerS(const qint32 value) {
         if (value != flightSpeedMPerS_) {
             flightSpeedMPerS_ = value;
@@ -51,6 +53,7 @@ public:
     }
 
     qreal maxRollDeg() const { return maxRollDeg_; }
+    void setMaxRollDeg(const QVariant &value) { setMaxRollDeg(value.toReal()); }
     void setMaxRollDeg(const qreal value) {
         if (value != maxRollDeg_) {
             maxRollDeg_ = value;
@@ -59,6 +62,7 @@ public:
     }
 
     qint32 commRadiusKm() const { return commRadiusKm_; }
+    void setCommRadiusKm(const QVariant &value) { setCommRadiusKm(value.toUInt()); }
     void setCommRadiusKm(const qint32 value) {
         if (value != commRadiusKm_) {
             commRadiusKm_ = value;
@@ -79,7 +83,6 @@ public:
                << commRadiusKm_;
         return stream;
     }
-
 
 signals:
     void nameChanged();
@@ -134,6 +137,26 @@ class QUavsModel : public QDataItemsModel<QUavData> {
           }
       }
 
+      bool setData(const QModelIndex &index, const QVariant &value, int role) {
+          if (index.row() < 0 || index.row() >= dataitems_.count())
+              return false;
+
+          auto &&uavdata = dataitems_[index.row()];
+          switch(role) {
+              case Name: uavdata->setName(value); break;
+              case FlightTimeMinutes: uavdata->setFlightTimeMinutes(value); break;
+              case FlightSpeedMPerS: uavdata->setFlightSpeedMPerS(value); break;
+              case MaxRollDeg: uavdata->setMaxRollDeg(value); break;
+              case CommRadiusKm: uavdata->setCommRadiusKm(value); break;
+              default:
+                  return false;
+          }
+
+          emit dataChanged(index, index);
+          return true;
+      }
+
+
       QHash<int, QByteArray> roleNames() const {
           QHash<int, QByteArray> roles;
           roles[Name] = "name";
@@ -143,6 +166,16 @@ class QUavsModel : public QDataItemsModel<QUavData> {
           roles[CommRadiusKm] = "commRadiusKm";
           return roles;
       }
+
+    public slots:
+      void OnNameChanged() {
+          auto uavData = static_cast<QUavData *>(sender());
+          int index = dataitems_.indexOf(uavData);
+
+          auto modelIndex = createIndex(index, index);
+          emit dataChanged(modelIndex, modelIndex);
+      }
+
 };
 
 inline QDataStream &operator<<(QDataStream &stream, const QUavsModel &dataitemsModel) {
