@@ -8,6 +8,7 @@ GridLayout {
     property real value: 0
     property real from: 0
     property real to: 100
+    property real stepSize: 5
     property bool visibleSlider: true
     rowSpacing: 1
     columnSpacing: 5
@@ -40,7 +41,7 @@ GridLayout {
         from: parent.from
         to: parent.to
         value: parent.value
-        stepSize: 1
+        stepSize: parent.stepSize
     }
 
     Connections {

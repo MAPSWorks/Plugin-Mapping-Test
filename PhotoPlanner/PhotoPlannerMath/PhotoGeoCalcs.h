@@ -42,38 +42,25 @@ public:
 
 class RunStartPointsCalc {
 public:
-    RunStartPointsCalc(const GeoPoint &centerSidePoint, qreal azimuth, qreal Lyp, size_t totalRuns)
-        : topLeftPoint_(CalculateTopLeftPoint(centerSidePoint, azimuth, Lyp, totalRuns))
-        , startPointsAzimuth_(azimuth + 90)
+    RunStartPointsCalc(qreal enterAzimuth, const GeoPoint &baseRunPoint, qreal runAzimuth, qreal Lyp, size_t totalRuns)
+        : basePoint_(baseRunPoint)
+        , startPointsAzimuth_(runAzimuth + 90 + (runAzimuth - enterAzimuth)/2)
         , Lyp_(Lyp)
-        , totalRuns_(totalRuns) {
-        //        assert(totalRuns_!=0);
-    }
-    RunStartPointsCalc(const GeoPoint &centerSidePoint, const GeoPoint &azimuthPoint, qreal Lyp, size_t totalRuns)
-        : RunStartPointsCalc(centerSidePoint, centerSidePoint.azimuthTo(azimuthPoint), Lyp, totalRuns ) {
+        , indexOffset_(totalRuns / 2 - totalRuns + 1)
+    {
     }
 
-    GeoPoint Calculate(size_t runIndex) {
+    GeoPoint Calculate(int index, qreal offset = 0) {
         // Indexes from left to right in azimuth direction
-        auto startPoint = topLeftPoint_;
-        if(runIndex < totalRuns_) {
-            startPoint = topLeftPoint_.atDistanceAndAzimuth(Lyp_ * runIndex, startPointsAzimuth_);
-        }
+        auto startPoint = basePoint_.atDistanceAndAzimuth(Lyp_ * (indexOffset_+ index) + offset, startPointsAzimuth_);
         return startPoint;
     }
 
 private:
-    static GeoPoint CalculateTopLeftPoint(const GeoPoint &trackPoint, qreal azimuth, qreal Lyp, size_t totalRuns) {
-        if (totalRuns < 2)
-            return trackPoint;
-        auto baseSize = Lyp * (totalRuns - 1);
-        return trackPoint.atDistanceAndAzimuth(baseSize / 2, azimuth - 90);
-    }
-
-    const GeoPoint topLeftPoint_;
-    const qreal startPointsAzimuth_;
+    const GeoPoint basePoint_;
+    const Azimuth startPointsAzimuth_;
     const qreal Lyp_;
-    const size_t totalRuns_;
+    const int indexOffset_;
 };
 
 class CartesianCalcs {

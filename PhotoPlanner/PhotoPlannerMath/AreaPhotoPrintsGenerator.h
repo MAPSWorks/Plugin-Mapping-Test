@@ -123,7 +123,7 @@ class AreaPhotoPrintsGenerator {
             GeoPointsGrid geoPointsGrid(totalRuns, azimuth);
             auto centerPoint = GetCenter();
             centerPoint.setAltitude(h);
-            RunStartPointsCalc middlePointsCalc(centerPoint, azimuth, Lyp, totalRuns);
+            RunStartPointsCalc middlePointsCalc(azimuth, centerPoint, azimuth, Lyp, totalRuns);
             for (size_t i = 0; i < totalRuns; ++i) {
                 auto middlePoint = middlePointsCalc.Calculate(i);
                 const auto runAzimuth = azimuth ; // + 180 * ( i % 2 );

@@ -24,6 +24,18 @@ private slots:
         QCOMPARE(sqrt(25), double(5));
     }
 
+    void test_basic_geo() {
+        using namespace aero_photo;
+
+        GeoCalc geoCalc;
+        GeoPoint pntStart(0, 0);
+        GeoPoint pntDown1 = geoCalc.AtDistanceAndAzimuth(pntStart, 1000, 180);
+        GeoPoint pntDown2 = geoCalc.AtDistanceAndAzimuth(pntStart, -1000, 0);
+        QVERIFY(fabs(geoCalc.Distance(pntDown1, pntStart) - 1000) < 1);
+        QVERIFY(fabs(geoCalc.Distance(pntDown2, pntStart) - 1000) < 1);
+        QVERIFY(fabs(geoCalc.Distance(pntDown1, pntDown2)) < 1);
+    }
+
     void test_Array2D() {
         using namespace aero_photo;
 
@@ -139,6 +151,27 @@ private slots:
         QCOMPARE( aero_photo::D2R(180), M_PI);
         QCOMPARE( aero_photo::R2D(0), 0.0);
         QCOMPARE( aero_photo::R2D(M_PI), 180.0);
+
+//        auto generator1 = aero_photo::RunStartPointsCalc::GetIndexToRunIdsFunction(1);
+//        QCOMPARE( generator1(0),  0);
+
+//        auto generator2 = aero_photo::RunStartPointsCalc::GetIndexToRunIdsFunction(2);
+//        QCOMPARE( generator2(0),  0);
+//        QCOMPARE( generator2(1),  1);
+
+
+//        auto generator3 = aero_photo::RunStartPointsCalc::GetIndexToRunIdsFunction(3);
+//        QCOMPARE( generator3(0),  -1);
+//        QCOMPARE( generator3(1),  0);
+//        QCOMPARE( generator3(2),  1);
+
+//        auto generator6 = aero_photo::RunStartPointsCalc::GetIndexToRunIdsFunction(6);
+//        QCOMPARE( generator6(0),  -2);
+//        QCOMPARE( generator6(5),  3);
+
+//        auto generator11 = aero_photo::RunStartPointsCalc::GetIndexToRunIdsFunction(11);
+//        QCOMPARE( generator11(5), 0);
+
 
 //        using namespace aero_photo;
 

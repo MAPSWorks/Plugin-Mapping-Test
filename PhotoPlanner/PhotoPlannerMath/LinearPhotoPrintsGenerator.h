@@ -31,8 +31,9 @@ public:
       auto pntB = trackTail_[trackIndex];
       GeoCalc geoCalc;
       const auto distance = geoCalc.RoundUpPoints(pntA, pntB, Lxp);
-      RunStartPointsCalc pointsA(pntA, pntB, Lyp, totalRuns);
-      RunStartPointsCalc pointsB(pntB, geoCalc.Azimuth(pntA, pntB), Lyp, totalRuns);
+      const auto azimuth = geoCalc.Azimuth(pntA, pntB);
+      RunStartPointsCalc pointsA(azimuth, pntA, azimuth, Lyp, totalRuns);
+      RunStartPointsCalc pointsB(azimuth, pntB, azimuth, Lyp, totalRuns);
       for (size_t runIndex = 0; runIndex < totalRuns; runIndex++) {
         auto startPointAB = pointsA.Calculate(runIndex);
         auto finishPointAB = pointsB.Calculate(runIndex);
