@@ -27,5 +27,6 @@
         <file>qml/TrackMarker.qml</file>
         <file>qml/PhotoPlannerParam.qml</file>
         <file>qml/PhotoPlannerParamForm.ui.qml</file>
+        <file>qml/PhotoPlannerParamSeparator.qml</file>
     </qresource>
 </RCC>

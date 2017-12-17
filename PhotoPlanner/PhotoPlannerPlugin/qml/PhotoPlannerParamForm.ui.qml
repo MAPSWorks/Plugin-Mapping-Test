@@ -9,8 +9,10 @@ GridLayout {
     property real from: 0
     property real to: 100
     property bool visibleSlider: true
+    rowSpacing: 1
     columnSpacing: 5
-    Layout.margins: 10
+    Layout.topMargin: 3
+    Layout.bottomMargin: 3
 
     rows: 2
     columns: 2
@@ -31,6 +33,7 @@ GridLayout {
 
     Slider {
         id: slider
+        padding: 0
         visible: parent.visibleSlider
         Layout.fillWidth: true
         Layout.columnSpan: 2

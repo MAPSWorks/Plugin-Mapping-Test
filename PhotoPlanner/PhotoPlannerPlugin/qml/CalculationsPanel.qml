@@ -77,6 +77,8 @@ Rectangle {
 
         SwipeView {
             id: swipeView
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -95,9 +97,11 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
+                    PhotoPlannerParamSeparator {
+                    }
+
                     RowLayout {
                         spacing: 5
-                        Layout.margins: 10
 
                         Label {
                             Layout.fillWidth:   true
@@ -119,7 +123,6 @@ Rectangle {
 
                     RowLayout {
                         spacing: 5
-                        Layout.margins: 10
 
                         Label {
                             Layout.fillWidth:   true
@@ -137,6 +140,9 @@ Rectangle {
                                 photoPlanner.cameraModelName = currentText;
                             }
                         }
+                    }
+
+                    PhotoPlannerParamSeparator {
                     }
 
                     PhotoPlannerParamForm {
@@ -176,6 +182,10 @@ Rectangle {
                             photoPlanner.gsd = value / 100
                             calculateAltitude()
                         }
+                    }
+
+                    PhotoPlannerParamSeparator {
+                        visible: map.missionType == "Area" || map.missionType == "Linear"
                     }
 
                     PhotoPlannerParamForm {
@@ -327,9 +337,10 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
+                    PhotoPlannerParamSeparator {  }
+
                     RowLayout {
                         spacing: 5
-                        Layout.margins: 10
 
                         Label {
                             Layout.fillWidth:   true
@@ -463,9 +474,11 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
+                    PhotoPlannerParamSeparator {
+                    }
+
                     RowLayout {
                         spacing: 5
-                        Layout.margins: 10
 
                         Label {
                             Layout.fillWidth:   true
@@ -593,8 +606,10 @@ Rectangle {
                         horizontalAlignment: Text.AlignHCenter
                     }
 
+                    PhotoPlannerParamSeparator {
+                    }
+
                     Label {
-                        Layout.margins: 10
                         text: qsTr("Choose map view type")
                     }
 
@@ -610,8 +625,7 @@ Rectangle {
                         }
                     }
 
-                    Item {
-                        height: 10
+                    PhotoPlannerParamSeparator {
                     }
 
                     CheckBox {
