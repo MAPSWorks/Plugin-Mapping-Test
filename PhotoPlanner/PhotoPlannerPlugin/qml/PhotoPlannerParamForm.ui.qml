@@ -8,12 +8,14 @@ GridLayout {
     property real value: 0
     property real from: 0
     property real to: 100
-    property real stepSize: 5
+    property real stepSize: 1
     property bool visibleSlider: true
     rowSpacing: 1
     columnSpacing: 5
     Layout.topMargin: 3
     Layout.bottomMargin: 3
+
+    signal valueChangedByUser()
 
     rows: 2
     columns: 2
@@ -49,6 +51,7 @@ GridLayout {
         onMoved: {
             var val = slider.value.toFixed(0)
             thisParam.value = val
+            valueChangedByUser()
         }
     }
 
@@ -60,6 +63,7 @@ GridLayout {
             val = Math.max(val, thisParam.from)
             if (thisParam.value != val)
                 thisParam.value = val
+            valueChangedByUser()
         }
     }
 }

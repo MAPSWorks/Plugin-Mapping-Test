@@ -12,6 +12,11 @@ Rectangle {
     signal calculateUavR()
     signal calculateUavRoll()
 
+    signal updatePhotoPlanParams()
+    signal calculateWidth()
+    signal calculateRuns()
+
+
     Connections {
         target: photoPlanner
         onCameraModelNameChanged: {
@@ -35,6 +40,7 @@ Rectangle {
         isInitialized = true
         calculateGsd()
         calculateUavR()
+        calculateRuns()
     }
 
     property bool isCalculateGsd: false
@@ -68,6 +74,44 @@ Rectangle {
             isCalculateUavRoll = true
             paramUavRoll.value = photoPlanner.calcUavMaxRollOnManeuverR().toFixed(2)
             isCalculateUavRoll = false
+        }
+    }
+
+    property bool isLinearPhotoWidthFixed: true
+    onIsLinearPhotoWidthFixedChanged: {
+        isLinearPhotoRunsFixed = !isLinearPhotoWidthFixed
+    }
+    property bool isLinearPhotoRunsFixed: false
+    onIsLinearPhotoRunsFixedChanged: {
+        isLinearPhotoWidthFixed = !isLinearPhotoRunsFixed;
+    }
+
+    onUpdatePhotoPlanParams: {
+        if (map.missionType == "Linear") {
+            if (isLinearPhotoWidthFixed) {
+                calculateRuns()
+            }
+            else {
+                calculateWidth()
+            }
+        }
+    }
+
+    property bool isCalculatingWidth: false
+    onCalculateWidth: {
+        if (isInitialized && !isCalculatingRuns) {
+            isCalculatingWidth = true
+            paramCalcWidth.value = photoPlanner.calcPhotoPlanWidth()
+            isCalculatingWidth = false
+        }
+    }
+
+    property bool isCalculatingRuns: false
+    onCalculateRuns: {
+        if (isInitialized && !isCalculatingWidth) {
+            isCalculatingRuns = true;
+            paramCalcRuns.value = photoPlanner.calcPhotoPlanRuns()
+            isCalculatingRuns = false;
         }
     }
 
@@ -150,7 +194,10 @@ Rectangle {
                         from: 0
                         to: 95
                         value: photoPlanner.longitOverlap
-                        onValueChanged: { photoPlanner.longitOverlap = value }
+                        onValueChanged: {
+                            photoPlanner.longitOverlap = value
+                            updatePhotoPlanParams()
+                        }
                     }
 
                     PhotoPlannerParamForm {
@@ -158,7 +205,10 @@ Rectangle {
                         from: 0
                         to: 95
                         value: photoPlanner.transverseOverlap
-                        onValueChanged: { photoPlanner.transverseOverlap = value }
+                        onValueChanged: {
+                            photoPlanner.transverseOverlap = value
+                            updatePhotoPlanParams()
+                        }
                     }
 
                     PhotoPlannerParamForm {
@@ -170,6 +220,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.altitude = value
                             photoPlannerParamsView.calculateGsd()
+                            updatePhotoPlanParams()
                         }
                     }
 
@@ -181,6 +232,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.gsd = value / 100
                             calculateAltitude()
+                            updatePhotoPlanParams()
                         }
                     }
 
@@ -197,15 +249,41 @@ Rectangle {
                         onValueChanged: { photoPlanner.azimuth = value }
                     }
 
-                    PhotoPlannerParamForm {
+                    RowLayout {
                         visible: map.missionType == "Linear"
-                        name: qsTr("Width, m")
-                        from: 1
-                        to: 1000
-                        value: photoPlanner.width
-                        onValueChanged: { photoPlanner.width = value }
-                    }
 
+                        ColumnLayout {
+                            PhotoPlannerParamForm {
+                                id: paramCalcWidth
+                                name: qsTr("Width, m")
+                                from: 1
+                                to: 1000
+                                value: photoPlanner.linearWidth
+                                onValueChanged: {
+                                    photoPlanner.linearWidth = value
+                                    calculateRuns()
+                                }
+                                onValueChangedByUser: {
+                                    isLinearPhotoWidthFixed = true
+                                }
+                            }
+
+                            PhotoPlannerParamForm {
+                                id: paramCalcRuns
+                                name: qsTr("Runs")
+                                from: 1
+                                to: 10
+                                value: photoPlanner.linearRuns
+                                onValueChanged: {
+                                    photoPlanner.linearRuns = value
+                                    calculateWidth()
+                                }
+                                onValueChangedByUser: {
+                                    isLinearPhotoRunsFixed = true
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -328,6 +406,7 @@ Rectangle {
                         paramCameraAy.updatedModelIndex(modelIndex)
                         prevModelIndex = modelIndex
                         photoPlannerParamsView.calculateGsd()
+                        updatePhotoPlanParams()
                     }
 
                     Label {

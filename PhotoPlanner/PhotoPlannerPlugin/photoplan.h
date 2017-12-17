@@ -27,9 +27,11 @@ class PhotoPlan : public QObject
     Q_PROPERTY(quint32 altitude READ altitude WRITE setAltitude NOTIFY altitudeChanged)
     Q_PROPERTY(qreal gsd READ gsd WRITE setGsd NOTIFY gsdChanged)
     Q_PROPERTY(quint32 speed READ speed WRITE setSpeed NOTIFY speedChanged)
-    Q_PROPERTY(quint32 width READ width WRITE setWidth NOTIFY widthChanged)
     Q_PROPERTY(qreal maxRoll READ maxRoll WRITE setMaxRoll NOTIFY maxRollChanged)
     Q_PROPERTY(qreal uavManeuverR READ uavManeuverR WRITE setUavManeuverR NOTIFY uavManeuverRChanged)
+
+    Q_PROPERTY(quint32 linearWidth READ linearWidth WRITE setLinearWidth NOTIFY linearWidthChanged)
+    Q_PROPERTY(quint32 linearRuns READ linearRuns WRITE setLinearRuns NOTIFY linearRunsChanged)
 
     Q_PROPERTY(QVariantList track READ track NOTIFY trackChanged)
     Q_PROPERTY(QVariantList photoCenters READ photoCenters NOTIFY photoCentersChanged)
@@ -41,6 +43,9 @@ class PhotoPlan : public QObject
 
 public:
     explicit PhotoPlan(QObject *parent = nullptr);
+
+    Q_INVOKABLE quint32 calcPhotoPlanRuns();
+    Q_INVOKABLE quint32 calcPhotoPlanWidth();
 
     Q_INVOKABLE qreal calcPhotoParamGsdOnAltitude();
     Q_INVOKABLE qreal calcPhotoParamAltitudeOnGsd();
@@ -98,8 +103,11 @@ public:
     quint32 speed() const;
     void setSpeed(const quint32 value);
 
-    quint32 width() const;
-    void setWidth(const quint32 value);
+    quint32 linearWidth() const;
+    void setLinearWidth(const quint32 value);
+
+    quint32 linearRuns() const;
+    void setLinearRuns(const quint32 value);
 
     qreal maxRoll() const;
     void setMaxRoll(const qreal value);
@@ -133,7 +141,8 @@ signals:
     void altitudeChanged();
     void gsdChanged();
     void speedChanged();
-    void widthChanged();
+    void linearWidthChanged();
+    void linearRunsChanged();
     void maxRollChanged();
     void uavManeuverRChanged();
     void trackChanged();
@@ -161,9 +170,12 @@ private:
     quint32 m_altitude;
     qreal m_gsd;
     quint32 m_speed;
-    quint32 m_width;
     qreal m_maxRoll;
     qreal m_maneuverR;
+
+    quint32 m_linearWidth = 100;
+    quint32 m_linearRuns = 1;
+
 
     QVector<QGeoCoordinate> m_photoCenters;
     QVector<QGeoCoordinate> m_sourceTrack;

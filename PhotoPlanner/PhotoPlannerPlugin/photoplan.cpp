@@ -16,8 +16,19 @@ PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
     m_altitude              = 100;
     m_gsd                   = 150;
     m_speed                 = 40;
-    m_width                 = 100;
     m_maxRoll               = 30;
+}
+
+quint32 PhotoPlan::calcPhotoPlanRuns()
+{
+    auto photoModel = CreatePhotoCameraModelFromGui();
+    return photoModel.CalcLinearRuns(altitude(), longitOverlap(), transverseOverlap(), linearWidth());
+}
+
+quint32 PhotoPlan::calcPhotoPlanWidth()
+{
+    auto photoModel = CreatePhotoCameraModelFromGui();
+    return photoModel.CalcLinearWidth(altitude(), longitOverlap(), transverseOverlap(), linearRuns());
 }
 
 qreal PhotoPlan::calcPhotoParamGsdOnAltitude() {
@@ -206,16 +217,29 @@ void PhotoPlan::setSpeed(const quint32 value)
     }
 }
 
-quint32 PhotoPlan::width() const
+quint32 PhotoPlan::linearWidth() const
 {
-    return m_width;
+    return m_linearWidth;
 }
-void PhotoPlan::setWidth(const quint32 value)
+void PhotoPlan::setLinearWidth(const quint32 value)
 {
-    if(value != m_width)
+    if(value != m_linearWidth)
     {
-        m_width = value;
-        emit widthChanged();
+        m_linearWidth = value;
+        emit linearWidthChanged();
+    }
+}
+
+quint32 PhotoPlan::linearRuns() const
+{
+    return m_linearRuns;
+}
+void PhotoPlan::setLinearRuns(const quint32 value)
+{
+    if(value != m_linearRuns)
+    {
+        m_linearRuns = value;
+        emit linearRunsChanged();
     }
 }
 
@@ -339,13 +363,11 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
         return;
     }
 
-//    PhotoUavModel uavModel(60, D2R(30));
     auto uavModel = CreatePhotoUavModelFromGui();
-//    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
     auto photoCameraModel = CreatePhotoCameraModelFromGui();
     LinearPhotoRegion region(pathAoI);
     m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
-    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), width());
+    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), linearWidth());
 
     UpdatePhotoPlannerDraw();
 }

@@ -29,6 +29,19 @@ public:
         return gsd * f_ / CalcDpi();
     }
 
+    double CalcLinearWidth(double h, double Px, double Py, int totalRuns) const {
+        double Bx, By;
+        CalcBxBy(h, Px, Py, Bx, By);
+        return totalRuns * By + 1;
+    }
+
+    double CalcLinearRuns(double h, double Px, double Py, int width) const {
+        double Bx, By;
+        CalcBxBy(h, Px, Py, Bx, By);
+        auto totalRuns = ceil(width/By);
+        return totalRuns;
+    }
+
 private:
     inline double CalcM(double h) const {
         return h/f_;
