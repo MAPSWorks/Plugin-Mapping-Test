@@ -32,7 +32,7 @@ public:
     double CalcLinearWidth(double h, double Px, double Py, int totalRuns) const {
         double Bx, By;
         CalcBxBy(h, Px, Py, Bx, By);
-        return totalRuns * By + 1;
+        return totalRuns * By - 1;
     }
 
     double CalcLinearRuns(double h, double Px, double Py, int width) const {
