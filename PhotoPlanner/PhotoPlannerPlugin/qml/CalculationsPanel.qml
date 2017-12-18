@@ -7,15 +7,18 @@ import QtQuick.Dialogs 1.2
 Rectangle {
     id: photoPlannerParamsView
 
+
+    signal updatePhotoPlanAltitudeAndGsd()
     signal calculateGsd()
     signal calculateAltitude()
-    signal calculateUavR()
-    signal calculateUavRoll()
 
-    signal updatePhotoPlanParams()
+    signal updatePhotoPlanWidthAndRuns()
     signal calculateWidth()
     signal calculateRuns()
 
+    signal updateUavRAndRoll()
+    signal calculateUavR()
+    signal calculateUavRoll()
 
     Connections {
         target: photoPlanner
@@ -38,42 +41,77 @@ Rectangle {
     property bool isInitialized: false
     Component.onCompleted: {
         isInitialized = true
-        calculateGsd()
-        calculateUavR()
-        calculateRuns()
+        updatePhotoPlanAltitudeAndGsd()
+        updatePhotoPlanWidthAndRuns()
+        updateUavRAndRoll()
     }
 
-    property bool isCalculateGsd: false
+    property bool isPhotoGsdFixed: false
+    onIsPhotoGsdFixedChanged: {
+        isPhotoAltitudeFixed = !isPhotoGsdFixed
+    }
+    property bool isPhotoAltitudeFixed: true
+    onIsPhotoAltitudeFixedChanged: {
+        isPhotoGsdFixed = !isPhotoAltitudeFixed;
+    }
+    onUpdatePhotoPlanAltitudeAndGsd: {
+        if (isPhotoAltitudeFixed) {
+            calculateGsd()
+        } else {
+            calculateAltitude()
+        }
+    }
+
+    property bool isCalculatingGsd: false
     onCalculateGsd: {
-        if (isInitialized && !isCalculateAltitude) {
-            isCalculateGsd = true
+        if (isInitialized && !isCalculatingAltitude) {
+            isCalculatingGsd = true
             paramCalcGsd.value = (photoPlanner.calcPhotoParamGsdOnAltitude() * 100).toFixed(2)
-            isCalculateGsd = false
+            isCalculatingGsd = false
+            updatePhotoPlanWidthAndRuns()
         }
     }
-    property bool isCalculateAltitude: false
+    property bool isCalculatingAltitude: false
     onCalculateAltitude: {
-        if (isInitialized && !isCalculateGsd) {
-            isCalculateAltitude = true
+        if (isInitialized && !isCalculatingGsd) {
+            isCalculatingAltitude = true
             paramCalcAltitude.value = photoPlanner.calcPhotoParamAltitudeOnGsd().toFixed()
-            isCalculateAltitude = false
+            isCalculatingAltitude = false
+            updatePhotoPlanWidthAndRuns()
         }
     }
 
-    property bool isCalculateUavR: false
-    onCalculateUavR: {
-        if (isInitialized && !isCalculateUavRoll) {
-            isCalculateUavR = true
-            paramUavR.value = photoPlanner.calcUavManeuverROnMaxRoll().toFixed(2)
-            isCalculateUavR = false
+
+    property bool isUavRFixed: true
+    onIsUavRFixedChanged: {
+        isUavRollFixed = !isUavRFixed
+    }
+    property bool isUavRollFixed: false
+    onIsUavRollFixedChanged: {
+        isUavRFixed = !isUavRollFixed
+    }
+    onUpdateUavRAndRoll: {
+        if (isUavRFixed) {
+            calculateUavRoll()
+        } else {
+            calculateUavR()
         }
     }
-    property bool isCalculateUavRoll: false
+
+    property bool isCalculatingUavR: false
+    onCalculateUavR: {
+        if (isInitialized && !isCalculatingUavRoll) {
+            isCalculatingUavR = true
+            paramUavR.value = photoPlanner.calcUavManeuverROnMaxRoll().toFixed(2)
+            isCalculatingUavR = false
+        }
+    }
+    property bool isCalculatingUavRoll: false
     onCalculateUavRoll: {
-        if (isInitialized && !isCalculateUavR) {
-            isCalculateUavRoll = true
+        if (isInitialized && !isCalculatingUavR) {
+            isCalculatingUavRoll = true
             paramUavRoll.value = photoPlanner.calcUavMaxRollOnManeuverR().toFixed(2)
-            isCalculateUavRoll = false
+            isCalculatingUavRoll = false
         }
     }
 
@@ -86,7 +124,7 @@ Rectangle {
         isLinearPhotoWidthFixed = !isLinearPhotoRunsFixed;
     }
 
-    onUpdatePhotoPlanParams: {
+    onUpdatePhotoPlanWidthAndRuns: {
         if (map.missionType == "Linear") {
             if (isLinearPhotoWidthFixed) {
                 calculateRuns()
@@ -196,7 +234,7 @@ Rectangle {
                         value: photoPlanner.longitOverlap
                         onValueChanged: {
                             photoPlanner.longitOverlap = value
-                            updatePhotoPlanParams()
+                            updatePhotoPlanWidthAndRuns()
                         }
                     }
 
@@ -207,7 +245,7 @@ Rectangle {
                         value: photoPlanner.transverseOverlap
                         onValueChanged: {
                             photoPlanner.transverseOverlap = value
-                            updatePhotoPlanParams()
+                            updatePhotoPlanWidthAndRuns()
                         }
                     }
 
@@ -220,7 +258,9 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.altitude = value
                             photoPlannerParamsView.calculateGsd()
-                            updatePhotoPlanParams()
+                        }
+                        onValueChangedByUser: {
+                            isPhotoAltitudeFixed = true
                         }
                     }
 
@@ -232,7 +272,9 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.gsd = value / 100
                             calculateAltitude()
-                            updatePhotoPlanParams()
+                        }
+                        onValueChangedByUser: {
+                            isPhotoGsdFixed = true
                         }
                     }
 
@@ -405,8 +447,7 @@ Rectangle {
                         paramCameraAx.updatedModelIndex(modelIndex)
                         paramCameraAy.updatedModelIndex(modelIndex)
                         prevModelIndex = modelIndex
-                        photoPlannerParamsView.calculateGsd()
-                        updatePhotoPlanParams()
+                        photoPlannerParamsView.updatePhotoPlanAltitudeAndGsd()
                     }
 
                     Label {
@@ -543,7 +584,7 @@ Rectangle {
                         paramUavRoll.updatedModelIndex(modelIndex)
                         paramUavR.updatedModelIndex(modelIndex)
                         prevModelIndex = modelIndex
-                        calculateUavR()
+                        updateUavRAndRoll()
                     }
 
                     Label {
@@ -606,7 +647,7 @@ Rectangle {
                             photoPlanner.speed = value;
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
                                 uavsModel.get(uavsView.modelIndex).flightSpeedMPerS = value
-                            calculateUavR()
+                            updateUavRAndRoll()
                         }
                     }
 
@@ -642,6 +683,9 @@ Rectangle {
                                 uavsModel.get(uavsView.modelIndex).maxRollDeg, value
                             calculateUavR()
                         }
+                        onValueChangedByUser: {
+                            isUavRollFixed = true;
+                        }
                     }
 
                     PhotoPlannerParamForm {
@@ -654,6 +698,9 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.uavManeuverR = value
                             calculateUavRoll()
+                        }
+                        onValueChangedByUser: {
+                            isUavRFixed = true;
                         }
                     }
                 }
