@@ -223,10 +223,12 @@ Map {
         map.track.path = photoPlanner.track; //map.areaPoI.path //photoPlanner.track;
         addTrackMarkers();
 
-        var pathLength = 0;
-        for(var i =0; i < map.track.pathLength() -1; i++)
+        var pathLength = 0; var fromPoint = map.track.coordinateAt(0);
+        for(var i = 1; i < map.track.pathLength(); i++)
         {
-            pathLength+=map.track.path[i].distanceTo(map.track.path[i+1]);
+            var toPoint = map.track.coordinateAt(i);
+            pathLength += fromPoint.distanceTo(toPoint);
+            fromPoint = toPoint;
         }
 
         if (photoPrintsVisible)
@@ -234,7 +236,7 @@ Map {
 
         resultsDlg.flightPathLength.text = (pathLength/1000+0.5).toFixed(1);
         resultsDlg.flightSpeed.text = photoPlanner.speed;
-        resultsDlg.flightTime.text = (pathLength*60/(1000*photoPlanner.speed)+0.5).toFixed(0);
+        resultsDlg.flightTime.text = (pathLength/photoPlanner.speed/60+0.5).toFixed(0);
         resultsDlg.picturesCount.text = photoPlanner.photoCenters.length;
         resultsDlg.open();
     }
@@ -520,34 +522,29 @@ Map {
                 }
                 Text {
                    id: flightPathLength;
-                   text: qsTr("20")
                 }
                 Text {
-                   text: qsTr("Speed, KpH")
+                   text: qsTr("Speed, MpS")
                 }
                 Text {
                    id: flightSpeed
-                   text: qsTr("20")
                 }
                 Text {
                    text: qsTr("Flight Time, min")
                 }
                 Text {
                    id: flightTime;
-                   text: qsTr("20")
                 }
                 Text {
                    text: qsTr("Pictures")
                 }
                 Text {
                     id: picturesCount
-                   text: qsTr("20")
                 }
                 Text {
                    text: qsTr("Photo Prints Area, SqKm")
                 }
                 Text {
-                   text: qsTr("20")
                 }
             }
        }
