@@ -82,11 +82,11 @@ Rectangle {
     }
 
 
-    property bool isUavRFixed: true
+    property bool isUavRFixed: false
     onIsUavRFixedChanged: {
         isUavRollFixed = !isUavRFixed
     }
-    property bool isUavRollFixed: false
+    property bool isUavRollFixed: true
     onIsUavRollFixedChanged: {
         isUavRFixed = !isUavRollFixed
     }
@@ -680,7 +680,7 @@ Rectangle {
                         onValueChanged: {
                             photoPlanner.maxRoll = value
                             if (uavsView.prevModelIndex == uavsView.modelIndex)
-                                uavsModel.get(uavsView.modelIndex).maxRollDeg, value
+                                uavsModel.get(uavsView.modelIndex).maxRollDeg = value
                             calculateUavR()
                         }
                         onValueChangedByUser: {
