@@ -131,6 +131,11 @@ protected:
                 auto aligmentMode = linedGeoPoints_[i].GetAdjustments() & PlannedTrackLine::AlignmentsMask;
                 switch(aligmentMode) {
                 case PlannedTrackLine::AdjustmentByUav: {
+                    if (!trackPoints_.empty() && !linedGeoPoints_[i].empty() &&
+                            linedGeoPoints_[i].front().distanceTo(trackPoints_.back()) < 10) {
+                        trackPoints_.pop_back();
+                        flightPoints_.pop_back();
+                    }
                     break;
                 }
                 case PlannedTrackLine::AdjustmentAlignByManeuver: {
