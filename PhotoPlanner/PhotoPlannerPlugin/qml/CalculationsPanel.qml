@@ -125,13 +125,11 @@ Rectangle {
     }
 
     onUpdatePhotoPlanWidthAndRuns: {
-        if (map.missionType == "Linear") {
-            if (isLinearPhotoWidthFixed) {
-                calculateRuns()
-            }
-            else {
-                calculateWidth()
-            }
+        if (isLinearPhotoWidthFixed) {
+            calculateRuns()
+        }
+        else {
+            calculateWidth()
         }
     }
 
