@@ -5,21 +5,34 @@
 
 namespace aero_photo {
 
-class LinedGeoPoints : public QVector<GeoPoints> {
+class PlannedTrackLine : public GeoPoints {
 public:
-    explicit LinedGeoPoints() { }
-    explicit LinedGeoPoints(size_t size)
-        : QVector<GeoPoints>(size)
-        , azimuths_(size)
+   static constexpr size_t AdjustmentByUav = 0x0001;
+   static constexpr size_t AdjustmentEnlargeEntry = 0x0002;
+   static constexpr size_t AdjustmentAlignByManeuver = 0x0004;
+   static constexpr size_t AdjustmentAlignDefault = AdjustmentEnlargeEntry | AdjustmentAlignByManeuver;
+
+   static constexpr size_t AlignmentsMask = AdjustmentByUav | AdjustmentAlignByManeuver;
+
+public:
+   explicit PlannedTrackLine() { }
+   explicit PlannedTrackLine(const GeoPoints &photoPrints, size_t adjustments = AdjustmentAlignDefault)
+        : GeoPoints(photoPrints)
+        , adjustments_(adjustments)
     {
+        if (size()>2)
+            azimuth_ = front().azimuthTo(back());
     }
 
-    void SetAzimuth(size_t index, qreal azimuth) { azimuths_[index] = azimuth; }
-    qreal GetAzimuth(size_t index) const { return azimuths_[index]; }
+    size_t GetAdjustments() const { return adjustments_; }
+    qreal GetAzimuth() const  { return azimuth_; }
+
 private:
-    void resize(int asize) = delete;
-    QVector<qreal> azimuths_;
+    size_t adjustments_ = AdjustmentAlignDefault;
+    qreal azimuth_ = 0;
 };
+
+using LinedGeoPoints = QVector<PlannedTrackLine>;
 
 } // aero_photo
 
