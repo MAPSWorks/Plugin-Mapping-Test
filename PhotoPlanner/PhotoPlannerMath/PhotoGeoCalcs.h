@@ -26,17 +26,26 @@ public:
         return pnt.atDistanceAndAzimuth(distance, azimuth);
     }
 
-    GeoDistance RoundUpPoints(GeoPoint &pntA, GeoPoint &pntB, GeoDistance factor) {
-        const auto distance = Distance(pntA, pntB);
-        auto deltaDistance = ceil(distance/factor)*factor - distance;
+    GeoDistance RoundUpPoints(GeoPoint &pntA, GeoPoint &pntB, GeoDistance factor, bool fixA = false, bool fixB = false) {
+        auto distance = Distance(pntA, pntB);
+        if(fixA && fixB)
+            return distance;
 
+        auto deltaDistance = ceil(distance/factor)*factor - distance;
         if (deltaDistance != 0) {
             auto azimuthAB = Azimuth(pntA, pntB);
             auto azimuthBA = azimuthAB + 180;
-            pntA = AtDistanceAndAzimuth(pntA, deltaDistance / 2, azimuthBA);
-            pntB = AtDistanceAndAzimuth(pntA, distance + deltaDistance, azimuthAB);
+            distance += deltaDistance;
+            if (!fixA && !fixB) {
+                pntA = AtDistanceAndAzimuth(pntA, deltaDistance / 2, azimuthBA);
+                pntB = AtDistanceAndAzimuth(pntA, distance, azimuthAB);
+            } else if(fixA) {
+                pntB = AtDistanceAndAzimuth(pntA, distance, azimuthAB);
+            } else { // if (fixB)
+                pntA = AtDistanceAndAzimuth(pntB, distance, azimuthBA);
+            }
         }
-        return distance + deltaDistance;
+        return distance;
     }
 };
 
@@ -44,8 +53,8 @@ class RunStartPointsCalc {
 public:
     RunStartPointsCalc(qreal enterAzimuth, const GeoPoint &baseRunPoint, qreal runAzimuth, qreal Lyp, size_t totalRuns)
         : basePoint_(baseRunPoint)
-        , startPointsAzimuth_(runAzimuth + 90 + (runAzimuth - enterAzimuth)/2)
-        , Lyp_(Lyp)
+        , startPointsAzimuth_(enterAzimuth + 90 + (runAzimuth - enterAzimuth)/2)
+        , Lyp_(Lyp/cos(D2R((runAzimuth - enterAzimuth)/2)))
         , indexOffset_(totalRuns / 2 - totalRuns + 1)
     {
     }
