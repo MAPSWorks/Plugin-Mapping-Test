@@ -16,6 +16,8 @@ PhotoPlannerWindow::PhotoPlannerWindow()
 
     qmlRegisterType<PhotoPlan>("PhotoPlanner", 1, 0, "PhotoPlanner");
     rootContext()->setContextProperty("photoPlanner", &photoPlan);
+    qmlRegisterType<PhotoPlannerOptions>("PhotoPlannerOptions", 1, 0, "PhotoPlannerOptions");
+    rootContext()->setContextProperty("photoPlannerOptions", &photoPlannerOptions);
 
     qmlRegisterType<QCameraData>("QCameraData", 1, 0, "QCameraData");
     rootContext()->setContextProperty("camerasModel", &camerasModel);
@@ -69,11 +71,23 @@ bool PhotoPlannerWindow::ReadConfiguration() {
         return false;
     quint32 version;
     datastream >> version;
-    if (version != 1)
+    if (version > 2)
         return false;
 
-    datastream >> camerasModel;
-    datastream >> uavsModel;
+    if (version >= 1) {
+        datastream >> camerasModel;
+        datastream >> uavsModel;
+    }
+
+    if (version >=2) {
+        quint32 mapTypeIndex;
+        datastream >> mapTypeIndex;
+        photoPlannerOptions.setMapTypeIndex(mapTypeIndex);
+
+        bool isPhotoPrintsVisible = false;
+        datastream >> isPhotoPrintsVisible;
+        photoPlannerOptions.setIsPhotoPrintsVisible(isPhotoPrintsVisible);
+    }
 
     return true;
 }
@@ -85,10 +99,15 @@ bool PhotoPlannerWindow::WriteConfiguration() {
 
     QDataStream datastream(&file);
     datastream.setVersion(QDataStream::Qt_5_9);
-    datastream << QString("PhotoPlannerConfiguration") << quint32(1);
+    datastream << QString("PhotoPlannerConfiguration") << quint32(2);
 
+    // Version 1
     datastream << camerasModel;
     datastream << uavsModel;
+
+    // Version 2
+    datastream << photoPlannerOptions.mapTypeIndex();
+    datastream << photoPlannerOptions.isPhotoPrintsVisible();
 
     return true;
 }

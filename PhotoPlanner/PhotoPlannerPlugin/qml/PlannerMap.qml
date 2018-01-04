@@ -29,7 +29,7 @@ Map {
     property var trackMarkers: []
 
     property var photoPrints: []
-    property bool photoPrintsVisible: false
+    property bool photoPrintsVisible: photoPlannerOptions.isPhotoPrintsVisible
 
     signal showMainMenu(variant coordinate)
     signal showMarkerMenu(variant coordinate)
@@ -243,6 +243,7 @@ Map {
 
 
     onPhotoPrintsVisibleChanged: {
+        photoPlannerOptions.isPhotoPrintsVisible = photoPrintsVisible
         if (photoPrintsVisible)
             addPhotoPrints()
         else

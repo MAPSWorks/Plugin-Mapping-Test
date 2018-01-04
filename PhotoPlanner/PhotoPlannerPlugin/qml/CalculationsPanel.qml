@@ -744,10 +744,11 @@ Rectangle {
                         model: mapTypesModel
                         textRole: "description"
                         Component.onCompleted: {
-                            currentIndex = 6
+                            currentIndex = photoPlannerOptions.mapTypeIndex
                         }
                         onCurrentIndexChanged: {
                             map.activeMapType = map.supportedMapTypes[currentIndex]
+                            photoPlannerOptions.mapTypeIndex = currentIndex
                         }
                     }
 
