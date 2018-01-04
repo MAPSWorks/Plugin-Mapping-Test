@@ -744,7 +744,7 @@ Rectangle {
                         model: mapTypesModel
                         textRole: "description"
                         Component.onCompleted: {
-                            currentIndex = 4
+                            currentIndex = 6
                         }
                         onCurrentIndexChanged: {
                             map.activeMapType = map.supportedMapTypes[currentIndex]
