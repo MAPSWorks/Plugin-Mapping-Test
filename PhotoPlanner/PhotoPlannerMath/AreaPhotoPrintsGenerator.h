@@ -77,46 +77,52 @@ class AreaPhotoPrintsGenerator {
         qreal preferredAzimuth_ = 0;
 
     private:
-        class GeoPointsGrid {
-        public:
-            explicit GeoPointsGrid(size_t totalRuns, qreal azimuth) : azimuth_(azimuth), linedGeoPoints_(totalRuns), isRevertedGeoPoint_(totalRuns, false) { }
 
-            bool Empty() const { return linedGeoPoints_.empty() || linedGeoPoints_.front().empty(); }
+        class GeoPointsGrid {
+
+            class GeoPointsRow : public GeoPoints {
+            public:
+                explicit GeoPointsRow() {}
+                explicit GeoPointsRow(GeoPoints &&geoPoints, bool isDirectOrder)
+                    : GeoPoints(geoPoints)
+                    , isDirectOrder_(isDirectOrder)
+                {
+                }
+
+                bool IsDirectOrder() const { return isDirectOrder_; }
+
+            private:
+                bool isDirectOrder_ = true;
+            };
+
+        public:
+            explicit GeoPointsGrid(size_t totalRuns) : pointsData_(totalRuns) { }
+
+            bool Empty() const { return pointsData_.empty() || pointsData_.front().empty(); }
             bool HasDifferentSizes() const {
-                const auto rowSize = linedGeoPoints_.front().size();
-                for (auto &rowGrid : linedGeoPoints_)
+                const auto rowSize = pointsData_.front().size();
+                for (auto &rowGrid : pointsData_)
                     if (rowSize != rowGrid.size())
                         return true;
                 return false;
             }
 
-            void SetLine(size_t runIndex, GeoPoints &&geoPoints, bool isDirectOrder) {
-                linedGeoPoints_[runIndex] = PlannedTrackLine(geoPoints);
-                isRevertedGeoPoint_[runIndex] = !isDirectOrder;
+            void SetRow(size_t runIndex, GeoPoints &&geoPoints, bool isDirectOrder) {
+                pointsData_[runIndex] = GeoPointsRow(std::move(geoPoints), isDirectOrder);
             }
+            bool IsRowDirectOrder(size_t rowIndex) const { return pointsData_[rowIndex].IsDirectOrder(); }
 
-            size_t Rows() const { return linedGeoPoints_.size(); }
-            size_t Cols() const { return linedGeoPoints_.front().size(); }
-            auto GetGeoPoint(size_t rowIndex, size_t colIndex) const { return linedGeoPoints_[rowIndex][colIndex]; }
-
-            void FixGeoPointsOrder(LinedGeoPoints &geoPoints) const {
-                for (size_t iRow = 0; iRow < Rows(); ++iRow) {
-                    if (isRevertedGeoPoint_[iRow]) {
-                        std::vector<GeoPoint> revertedGeoPoints(geoPoints[iRow].crbegin(), geoPoints[iRow].crend());
-                        geoPoints[iRow] = PlannedTrackLine(GeoPoints::fromStdVector(revertedGeoPoints));
-                    }
-                }
-            }
+            size_t Rows() const { return pointsData_.size(); }
+            size_t Cols() const { return pointsData_.front().size(); }
+            auto GetGeoPoint(size_t rowIndex, size_t colIndex) const { return pointsData_[rowIndex][colIndex]; }
 
         private:
-            qreal azimuth_;
-            LinedGeoPoints linedGeoPoints_;
-            std::vector<bool> isRevertedGeoPoint_;
+            QVector<GeoPointsRow> pointsData_;
         };
 
         GeoPointsGrid GeneratePhotoPrintsGrid(qreal h, qreal Lxp, qreal Lyp, qreal azimuth, size_t extentBorderValue) {
             size_t totalRuns = ceil(GetRadius() * 2 / Lyp) + extentBorderValue;
-            GeoPointsGrid geoPointsGrid(totalRuns, azimuth);
+            GeoPointsGrid geoPointsGrid(totalRuns);
             auto centerPoint = GetCenter();
             centerPoint.setAltitude(h);
             RunStartPointsCalc middlePointsCalc(azimuth, centerPoint, azimuth, Lyp, totalRuns);
@@ -128,8 +134,7 @@ class AreaPhotoPrintsGenerator {
                 GeoCalc geoCalc;
                 const auto runDistance = geoCalc.RoundUpPoints(endPntA, endPntB, Lxp);
                 LinePhotoPrintsGenerator thisRunLineGenerator(endPntA, endPntA.azimuthTo(endPntB), runDistance);
-
-                geoPointsGrid.SetLine(i, thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp), (i % 2) == 0);
+                geoPointsGrid.SetRow(i, thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp), (i % 2) == 0);
             }
             return geoPointsGrid;
         }
@@ -150,15 +155,23 @@ class AreaPhotoPrintsGenerator {
             NearFilter<uint8_t> filter(extentBorderValue);
             auto filteredArray = filter(containsArray);
 
-            LinedGeoPoints filteredGeoPoints(pointsGrid.Rows());
+            std::vector<QList<GeoPoint>> filteredGeoPoints(pointsGrid.Rows());
             auto fillFilteredGeoPoints = [&filteredGeoPoints, &pointsGrid](auto iRow, auto iCol, uint8_t itemValue) {
-                if (itemValue)
-                    filteredGeoPoints[iRow].push_back(pointsGrid.GetGeoPoint(iRow, iCol));
+                if (itemValue) {
+                    if (pointsGrid.IsRowDirectOrder(iRow)) {
+                        filteredGeoPoints[iRow].push_back(pointsGrid.GetGeoPoint(iRow, iCol));
+                    } else {
+                        filteredGeoPoints[iRow].push_front(pointsGrid.GetGeoPoint(iRow, iCol));
+                    }
+                }
             };
             filteredArray.IterateItems(fillFilteredGeoPoints);
 
-            pointsGrid.FixGeoPointsOrder(filteredGeoPoints);
-            return filteredGeoPoints;
+            LinedGeoPoints linedGeoPoints;
+            for (auto &&row : filteredGeoPoints) {
+                linedGeoPoints.push_back(PlannedTrackLine(GeoPoints::fromList(row)));
+            }
+            return linedGeoPoints;
         }
     };
 
