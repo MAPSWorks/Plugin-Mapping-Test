@@ -18,9 +18,20 @@ public:
     : LinePhotoPrintsGenerator(pntA, pntA.azimuthTo(pntB), pntA.distanceTo(pntB)) {
   }
 
-  GeoPoints GeneratePhotoPrintsCenters(qreal Lxp) {
+//  GeoPoints GeneratePhotoPrintsCenters(qreal Lxp) {
+//    GeoPoints photoPrintsCenters;
+//    const int totalPrints = ceil(distance_ / Lxp) + 1;
+//    for (int i = 0; i < totalPrints; ++i) {
+//      auto nextCenter = pntA_.atDistanceAndAzimuth(Lxp*i, azimuth_);
+//      photoPrintsCenters.push_back(nextCenter);
+//    }
+//    return photoPrintsCenters;
+//  }
+
+  GeoPoints GeneratePhotoPrintsCenters(qreal LxpMax) {
     GeoPoints photoPrintsCenters;
-    const int totalPrints = ceil(distance_ / Lxp) + 1;
+    const int totalPrints = ceil(distance_ / LxpMax) + 1;
+    auto Lxp = distance_ / (totalPrints - 1);
     for (int i = 0; i < totalPrints; ++i) {
       auto nextCenter = pntA_.atDistanceAndAzimuth(Lxp*i, azimuth_);
       photoPrintsCenters.push_back(nextCenter);

@@ -110,7 +110,6 @@ protected:
         flightPoints_.clear();
 
         const auto R = photoUav_.GetManeuverR();
-        const bool addAdditionalEntryLine = (R!=0) && true;
 
         int prevLine = -1;
         for(int i = 0; i<linedGeoPoints_.size(); ++i) {
@@ -118,40 +117,39 @@ protected:
             if(line.empty())
                 continue;
 
-            if(flightPoints_.empty()) {
-                if(R!=0) {
-                    auto startPointAt3R = linedGeoPoints_[i].front().atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    auto startPointAt1R = linedGeoPoints_[i].front().atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    flightPoints_.push_back(FlightPoint(startPointAt3R, 0));
-                    flightPoints_.push_back(FlightPoint(startPointAt1R, 1));
-                }
+            const bool enlargeEntryRequired = (R!=0) &&
+                    (linedGeoPoints_[i].GetAdjustments() & PlannedTrackLine::AdjustmentEnlargeEntry);
+
+            auto endAligmentPoint = linedGeoPoints_[i].front();
+            auto additionalEntryStart = endAligmentPoint.atDistanceAndAzimuth(4*R, linedGeoPoints_[i].GetAzimuth() + 180);
+            auto additionalEntryEnd = endAligmentPoint.atDistanceAndAzimuth(2*R, linedGeoPoints_[i].GetAzimuth() + 180);
+            if (enlargeEntryRequired) {
+                endAligmentPoint = additionalEntryStart;
             }
 
             if(prevLine>=0) {
-                GeoPoint additionalEntryStart;
-                GeoPoint additionalEntryEnd;
-                GeoPoint endAligmentPoint = linedGeoPoints_[i].front();
-
-                if (addAdditionalEntryLine) {
-                    additionalEntryStart = endAligmentPoint.atDistanceAndAzimuth(4*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    additionalEntryEnd = endAligmentPoint.atDistanceAndAzimuth(2*R, linedGeoPoints_.GetAzimuth(i) + 180);
-                    endAligmentPoint = additionalEntryStart;
+                auto aligmentMode = linedGeoPoints_[i].GetAdjustments() & PlannedTrackLine::AlignmentsMask;
+                switch(aligmentMode) {
+                case PlannedTrackLine::AdjustmentByUav: {
+                    break;
                 }
-
-                ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_.GetAzimuth(prevLine), endAligmentPoint, linedGeoPoints_.GetAzimuth(i));
-                auto aligmentPoints = aligment.Calculate(photoUav_);
-                for(auto point : aligmentPoints)
-                    trackPoints_.push_back(point);
-                for(auto point : aligment.GetFlightPoints())
-                    flightPoints_.push_back(FlightPoint(point, 0));
-
-                if (addAdditionalEntryLine) {
-                    trackPoints_.push_back(additionalEntryStart);
-                    trackPoints_.push_back(additionalEntryEnd);
-                    flightPoints_.push_back(FlightPoint(additionalEntryStart, 0));
-                    flightPoints_.push_back(FlightPoint(additionalEntryEnd, 1));
+                case PlannedTrackLine::AdjustmentAlignByManeuver: {
+                    ManeuverTrackAlignment aligment(linedGeoPoints_[prevLine].back(), linedGeoPoints_[prevLine].GetAzimuth(), endAligmentPoint, linedGeoPoints_[i].GetAzimuth());
+                    auto aligmentPoints = aligment.Calculate(photoUav_);
+                    for(auto point : aligmentPoints)
+                        trackPoints_.push_back(point);
+                    for(auto point : aligment.GetFlightPoints())
+                        flightPoints_.push_back(FlightPoint(point, 0));
+                    break;
                 }
+                }
+            }
 
+            if (enlargeEntryRequired) {
+                trackPoints_.push_back(additionalEntryStart);
+                trackPoints_.push_back(additionalEntryEnd);
+                flightPoints_.push_back(FlightPoint(additionalEntryStart, 0));
+                flightPoints_.push_back(FlightPoint(additionalEntryEnd, 1));
             }
 
             trackPoints_.push_back(line.front());

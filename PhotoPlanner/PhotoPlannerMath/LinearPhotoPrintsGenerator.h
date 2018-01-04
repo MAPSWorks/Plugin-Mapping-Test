@@ -6,6 +6,7 @@
 #include "LinePhotoPrintsGenerator.h"
 
 #include <stdexcept>
+#include <cassert>
 
 namespace aero_photo {
 
@@ -19,39 +20,56 @@ public:
     trackTail_.pop_front();
   }
 
-  LinedGeoPoints GeneratePhotoPrintsCenters(qreal h, qreal Lxp, qreal Lyp, size_t totalRuns) {
+  LinedGeoPoints GeneratePhotoPrintsCenters(qreal h, qreal Lxp, qreal Lyp, size_t totalRuns, const qreal tolerateAngle = 0) {
+    assert(!trackTail_.empty());
+
     trackHead_.setAltitude(h);
     for (auto &tailPnt : trackTail_)
       tailPnt.setAltitude(h);
 
     LinedGeoPoints linedGeoPoints(totalRuns * (trackTail_.size()));
+
     // !!! Both pntA & pntB must be copy of members
     auto pntA = trackHead_;
+    auto azimuthToA = pntA.azimuthTo(trackTail_[0]);
     for (int trackIndex = 0; trackIndex < trackTail_.size(); trackIndex++) {
+      const bool isFirstSegment = (trackIndex==0);
+      const bool isLastSegment = (trackIndex + 1 == trackTail_.size());
+
       auto pntB = trackTail_[trackIndex];
+      const auto azimuthAB = pntA.azimuthTo(pntB);
+      const auto azimuthFromB = (!isLastSegment)
+              ? pntB.azimuthTo(trackTail_[trackIndex + 1])
+              : azimuthAB;
+
+      const bool fixA = (abs(azimuthAB - azimuthToA) < tolerateAngle) && !isFirstSegment;
+      const bool fixB = (abs(azimuthFromB - azimuthAB) < tolerateAngle) && !isLastSegment;
       GeoCalc geoCalc;
-      const auto distance = geoCalc.RoundUpPoints(pntA, pntB, Lxp);
-      const auto azimuth = geoCalc.Azimuth(pntA, pntB);
-      RunStartPointsCalc pointsA(azimuth, pntA, azimuth, Lyp, totalRuns);
-      RunStartPointsCalc pointsB(azimuth, pntB, azimuth, Lyp, totalRuns);
+      geoCalc.RoundUpPoints(pntA, pntB, Lxp, fixA, fixB);
+      RunStartPointsCalc pointsA(azimuthToA, pntA, azimuthAB, Lyp, totalRuns);
+      RunStartPointsCalc pointsB(azimuthAB, pntB, azimuthFromB, Lyp, totalRuns);
       for (size_t runIndex = 0; runIndex < totalRuns; runIndex++) {
-        auto startPointAB = pointsA.Calculate(runIndex);
-        auto finishPointAB = pointsB.Calculate(runIndex);
-        auto runAzimuth = geoCalc.Azimuth(startPointAB, finishPointAB);
-        LinePhotoPrintsGenerator thisRunLineGenerator(startPointAB, runAzimuth, distance);
+        auto aSidePair = std::make_pair(pointsA.Calculate(runIndex), fixA);
+        auto bSidePair = std::make_pair(pointsB.Calculate(runIndex), fixB);
+        const bool isDirectDirection = (runIndex % 2 == 0);
+        const auto &startPair = isDirectDirection ? aSidePair : bSidePair;
+        const auto &finishPair = isDirectDirection ? bSidePair : aSidePair;
+
+        LinePhotoPrintsGenerator thisRunLineGenerator(startPair.first, finishPair.first);
         auto pointRunPrintsCenters = thisRunLineGenerator.GeneratePhotoPrintsCenters(Lxp);
-        if (runIndex % 2 != 0) {
-          runAzimuth += 180;
-          if (!pointRunPrintsCenters.empty())
-            for (int i = 0, j = pointRunPrintsCenters.size() - 1; i < j; ++i, --j)
-              std::swap(pointRunPrintsCenters[i], pointRunPrintsCenters[j]);
-        }
         // We must calculate index
         const auto linedIndex = CalculateRunSequnce(trackIndex, runIndex);
-        linedGeoPoints[linedIndex] = pointRunPrintsCenters;
-        linedGeoPoints.SetAzimuth(linedIndex, runAzimuth);
+        const bool adjustedByUavRequired =
+                startPair.second &&
+                ((isDirectDirection && trackIndex!=0) || (!isDirectDirection && trackIndex + 1 != trackTail_.size())) &&
+                true;
+        const size_t lineAdjustment = (adjustedByUavRequired)
+                ? PlannedTrackLine::AdjustmentByUav
+                : PlannedTrackLine::AdjustmentAlignDefault;
+        linedGeoPoints[linedIndex] = PlannedTrackLine(pointRunPrintsCenters, lineAdjustment);
       }
       pntA = trackTail_[trackIndex];
+      azimuthToA = azimuthAB;
     }
     return linedGeoPoints;
   }

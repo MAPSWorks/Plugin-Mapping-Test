@@ -91,8 +91,7 @@ class AreaPhotoPrintsGenerator {
             }
 
             void SetLine(size_t runIndex, GeoPoints &&geoPoints, bool isDirectOrder) {
-                linedGeoPoints_[runIndex] = geoPoints;
-                linedGeoPoints_.SetAzimuth(runIndex, azimuth_);
+                linedGeoPoints_[runIndex] = PlannedTrackLine(geoPoints);
                 isRevertedGeoPoint_[runIndex] = !isDirectOrder;
             }
 
@@ -104,10 +103,7 @@ class AreaPhotoPrintsGenerator {
                 for (size_t iRow = 0; iRow < Rows(); ++iRow) {
                     if (isRevertedGeoPoint_[iRow]) {
                         std::vector<GeoPoint> revertedGeoPoints(geoPoints[iRow].crbegin(), geoPoints[iRow].crend());
-                        geoPoints[iRow] = GeoPoints::fromStdVector(revertedGeoPoints);
-                        geoPoints.SetAzimuth(iRow, azimuth_ + 180);
-                    } else {
-                        geoPoints.SetAzimuth(iRow, azimuth_);
+                        geoPoints[iRow] = PlannedTrackLine(GeoPoints::fromStdVector(revertedGeoPoints));
                     }
                 }
             }
