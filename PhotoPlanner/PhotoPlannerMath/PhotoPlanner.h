@@ -118,6 +118,7 @@ protected:
                 continue;
 
             const bool enlargeEntryRequired = (R!=0) &&
+                    CalculationParams::Instance().enlargeEntryRequired &&
                     (linedGeoPoints_[i].GetAdjustments() & PlannedTrackLine::AdjustmentEnlargeEntry);
 
             auto endAligmentPoint = linedGeoPoints_[i].front();

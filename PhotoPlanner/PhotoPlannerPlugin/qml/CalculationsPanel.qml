@@ -225,6 +225,16 @@ Rectangle {
                     PhotoPlannerParamSeparator {
                     }
 
+                    CheckBox {
+                        Layout.fillWidth:   true
+                        checked: photoPlanner.enlargeEntryRequired
+                        text: qsTr("Use additional aligment")
+                        onCheckedChanged: {
+                            if (checked != photoPlanner.enlargeEntryRequired)
+                                photoPlanner.enlargeEntryRequired = checked
+                        }
+                    }
+
                     PhotoPlannerParamForm {
                         name: qsTr("Longitudinal overlap, %")
                         from: 0
@@ -763,6 +773,7 @@ Rectangle {
                         }
 
                     }
+
                 }
             }
 

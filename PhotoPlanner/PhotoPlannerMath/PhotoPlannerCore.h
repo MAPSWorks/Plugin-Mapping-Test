@@ -81,6 +81,16 @@ private:
 };
 
 
+class CalculationParams {
+    CalculationParams() { }
+public:
+    static CalculationParams &Instance() {
+        static CalculationParams instance;
+        return instance;
+    }
+
+    bool enlargeEntryRequired = false;
+};
 
 
 }

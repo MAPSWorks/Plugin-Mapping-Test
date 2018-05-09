@@ -9,6 +9,7 @@
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
 {
     m_cameraModelName           = "Sony S600";
+    m_enlargeEntryRequired  = false;
     m_focusRange            = 35;
     m_longitOverlap         = 20;
     m_transverseOverlap     = 20;
@@ -74,6 +75,18 @@ void PhotoPlan::setUavModelName(const QString &value)
     {
         m_uavModelName = value;
         emit uavModelNameChanged();
+    }
+}
+
+
+bool PhotoPlan::enlargeEntryRequired() const {
+    return m_enlargeEntryRequired;
+}
+
+void PhotoPlan::setEnlargeEntryRequired(const bool value) {
+    if (value!=m_enlargeEntryRequired) {
+        m_enlargeEntryRequired = value;
+        emit enlargeEntryRequiredChanged();
     }
 }
 
@@ -339,6 +352,10 @@ aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
     return aero_photo::PhotoCameraModel(focusM, lxM, lyM, ax, ay);
 }
 
+void PhotoPlan::UpdateCalculationParamsFromGui() const {
+    aero_photo::CalculationParams::Instance().enlargeEntryRequired = m_enlargeEntryRequired;
+}
+
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -365,6 +382,7 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
 
     auto uavModel = CreatePhotoUavModelFromGui();
     auto photoCameraModel = CreatePhotoCameraModelFromGui();
+    UpdateCalculationParamsFromGui();
     LinearPhotoRegion region(pathAoI);
     m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
     dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), linearWidth());
@@ -392,8 +410,8 @@ void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
     auto uavModel = CreatePhotoUavModelFromGui();
 //    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
     auto photoCameraModel = CreatePhotoCameraModelFromGui();
+    UpdateCalculationParamsFromGui();
     AreaPhotoRegion region(pathAoI);
-
     m_apPhotoPlanner.reset(new AreaPhotoPlanner(uavModel, photoCameraModel, region));
     dynamic_cast<AreaPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
 
