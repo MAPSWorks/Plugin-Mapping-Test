@@ -9,6 +9,7 @@
 
 #include <QDateTime>
 #include <QXmlStreamWriter>
+#include <QFile>
 
 namespace aero_photo {
 
@@ -43,25 +44,35 @@ public:
 
     qreal velocity() const { return photoUav_.velocity(); }
 
-    void SaveToXml(QIODevice *iodevice) {
-        QXmlStreamWriter stream(iodevice);
-        stream.setAutoFormatting(true);
-        stream.writeStartDocument();
-        SaveToXmlMission(stream);
-        stream.writeEndDocument();
+    void SaveToXml(QString fileurlcvt, const int totalPointsInPacket) {
+        fileurlcvt = fileurlcvt.remove(".xml");
+        for(int i = 0; totalPointsInPacket * i < GetFlightPoints().size(); i++) {
+            auto packname = QString("%1-%2.xml").arg(fileurlcvt).arg(i);
+            if (i == 0) {
+                packname = QString("%1.xml").arg(fileurlcvt);
+            }
+            QFile xmlFile(packname);
+            if (xmlFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QXmlStreamWriter stream(&xmlFile);
+                stream.setAutoFormatting(true);
+                stream.writeStartDocument();
+                SaveToXmlPacket(stream, i, totalPointsInPacket);
+                stream.writeEndDocument();
+            }
+        }
     }
 
 protected:
-    void SaveToXmlMission(QXmlStreamWriter &stream) {
+    void SaveToXmlPacket(QXmlStreamWriter &stream, int packetNumber, int totalPointsInPacket) {
         stream.writeStartElement("mission");
         stream.writeAttribute("version", "9.10.56");
         stream.writeAttribute("href", "http://www.uavos.com/");
         stream.writeAttribute("title", "mission");
         stream.writeTextElement("hash", "f7c8603a8b1af004375ebc326a0ab6e");
         stream.writeTextElement("timestamp", QDateTime::currentDateTime().toString());
-        if (!GetFlightPoints().empty())
+        if (packetNumber==0 && !GetFlightPoints().empty())
             SaveToXmlHome(stream, GetFlightPoints().front());
-        SaveToXmlWayPoints(stream);
+        SaveToXmlPacketWayPoints(stream, packetNumber, totalPointsInPacket);
         stream.writeEndElement();
     }
     void SaveToXmlHome(QXmlStreamWriter &stream, const GeoPoint &homePoint) {
@@ -71,12 +82,14 @@ protected:
         stream.writeTextElement("hmsl", "0");
         stream.writeEndElement();
     }
-    void SaveToXmlWayPoints(QXmlStreamWriter &stream) {
+    void SaveToXmlPacketWayPoints(QXmlStreamWriter &stream, int packetNumber, int totalPointsInPacket) {
         stream.writeStartElement("waypoints");
-        stream.writeAttribute("cnt", QString::number(GetFlightPoints().size()));
-        size_t index = 0;
-        for (const auto &flightPoint : GetFlightPoints()) {
-            SaveToXmlOnePoint(stream, index++, flightPoint);
+        const int packetOffset = packetNumber * totalPointsInPacket;
+        totalPointsInPacket = std::min(totalPointsInPacket, GetFlightPoints().size() - packetOffset);
+        stream.writeAttribute("cnt", QString::number(totalPointsInPacket));
+        const auto &points = GetFlightPoints();
+        for (int index = 0; index < totalPointsInPacket ; index ++) {
+            SaveToXmlOnePoint(stream, index, points[packetOffset + index]);
         }
         stream.writeEndElement();
     }

@@ -424,7 +424,7 @@ Item {
         }
 
         onAccepted: {
-            photoPlanner.saveFlightPlan(fileUrl);
+            photoPlanner.saveFlightPlan(fileUrl, calculationsPanel.pointsInPacket);
         }
     }
 

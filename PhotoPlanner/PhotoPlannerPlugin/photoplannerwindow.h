@@ -12,6 +12,7 @@ class PhotoPlannerOptions : public QObject
     Q_OBJECT
     Q_PROPERTY(bool isPhotoPrintsVisible READ isPhotoPrintsVisible WRITE setIsPhotoPrintsVisible NOTIFY isPhotoPrintsVisibleChanged)
     Q_PROPERTY(quint32 mapTypeIndex READ mapTypeIndex WRITE setMapTypeIndex NOTIFY mapTypeIndexChanged)
+    Q_PROPERTY(quint32 pointsInPacket READ pointsInPacket WRITE setPointsInPacket NOTIFY pointsInPacketChanged)
 
 public:
     explicit PhotoPlannerOptions(QObject *parent = nullptr) : QObject(parent)  { }
@@ -25,6 +26,15 @@ public:
         }
     }
 
+    quint32 pointsInPacket() const { return pointsInPacket_; }
+    void setPointsInPacket(const quint32 &value) {
+        if(value != pointsInPacket_)
+        {
+            pointsInPacket_ = value;
+            emit pointsInPacketChanged();
+        }
+    }
+
     bool isPhotoPrintsVisible() const { return isPhotoPrintsVisible_; }
     void setIsPhotoPrintsVisible(const bool value) {
         if (value != isPhotoPrintsVisible_) {
@@ -35,10 +45,12 @@ public:
 
 signals:
     void mapTypeIndexChanged();
+    void pointsInPacketChanged();
     void isPhotoPrintsVisibleChanged();
 
 private:
     quint32 mapTypeIndex_ = 0;
+    quint32 pointsInPacket_ = 1024;
     bool isPhotoPrintsVisible_ = false;
 };
 

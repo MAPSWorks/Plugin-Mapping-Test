@@ -56,7 +56,7 @@ public:
 
     Q_INVOKABLE void calcLinearPhotoPrints(QVariantList aoi);
     Q_INVOKABLE void calcAreaPhotoPrints(QVariantList aoi);
-    Q_INVOKABLE void saveFlightPlan(QVariant fileurl);
+    Q_INVOKABLE void saveFlightPlan(QVariant fileurl, int pointsInPacket);
 
     Q_INVOKABLE QVariantList loadAoi(QVariant fileurl);
     Q_INVOKABLE void saveAoi(QVariant fileurl, QString poiType, QVariantList aoi);

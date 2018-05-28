@@ -151,6 +151,8 @@ Rectangle {
         }
     }
 
+    property int pointsInPacket: photoPlannerOptions.pointsInPacket
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 5
@@ -773,6 +775,22 @@ Rectangle {
                         }
 
                     }
+
+                    PhotoPlannerParamForm {
+                        id: pointsInPacketOptions
+                        name: qsTr("Total points in packet")
+                        from: 40
+                        to: 4096
+
+                        Component.onCompleted: {
+                            value = photoPlannerOptions.pointsInPacket
+                        }
+
+                        onValueChanged: {
+                            photoPlannerOptions.pointsInPacket = value
+                        }
+                    }
+
 
                 }
             }

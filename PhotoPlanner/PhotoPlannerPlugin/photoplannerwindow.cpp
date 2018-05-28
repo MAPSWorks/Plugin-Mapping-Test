@@ -71,8 +71,6 @@ bool PhotoPlannerWindow::ReadConfiguration() {
         return false;
     quint32 version;
     datastream >> version;
-    if (version > 2)
-        return false;
 
     if (version >= 1) {
         datastream >> camerasModel;
@@ -89,6 +87,11 @@ bool PhotoPlannerWindow::ReadConfiguration() {
         photoPlannerOptions.setIsPhotoPrintsVisible(isPhotoPrintsVisible);
     }
 
+    if (version >=3) {
+        quint32 pointsInPacket;
+        datastream >> pointsInPacket;
+        photoPlannerOptions.setPointsInPacket(pointsInPacket);
+    }
     return true;
 }
 
@@ -99,7 +102,7 @@ bool PhotoPlannerWindow::WriteConfiguration() {
 
     QDataStream datastream(&file);
     datastream.setVersion(QDataStream::Qt_5_9);
-    datastream << QString("PhotoPlannerConfiguration") << quint32(2);
+    datastream << QString("PhotoPlannerConfiguration") << quint32(3);
 
     // Version 1
     datastream << camerasModel;
@@ -108,6 +111,9 @@ bool PhotoPlannerWindow::WriteConfiguration() {
     // Version 2
     datastream << photoPlannerOptions.mapTypeIndex();
     datastream << photoPlannerOptions.isPhotoPrintsVisible();
+
+    // Version 3
+    datastream << photoPlannerOptions.pointsInPacket();
 
     return true;
 }

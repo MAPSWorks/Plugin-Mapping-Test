@@ -430,14 +430,11 @@ void PhotoPlan::UpdatePhotoPlannerDraw()
     m_flightPoints = m_apPhotoPlanner->GetFlightPoints();
 }
 
-void PhotoPlan::saveFlightPlan(QVariant fileurl)
+void PhotoPlan::saveFlightPlan(QVariant fileurl, int pointsInPacket)
 {
     auto fileurlcvt = fileurl.value<QUrl>().toLocalFile();
     if (m_apPhotoPlanner) {
-        QFile xmlFile(fileurlcvt);
-        if (xmlFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            m_apPhotoPlanner->SaveToXml(&xmlFile);
-        }
+        m_apPhotoPlanner->SaveToXml(fileurlcvt, pointsInPacket);
     }
 }
 
