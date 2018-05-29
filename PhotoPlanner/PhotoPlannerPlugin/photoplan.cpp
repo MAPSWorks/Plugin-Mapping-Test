@@ -9,7 +9,6 @@
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
 {
     m_cameraModelName           = "Sony S600";
-    m_enlargeEntryRequired  = false;
     m_focusRange            = 35;
     m_longitOverlap         = 20;
     m_transverseOverlap     = 20;
@@ -82,11 +81,20 @@ void PhotoPlan::setUavModelName(const QString &value)
 bool PhotoPlan::enlargeEntryRequired() const {
     return m_enlargeEntryRequired;
 }
-
 void PhotoPlan::setEnlargeEntryRequired(const bool value) {
     if (value!=m_enlargeEntryRequired) {
         m_enlargeEntryRequired = value;
         emit enlargeEntryRequiredChanged();
+    }
+}
+
+bool PhotoPlan::maneuverAligmentRequired() const {
+    return m_maneuverAligmentRequired;
+}
+void PhotoPlan::setManeuverAligmentRequired(const bool value) {
+    if (value != m_maneuverAligmentRequired) {
+        m_maneuverAligmentRequired = value;
+        emit maneuverAligmentRequiredChanged();
     }
 }
 
@@ -354,6 +362,7 @@ aero_photo::PhotoCameraModel PhotoPlan::CreatePhotoCameraModelFromGui() const  {
 
 void PhotoPlan::UpdateCalculationParamsFromGui() const {
     aero_photo::CalculationParams::Instance().enlargeEntryRequired = m_enlargeEntryRequired;
+    aero_photo::CalculationParams::Instance().maneuverAligmentRequired = m_maneuverAligmentRequired;
 }
 
 #include <algorithm>

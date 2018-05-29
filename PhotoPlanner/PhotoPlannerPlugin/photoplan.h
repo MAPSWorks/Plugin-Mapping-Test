@@ -16,6 +16,7 @@ class PhotoPlan : public QObject
     Q_PROPERTY(QString cameraModelName READ cameraModelName WRITE setCameraModelName NOTIFY cameraModelNameChanged)
     Q_PROPERTY(QString uavModelName READ uavModelName WRITE setUavModelName NOTIFY uavModelNameChanged)
     Q_PROPERTY(bool enlargeEntryRequired READ enlargeEntryRequired WRITE setEnlargeEntryRequired NOTIFY enlargeEntryRequiredChanged)
+    Q_PROPERTY(bool maneuverAligmentRequired READ maneuverAligmentRequired WRITE setManeuverAligmentRequired NOTIFY maneuverAligmentRequiredChanged)
 
     Q_PROPERTY(quint32 focusRange READ focusRange WRITE setFocusRange NOTIFY focusRangeChanged)
     Q_PROPERTY(qreal cameraLx READ cameraLx WRITE setCameraLx NOTIFY cameraLxChanged)
@@ -73,6 +74,9 @@ public:
 
     bool enlargeEntryRequired() const;
     void setEnlargeEntryRequired(const bool value);
+
+    bool maneuverAligmentRequired() const;
+    void setManeuverAligmentRequired(const bool value);
 
     quint32 focusRange() const;
     void setFocusRange(const quint32 value);
@@ -135,6 +139,7 @@ signals:
     void cameraModelNameChanged();
     void uavModelNameChanged();
     void enlargeEntryRequiredChanged();
+    void maneuverAligmentRequiredChanged();
     void focusRangeChanged();
     void cameraLxChanged();
     void cameraLyChanged();
@@ -165,7 +170,8 @@ private:
 
     QString m_cameraModelName;
     QString m_uavModelName;
-    bool m_enlargeEntryRequired;
+    bool m_enlargeEntryRequired = false;
+    bool m_maneuverAligmentRequired = true;
     quint32 m_focusRange;
     qreal m_cameraLx;
     qreal m_cameraLy;

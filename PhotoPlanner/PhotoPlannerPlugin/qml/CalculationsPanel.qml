@@ -230,11 +230,24 @@ Rectangle {
                     CheckBox {
                         Layout.fillWidth:   true
                         checked: photoPlanner.enlargeEntryRequired
-                        text: qsTr("Use additional aligment")
+                        text: qsTr("Extend aligment")
                         onCheckedChanged: {
                             if (checked != photoPlanner.enlargeEntryRequired)
                                 photoPlanner.enlargeEntryRequired = checked
                         }
+                    }
+
+                    CheckBox {
+                        Layout.fillWidth:   true
+                        checked: photoPlanner.maneuverAligmentRequired
+                        text: qsTr("Use maneuver for aligment")
+                        onCheckedChanged: {
+                            if (checked != photoPlanner.maneuverAligmentRequired)
+                                photoPlanner.maneuverAligmentRequired = checked
+                        }
+                    }
+
+                    PhotoPlannerParamSeparator {
                     }
 
                     PhotoPlannerParamForm {

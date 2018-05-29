@@ -63,9 +63,15 @@ public:
                 startPair.second &&
                 ((isDirectDirection && trackIndex!=0) || (!isDirectDirection && trackIndex + 1 != trackTail_.size())) &&
                 true;
+        const auto guiAligmentMode = CalculationParams::Instance().maneuverAligmentRequired
+                ? PlannedTrackLine::AdjustmentAlignByManeuver
+                : PlannedTrackLine::AdjustmentByUav;
+        const auto guiExtendedMode = CalculationParams::Instance().enlargeEntryRequired
+                ? PlannedTrackLine::AdjustmentEnlargeEntry
+                : 0;
         const size_t lineAdjustment = (adjustedByUavRequired)
                 ? PlannedTrackLine::AdjustmentByUav
-                : PlannedTrackLine::AdjustmentAlignDefault;
+                : guiAligmentMode | guiExtendedMode;
         linedGeoPoints[linedIndex] = PlannedTrackLine(pointRunPrintsCenters, lineAdjustment);
       }
       pntA = trackTail_[trackIndex];

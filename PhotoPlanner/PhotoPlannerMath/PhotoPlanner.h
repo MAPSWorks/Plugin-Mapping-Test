@@ -166,13 +166,11 @@ protected:
 
             if (enlargeEntryRequired) {
                 trackPoints_.push_back(additionalEntryStart);
-                trackPoints_.push_back(additionalEntryEnd);
                 flightPoints_.push_back(FlightPoint(additionalEntryStart, 0));
-                flightPoints_.push_back(FlightPoint(additionalEntryEnd, 1));
             }
 
             trackPoints_.push_back(line.front());
-            flightPoints_.push_back(FlightPoint(line.front(), 0, Bx));
+            flightPoints_.push_back(FlightPoint(line.front(), 1, Bx));
             if(line.size()>1) {
                 trackPoints_.push_back(line.back());
                 flightPoints_.push_back(FlightPoint(line.back(), 1));

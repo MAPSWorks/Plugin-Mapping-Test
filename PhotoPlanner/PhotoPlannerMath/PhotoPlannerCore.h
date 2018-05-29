@@ -89,7 +89,8 @@ public:
         return instance;
     }
 
-    bool enlargeEntryRequired = false;
+    bool enlargeEntryRequired = true;
+    bool maneuverAligmentRequired = true;
 };
 
 
