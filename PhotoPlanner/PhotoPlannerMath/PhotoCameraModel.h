@@ -1,6 +1,8 @@
 #ifndef PHOTOCAMERAMODEL_H
 #define PHOTOCAMERAMODEL_H
 
+#include <cmath>
+
 namespace aero_photo {
 
 class PhotoCameraModel {
@@ -38,7 +40,7 @@ public:
     double CalcLinearRuns(double h, double Px, double Py, int width) const {
         double Bx, By;
         CalcBxBy(h, Px, Py, Bx, By);
-        auto totalRuns = ceil(width/By);
+        auto totalRuns = std::ceil(width/By);
         return totalRuns;
     }
 
