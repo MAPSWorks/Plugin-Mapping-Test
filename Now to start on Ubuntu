@@ -10,5 +10,18 @@ How to link with Proj.4
 
 How to install GL.h
 	sudo apt-get install mesa-common-dev libglu1-mesa-dev
-		
+	
+	
+Ubuntu 18.04
+    sudo apt-get install qtcreator
+    sudo apt-get install qt5-default
+    sudo apt-get install qtdeclarative5-dev
+    sudo apt-get install qtpositioning5-dev
+    sudo apt-get install qtscript5-dev
+    sudo apt-get install qtlocation5-dev
+    sudo apt-get install qml-module-qtpositioning
+    sudo apt-get install qml-module-qtlocation
+    
+    Add Kit based on GCC compiler
+
 
