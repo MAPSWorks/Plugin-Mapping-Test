@@ -43,7 +43,8 @@ HEADERS += \
     PhotoPlanner.h \
     PhotoPlannerCore.h \
     PhotoPrintsGenerators.h \
-    PhotoUavModel.h
+    PhotoUavModel.h \
+    PhotoPlannerXmlWriter.h
 
 SOURCES += \
     PhotoPlannerCore.cpp

@@ -6,10 +6,7 @@
 #include "PhotoUavModel.h"
 #include "LinedGeoPoints.h"
 #include "ManeuverTrackAlignment.h"
-
-#include <QDateTime>
-#include <QXmlStreamWriter>
-#include <QFile>
+#include "PhotoPlannerXmlWriter.h"
 
 namespace aero_photo {
 
@@ -25,7 +22,6 @@ namespace aero_photo {
 //    double windSpeed = 0;
 //    double windBearing = 0;
 //};
-
 
 class PhotoPlanner {
 protected:
@@ -45,78 +41,11 @@ public:
     qreal velocity() const { return photoUav_.velocity(); }
 
     void SaveToXml(QString fileurlcvt, const int totalPointsInPacket) {
-        fileurlcvt = fileurlcvt.remove(".xml");
-        for(int i = 0; totalPointsInPacket * i < GetFlightPoints().size(); i++) {
-            auto packname = QString("%1-%2.xml").arg(fileurlcvt).arg(i);
-            if (i == 0) {
-                packname = QString("%1.xml").arg(fileurlcvt);
-            }
-            QFile xmlFile(packname);
-            if (xmlFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                QXmlStreamWriter stream(&xmlFile);
-                stream.setAutoFormatting(true);
-                stream.writeStartDocument();
-                SaveToXmlPacket(stream, i, totalPointsInPacket);
-                stream.writeEndDocument();
-            }
-        }
+        PhotoPlannerXmlWriter writer(GetFlightPoints(), velocity());
+        writer.WritePackets(fileurlcvt, totalPointsInPacket);
     }
 
 protected:
-    void SaveToXmlPacket(QXmlStreamWriter &stream, int packetNumber, int totalPointsInPacket) {
-        stream.writeStartElement("mission");
-        stream.writeAttribute("version", "9.10.56");
-        stream.writeAttribute("href", "http://www.uavos.com/");
-        stream.writeAttribute("title", "mission");
-        stream.writeTextElement("hash", "f7c8603a8b1af004375ebc326a0ab6e");
-        stream.writeTextElement("timestamp", QDateTime::currentDateTime().toString());
-        if (packetNumber==0 && !GetFlightPoints().empty())
-            SaveToXmlHome(stream, GetFlightPoints().front());
-        SaveToXmlPacketWayPoints(stream, packetNumber, totalPointsInPacket);
-        stream.writeEndElement();
-    }
-    void SaveToXmlHome(QXmlStreamWriter &stream, const GeoPoint &homePoint) {
-        stream.writeStartElement("home");
-        stream.writeTextElement("lat", QString::number(homePoint.latitude(), 'f', 15));
-        stream.writeTextElement("lon", QString::number(homePoint.longitude(), 'f', 15));
-        stream.writeTextElement("hmsl", "0");
-        stream.writeEndElement();
-    }
-    void SaveToXmlPacketWayPoints(QXmlStreamWriter &stream, int packetNumber, int totalPointsInPacket) {
-        stream.writeStartElement("waypoints");
-        const int packetOffset = packetNumber * totalPointsInPacket;
-        totalPointsInPacket = std::min(totalPointsInPacket, GetFlightPoints().size() - packetOffset);
-        stream.writeAttribute("cnt", QString::number(totalPointsInPacket));
-        const auto &points = GetFlightPoints();
-        for (int index = 0; index < totalPointsInPacket ; index ++) {
-            SaveToXmlOnePoint(stream, index, points[packetOffset + index]);
-        }
-        stream.writeEndElement();
-    }
-    void SaveToXmlOnePoint(QXmlStreamWriter &stream, int index, const FlightPoint &flightPoint) {
-        // Conversion???
-        stream.writeStartElement("waypoint");
-        stream.writeAttribute("idx", QString::number(index));
-        stream.writeTextElement("altitude", QString::number(flightPoint.altitude()));
-        stream.writeTextElement("type", QString::number(flightPoint.type()));
-        stream.writeTextElement("latitude", QString::number(flightPoint.latitude(), 'f', 15));
-        stream.writeTextElement("longitude", QString::number(flightPoint.longitude(), 'f', 15));
-        SaveToXmlOnePointActions(stream, flightPoint);
-        stream.writeEndElement();
-    }
-
-    void SaveToXmlOnePointActions(QXmlStreamWriter &stream, const FlightPoint &flightPoint) {
-        stream.writeStartElement("actions");
-        stream.writeTextElement("speed", QString::number(velocity()));
-        stream.writeTextElement("shot", (flightPoint.shotDistance()>0) ? "2" : "0" );
-        stream.writeTextElement("dshot", QString::number(flightPoint.shotDistance()));
-        stream.writeTextElement("POI", "0");
-        stream.writeTextElement("loiter", "0");
-        stream.writeTextElement("turnR", "0");
-        stream.writeTextElement("loops", "0");
-        stream.writeTextElement("time", "0");
-        stream.writeEndElement();
-    }
 
     void CalculateTrack(double Bx) {
         trackPoints_.clear();
@@ -189,8 +118,6 @@ protected:
     FlightPoints flightPoints_;
     PhotoPrints photoPrints_;
 };
-
-
 
 }
 
