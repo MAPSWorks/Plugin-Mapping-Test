@@ -49,6 +49,8 @@ private:
         stream.writeTextElement("timestamp", QDateTime::currentDateTime().toString());
         if (packetNumber==0 && !GetFlightPoints().empty())
             WriteHome(stream, GetFlightPoints().front());
+        if (!GetFlightPoints().empty())
+            WriteRunway(stream, GetFlightPoints().front());
         WritePoints(stream, packetNumber, totalPointsInPacket);
         stream.writeEndElement();
     }
@@ -57,6 +59,21 @@ private:
         stream.writeTextElement("lat", QString::number(homePoint.latitude(), 'f', 15));
         stream.writeTextElement("lon", QString::number(homePoint.longitude(), 'f', 15));
         stream.writeTextElement("hmsl", "0");
+        stream.writeEndElement();
+    }
+    void WriteRunway(QXmlStreamWriter &stream, const GeoPoint &runwayPoint) {
+        stream.writeStartElement("runways");
+        stream.writeAttribute("cnt", "1");
+        stream.writeStartElement("runway");
+        stream.writeAttribute("idx", "0");
+        stream.writeTextElement("turn", "0");
+        stream.writeTextElement("approach", "400");
+        stream.writeTextElement("HMSL", "0");
+        stream.writeTextElement("latitude", QString::number(runwayPoint.latitude(), 'f', 15));
+        stream.writeTextElement("longitude", QString::number(runwayPoint.longitude(), 'f', 15));
+        stream.writeTextElement("dN", "150");
+        stream.writeTextElement("dE", "0");
+        stream.writeEndElement();
         stream.writeEndElement();
     }
     void WritePoints(QXmlStreamWriter &stream, int packetNumber, int totalPointsInPacket) {
