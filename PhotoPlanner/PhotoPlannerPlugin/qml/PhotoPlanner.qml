@@ -431,7 +431,7 @@ Item {
     CalculationsPanel {
         id:             calculationsPanel
         visible:        toolBar.settings.checked
-        width:          350
+        width:          450
         anchors.top:    item.top
         anchors.bottom: item.bottom
         anchors.right:  item.right

@@ -347,6 +347,16 @@ Rectangle {
                                     isLinearPhotoRunsFixed = true
                                 }
                             }
+
+                            CheckBox {
+                                Layout.fillWidth:   true
+                                checked: photoPlanner.linearUseReverseDirection
+                                text: qsTr("Use reverse direction")
+                                onCheckedChanged: {
+                                    if (checked != photoPlanner.linearUseReverseDirection)
+                                        photoPlanner.linearUseReverseDirection = checked
+                                }
+                            }
                         }
                     }
                 }

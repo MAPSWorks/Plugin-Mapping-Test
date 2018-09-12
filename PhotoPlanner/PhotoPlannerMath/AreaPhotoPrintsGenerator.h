@@ -22,7 +22,7 @@ class AreaPhotoPrintsGenerator {
     public:
         explicit RegionInternals(const AreaPhotoRegion &area) {
             if (area.GetBorder().size()<3)
-                throw std::logic_error("Invalid AreaPhotoRegion size()");
+                throw std::logic_error("More then 2 points must be entered for AREA calculation!");
 
             InitializeAreaPolygonAndBounds(area.GetBorder());
             InitializeGeoItems(area.GetBorder());

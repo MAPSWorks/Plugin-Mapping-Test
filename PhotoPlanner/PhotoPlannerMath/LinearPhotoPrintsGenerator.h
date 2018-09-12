@@ -14,7 +14,7 @@ class LinearPhotoPrintsGenerator {
 public:
   explicit LinearPhotoPrintsGenerator(const LinearPhotoRegion &linearRegion) {
     if (linearRegion.GetTrack().size() < 2)
-      throw std::logic_error("Invalid LinearPhotoRegion size()");
+      throw std::logic_error("More then 1 point must be entered for LINEAR calculation!");
     trackHead_ = linearRegion.GetTrack().front();
     trackTail_ = linearRegion.GetTrack();
     trackTail_.pop_front();

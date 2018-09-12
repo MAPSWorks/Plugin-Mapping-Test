@@ -5,6 +5,7 @@
 #include <QUrl>
 #include <QVariant>
 #include <QtDebug>
+#include <QMessageBox>
 
 PhotoPlan::PhotoPlan(QObject *parent) : QObject(parent)
 {
@@ -264,6 +265,19 @@ void PhotoPlan::setLinearRuns(const quint32 value)
     }
 }
 
+bool PhotoPlan::linearUseReverseDirection() const
+{
+    return m_linearUseReverseDirection;
+}
+void PhotoPlan::setLinearUseReverseDirection(const bool value)
+{
+    if(value != m_linearUseReverseDirection)
+    {
+        m_linearUseReverseDirection = value;
+        emit linearUseReverseDirectionChanged();
+    }
+}
+
 qreal PhotoPlan::maxRoll() const
 {
     return m_maxRoll;
@@ -380,23 +394,32 @@ void PhotoPlan::calcLinearPhotoPrints(QVariantList aoi)
     using namespace aero_photo;
 
     QVector<QGeoCoordinate> pathAoI;
-
-    foreach(QVariant crd, aoi) {
-        pathAoI.append(crd.value<QGeoCoordinate>());
+    if(linearUseReverseDirection()) {
+        for (auto i = aoi.size(); i > 0; i--)
+            pathAoI.append(aoi[i-1].value<QGeoCoordinate>());
+    } else {
+        for (const auto &crd : aoi) {
+            pathAoI.append(crd.value<QGeoCoordinate>());
+        }
     }
 
     if(pathAoI.empty()) {
         return;
     }
 
-    auto uavModel = CreatePhotoUavModelFromGui();
-    auto photoCameraModel = CreatePhotoCameraModelFromGui();
-    UpdateCalculationParamsFromGui();
-    LinearPhotoRegion region(pathAoI);
-    m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
-    dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), linearWidth());
-
-    UpdatePhotoPlannerDraw();
+    try
+    {
+        auto uavModel = CreatePhotoUavModelFromGui();
+        auto photoCameraModel = CreatePhotoCameraModelFromGui();
+        UpdateCalculationParamsFromGui();
+        LinearPhotoRegion region(pathAoI);
+        m_apPhotoPlanner.reset(new LinearPhotoPlanner(uavModel, photoCameraModel, region));
+        dynamic_cast<LinearPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), linearWidth());
+        UpdatePhotoPlannerDraw();
+    }
+    catch (const std::exception &exc) {
+        QMessageBox::critical(nullptr, "Calculation error", exc.what());
+    }
 }
 
 void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
@@ -404,27 +427,30 @@ void PhotoPlan::calcAreaPhotoPrints(QVariantList aoi)
     using namespace aero_photo;
 
     QVector<QGeoCoordinate> pathAoI;
-
-    foreach(QVariant crd, aoi)
-    {
+    for (const auto &crd : aoi) {
         pathAoI.append(crd.value<QGeoCoordinate>());
     }
-
     if(pathAoI.empty())
     {
         return;
     }
 
-//    PhotoUavModel uavModel(60, D2R(30));
-    auto uavModel = CreatePhotoUavModelFromGui();
-//    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
-    auto photoCameraModel = CreatePhotoCameraModelFromGui();
-    UpdateCalculationParamsFromGui();
-    AreaPhotoRegion region(pathAoI);
-    m_apPhotoPlanner.reset(new AreaPhotoPlanner(uavModel, photoCameraModel, region));
-    dynamic_cast<AreaPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
+    try
+    {
+        //    PhotoUavModel uavModel(60, D2R(30));
+        auto uavModel = CreatePhotoUavModelFromGui();
+        //    PhotoCameraModel photoCameraModel(0.02, 0.015, 0.0225);
+        auto photoCameraModel = CreatePhotoCameraModelFromGui();
+        UpdateCalculationParamsFromGui();
+        AreaPhotoRegion region(pathAoI);
+        m_apPhotoPlanner.reset(new AreaPhotoPlanner(uavModel, photoCameraModel, region));
+        dynamic_cast<AreaPhotoPlanner *>(m_apPhotoPlanner.get())->Calculate(altitude(), longitOverlap(), transverseOverlap(), azimuth(),  1);
 
-    UpdatePhotoPlannerDraw();
+        UpdatePhotoPlannerDraw();
+    }
+    catch (const std::exception &exc) {
+        QMessageBox::critical(nullptr, "Calculation error", exc.what());
+    }
 }
 
 void PhotoPlan::UpdatePhotoPlannerDraw()

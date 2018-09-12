@@ -34,6 +34,7 @@ class PhotoPlan : public QObject
 
     Q_PROPERTY(quint32 linearWidth READ linearWidth WRITE setLinearWidth NOTIFY linearWidthChanged)
     Q_PROPERTY(quint32 linearRuns READ linearRuns WRITE setLinearRuns NOTIFY linearRunsChanged)
+    Q_PROPERTY(bool linearUseReverseDirection READ linearUseReverseDirection WRITE setLinearUseReverseDirection NOTIFY linearUseReverseDirectionChanged)
 
     Q_PROPERTY(QVariantList track READ track NOTIFY trackChanged)
     Q_PROPERTY(QVariantList photoCenters READ photoCenters NOTIFY photoCentersChanged)
@@ -117,6 +118,9 @@ public:
     quint32 linearRuns() const;
     void setLinearRuns(const quint32 value);
 
+    bool linearUseReverseDirection() const;
+    void setLinearUseReverseDirection(const bool value);
+
     qreal maxRoll() const;
     void setMaxRoll(const qreal value);
 
@@ -153,6 +157,7 @@ signals:
     void speedChanged();
     void linearWidthChanged();
     void linearRunsChanged();
+    void linearUseReverseDirectionChanged();
     void maxRollChanged();
     void uavManeuverRChanged();
     void trackChanged();
@@ -188,7 +193,7 @@ private:
 
     quint32 m_linearWidth = 100;
     quint32 m_linearRuns = 1;
-
+    bool m_linearUseReverseDirection = false;
 
     QVector<QGeoCoordinate> m_photoCenters;
     QVector<QGeoCoordinate> m_sourceTrack;
