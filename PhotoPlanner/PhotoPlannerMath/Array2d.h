@@ -18,12 +18,14 @@ public:
     auto Data() { return data_.data(); }
     auto Data() const { return data_.data(); }
 
-    void SetItems(auto &&setter) {
+    template <typename TItemSetter>
+    void SetItems(TItemSetter &&setter) {
         for(size_t iRow = 0; iRow < rows_; iRow++)
             for(size_t iCol = 0; iCol < cols_; iCol++)
                 Item(iRow, iCol) = setter(iRow, iCol);
     }
-    void IterateItems (auto &&itemFun) const {
+    template <typename TItemFun>
+    void IterateItems (TItemFun &&itemFun) const {
         for(size_t iRow = 0; iRow < rows_; iRow++)
             for(size_t iCol = 0; iCol < cols_; iCol++)
                 itemFun(iRow, iCol, Item(iRow, iCol));

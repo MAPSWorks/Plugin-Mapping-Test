@@ -93,7 +93,8 @@ private:
         return TurnPointData{turnPoint, isTurnRight};
     }
 
-    AligmentResult CalculateOneSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
+    template <typename TTurnInfo>
+    AligmentResult CalculateOneSideLine(TTurnInfo &&turn1, TTurnInfo &&turn2, qreal R, qreal &length) {
         auto az = Azimuth(turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? 270 : 90));
         auto t1mnv = turn1.center.atDistanceAndAzimuth(R, az);
         auto t2mnv = turn2.center.atDistanceAndAzimuth(R, az);
@@ -119,7 +120,9 @@ private:
 
         return result;
     }
-    AligmentResult CalculateTwoSideLine(auto &&turn1, auto &&turn2, qreal R, qreal &length) {
+
+    template <typename TTurnInfo>
+    AligmentResult CalculateTwoSideLine(TTurnInfo &&turn1, TTurnInfo &&turn2, qreal R, qreal &length) {
         auto halfDistance = turn1.center.distanceTo(turn2.center) / 2.0;
         auto deltaAz = R2D(acos(R/halfDistance));
         auto az = turn1.center.azimuthTo(turn2.center) + (turn1.isTurnRight ? -deltaAz : deltaAz);
@@ -147,7 +150,8 @@ private:
         return result;
     }
 
-    void AddManeuverTurn(GeoPoints &points, qreal R, auto &&turn, Azimuth az1A, Azimuth az2A) {
+    template <typename TTurnInfo>
+    void AddManeuverTurn(GeoPoints &points, qreal R, TTurnInfo &&turn, Azimuth az1A, Azimuth az2A) {
         if (az1A == az2A)
             return;
 
